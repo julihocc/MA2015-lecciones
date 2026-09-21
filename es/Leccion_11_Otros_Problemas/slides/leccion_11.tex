@@ -1,0 +1,262 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{11}{Otros Problemas Comunes}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 08 estableció que por lo general no se puede saber si una corrida tuvo éxito. Estos dos problemas son el caso raro en que una comprobación lo zanja.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Un objetivo verificable puede ser una regla de parada (residual 0, conflictos 0).
+    \item Cuando la restricción es el objetivo, el paisaje cerca de la respuesta es una meseta.
+    \item Una caja finita de enteros se puede enumerar; eso responde preguntas que un AG no puede.
+\end{itemize}
+\end{frame}
+
+% ================= coloreado_01_el_grafo =================
+\begin{frame}{Testigos y certificados}
+\[
+R(x,y,z)=|f|+|g|+|w|,\quad (x,y,z)\in[-20,20]^3\cap\mathbb Z^3,
+\quad |\mathcal X|=41^3=68{,}921,
+\]
+\[
+C(c)=\sum_{(u,v)\in E}I[c_u=c_v],\quad
+|\mathcal C|=3^{30}=205{,}891{,}132{,}094{,}649,\quad
+\mathbb E[C]=|E|/3.
+\]
+Residuo o conflictos cero es un testigo. La enumeración y el retroceso exacto
+añaden certificados de unicidad o imposibilidad que una corrida exitosa no da.
+\end{frame}
+
+\section{Cuando la restricción es el objetivo completo}
+
+\begin{frame}{Cuando la restricción es el objetivo completo}
+El coloreado de grafos es lo opuesto al sistema de ecuaciones. Allí el objetivo era
+una cantidad más o menos suave a minimizar; aquí lo único que se mide es una
+restricción violada. La aptitud es el número negado de aristas cuyos dos extremos comparten
+un color, por lo que un coloreado legal y un coloreado óptimo son el mismo objeto y
+no hay nada que optimizar una vez que lo alcanzas.
+\end{frame}
+
+\marcoresultado{Cuando la restricción es el objetivo completo}{../figures/coloreado_01_el_grafo.png}{%
+    30 vértices, 64 aristas distintas, grado medio 4.27, y 3³⁰ = 205,891,132,094,649 coloreados. Un coloreado aleatorio en la semilla 7 rompe 26 de las 64 aristas}
+
+% ================= coloreado_02_poblacion_aleatoria =================
+\section{La línea base que provee la suerte}
+
+\begin{frame}{La línea base que provee la suerte}
+Un coloreado aleatorio asigna cada uno de los tres colores de forma independiente, así que cada arista
+tiene una posibilidad entre tres de romperse. Eso da una cantidad esperada de conflictos
+de |E|/3 antes de ejecutar nada, y la muestra debería acercarse a ello. Lo que importa
+es el otro extremo del histograma: el mejor de 500 coloreados aleatorios, y qué
+tan lejos está todavía del 0 que exige el problema.
+\end{frame}
+
+\begin{frame}[fragile]{(1) poblacion\_aleatoria()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=86,lastline=90]{../src/coloreado_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la muestra}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=93,lastline=101]{../src/coloreado_02_poblacion_aleatoria.py}
+\end{frame}
+
+\marcoresultado{La línea base que provee la suerte}{../figures/coloreado_02_poblacion_aleatoria.png}{%
+    /3 = 21.33`, y la mejor extracción aún rompe 11 aristas (17.2\%)}
+
+% ================= coloreado_03_operadores_basados_en_aptitud =================
+\section{Operadores que consultan la función de aptitud}
+
+\begin{frame}{Operadores que consultan la función de aptitud}
+En una meseta, un operador ciego es como lanzar una moneda. La respuesta de Gridin para este problema
+es dejar que los operadores miren antes de saltar: una cruza que conserva los mejores
+dos de \{ambos hijos, ambos padres\}, y una mutación que prueba algunos recoloreados
+aleatorios y se queda con uno solo si reduce el conteo de conflictos. Ambos son
+codiciosos (greedy), y la codicia es una elección real con un costo real, así que hay que medirlo en lugar de
+solo afirmarlo.
+\end{frame}
+
+\begin{frame}[fragile]{(1) cruza\_n\_puntos()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=95,lastline=107]{../src/coloreado_03_operadores_basados_en_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_basada\_en\_aptitud\_n\_puntos()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=110,lastline=118]{../src/coloreado_03_operadores_basados_en_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutacion\_basada\_en\_aptitud\_cambio\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=121,lastline=133]{../src/coloreado_03_operadores_basados_en_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) el experimento}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=136,lastline=162]{../src/coloreado_03_operadores_basados_en_aptitud.py}
+\end{frame}
+
+\marcoresultado{Operadores que consultan la función de aptitud}{../figures/coloreado_03_operadores_basados_en_aptitud.png}{%
+    La cruza sencilla de dos puntos mueve la media de la población en +0.03 aristas; la versión basada en aptitud en −2.32. El recoloreado codicioso mueve la media en −1.02 pero deja intactos 206 de los 500 individuos, y su mejor individuo (11) es *peor* que el mejor de un recoloreado ciego (9)}
+
+% ================= coloreado_04_busqueda_completa =================
+\section{La búsqueda que no termina, y la que sí}
+
+\begin{frame}{La búsqueda que no termina, y la que sí}
+Este es el paso para el que se construyó la lección. El algoritmo genético se ensambla y
+se ejecuta, y en la mayoría de las semillas se detiene a una o dos aristas de un coloreado legal y
+se queda ahí por el resto de su presupuesto - la meseta que el paso 1 predijo.
+Luego, diez líneas de backtracking resuelven la misma pregunta de inmediato, y también prueban
+que dos colores son imposibles, lo cual ninguna cantidad de ejecución del AG podría haber
+establecido.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_rango\_con\_elite()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=139,lastline=158]{../src/coloreado_04_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=161,lastline=187]{../src/coloreado_04_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) coloreado\_exacto()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=190,lastline=227]{../src/coloreado_04_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) el barrido de semillas}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=230,lastline=241]{../src/coloreado_04_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda que no termina, y la que sí}{../figures/coloreado_04_busqueda_completa.png}{%
+    \textbf{1 de 4 semillas} alcanza un coloreado legal (semilla 11, generación 15). Las semillas 7 y 16 se estancan en 2 conflictos y la semilla 1 en 1 conflicto, todas aún atascadas después de las 200 generaciones completas. El backtracking encuentra un 3-coloreado adecuado en 40 nodos de búsqueda y prueba que no existe ningún 2-coloreado en 4 nodos — 0.69 ms para ambos}
+
+% ================= ecuaciones_01_el_sistema =================
+\section{Un problema cuya respuesta puede verificarse}
+
+
+
+\marcoresultado{Un problema cuya respuesta puede verificarse}{../figures/ecuaciones_01_el_sistema.png}{%
+    Los genes son enteros en \texttt{[-20, 20]}, así que el espacio completo es de 68,921 tripletas. Los residuales son enteros, no flotantes: a lo largo de la línea \texttt{(y, z) = (1, 1)} van de 3 dígitos en \texttt{x = 2} a 31 dígitos en \texttt{x = 20}}
+
+% ================= ecuaciones_02_poblacion_aleatoria =================
+\section{Lo que vale una muestra aleatoria aquí}
+
+\begin{frame}{Lo que vale una muestra aleatoria aquí}
+Antes de ejecutar un algoritmo genético, averigua qué se logra solo con suerte. En la lección 09
+el muestreo aleatorio fue una línea base respetable. Aquí no lo es, y la razón es
+visible en un histograma: el residual se mide en dígitos decimales, por lo que una extracción
+que parece cercana sigue estando astronómicamente lejos.
+\end{frame}
+
+\begin{frame}[fragile]{(1) tripleta\_aleatoria()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=75,lastline=79]{../src/ecuaciones_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la muestra}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=82,lastline=92]{../src/ecuaciones_02_poblacion_aleatoria.py}
+\end{frame}
+
+\marcoresultado{Lo que vale una muestra aleatoria aquí}{../figures/ecuaciones_02_poblacion_aleatoria.png}{%
+    400 extracciones uniformes (0.58\% de la caja) encuentran 0 soluciones; el mejor es \texttt{(0, 1, 2)} con residual 453, mientras que la extracción mediana tiene un residual de 957 dígitos y la peor 14,187 dígitos}
+
+% ================= ecuaciones_03_ag_completo =================
+\section{El algoritmo genético lo resuelve}
+
+\begin{frame}{El algoritmo genético lo resuelve}
+Nada aquí es maquinaria nueva: la selección por rango con elitismo vino de la lección 03,
+la cruza blend de la lección 04, la desviación gaussiana de la lección 05. Lo que es nuevo
+es la regla de parada. Todas las demás lecciones se detuvieron después de un presupuesto fijo porque
+no podían decir si habían ganado. Esta se detiene cuando el residual es cero,
+porque eso es una prueba.
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=88,lastline=99]{../src/ecuaciones_03_ag_completo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) seleccion\_rango\_con\_elite()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=102,lastline=123]{../src/ecuaciones_03_ag_completo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) cruza\_blend()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=126,lastline=139]{../src/ecuaciones_03_ag_completo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) mutacion\_desviacion\_aleatoria()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=142,lastline=151]{../src/ecuaciones_03_ag_completo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=154,lastline=187]{../src/ecuaciones_03_ag_completo.py}
+\end{frame}
+
+\marcoresultado{El algoritmo genético lo resuelve}{../figures/ecuaciones_03_ag_completo.png}{%
+    La semilla 3 alcanza un residual de 0 en la generación 5 después de 2,794 evaluaciones, en \texttt{x = -6, y = 2, z = 3}; \texttt{f}, \texttt{g} y \texttt{w} son cada una individualmente 0}
+
+% ================= ecuaciones_04_busqueda_exhaustiva =================
+\section{El método que no necesita un algoritmo genético}
+
+\begin{frame}{El método que no necesita un algoritmo genético}
+Los genes son enteros y la caja es finita, así que todo el espacio de búsqueda puede
+ser recorrido. Este es el paso donde el curso finalmente hace la pregunta que ha estado
+evadiendo: dado que un algoritmo genético es una heurística, ¿cuándo es la herramienta
+incorrecta? La respuesta aquí no es la que sugieren los conteos de evaluación, y el
+paso está escrito alrededor de lo que el código realmente mide.
+\end{frame}
+
+\begin{frame}[fragile]{(1) enumerar\_caja()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=179,lastline=199]{../src/ecuaciones_04_busqueda_exhaustiva.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=145,lastline=145]{../src/ecuaciones_04_busqueda_exhaustiva.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la comparación}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=202,lastline=216]{../src/ecuaciones_04_busqueda_exhaustiva.py}
+\end{frame}
+
+\marcoresultado{El método que no necesita un algoritmo genético}{../figures/ecuaciones_04_busqueda_exhaustiva.png}{%
+    Las 5 semillas probadas encuentran la misma raíz, en 5–28 generaciones y 2,794–13,764 evaluaciones. Enumerar la caja cuesta 68,921 evaluaciones (alrededor de 10× más, aproximadamente 3.7 s) y devuelve estrictamente más: hay \textbf{exactamente una} raíz en la caja}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+El sistema tiene exactamente una raíz en la caja. El AG la encuentra más barato que la enumeración, pero no prueba unicidad. Colorear tiene 205 billones de asignaciones, y el retroceso exacto certifica tres colores y descarta dos.
+
+\vspace{0.8em}
+\textbf{Lección 12 --- El algoritmo genético adaptativo}
+
+Los ajustes fijos afinados de la 07, el TSP de la 10, presupuesto igual de evaluaciones. Adaptar es un seguro contra una constante mala, no un reemplazo del ajuste.
+\end{frame}
+\end{document}

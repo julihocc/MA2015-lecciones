@@ -1,0 +1,275 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{04}{Cruza}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 03 abrió la selección sobre una generación. Sigue la cruza, todavía sobre dos padres fijos, con un solo instrumento.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Una cruza se define por los hijos que puede alcanzar.
+    \item Más puntos de corte no es un dial de fuerza.
+    \item Cortar-y-copiar copia valores parentales; el blend calcula otros --- y se sale del intervalo.
+\end{itemize}
+\end{frame}
+
+% ================= descendencia_01_dos_padres =================
+\begin{frame}{El alcance es el soporte del operador}
+Para BLX-\(\alpha\), sean \(m=\min(a,b)\), \(M=\max(a,b)\) y \(d=M-m\):
+\[
+x'\sim U[m-\alpha d,\,M+\alpha d],\qquad
+\Pr(x'\notin[m,M])=\frac{2\alpha}{1+2\alpha}.
+\]
+La cruza uniforme tiene \(2^L\) primeros hijos posibles si todos los pares
+parentales difieren; la lineal alcanza dos hijos afines. Los cortes canónicos de
+(n) puntos usan (1,\ldots,L-1), pero este código excluye (L-1).
+Muestrear ilustra el alcance; enumerar fija su cardinalidad. OX1 conserva
+pertenencia y unicidad de una permutación.
+\end{frame}
+
+\section{Dos padres, y cómo medir lo que un operador les hace}
+
+\begin{frame}{Dos padres, y cómo medir lo que un operador les hace}
+La cruza es el operador que toma dos cromosomas y devuelve dos nuevos.
+Nada más en un algoritmo genético crea una combinación que no estaba ahí
+antes, por lo que toda la lección gira en torno a una pregunta: DADOS ESTOS DOS PADRES,
+¿CUÁL ES EL CONJUNTO DE HIJOS QUE UN OPERADOR PUEDE PRODUCIR?
+\end{frame}
+
+\marcoresultado{Dos padres, y cómo medir lo que un operador les hace}{../figures/descendencia_01_dos_padres.png}{%
+    La fila cero: 2 hijos alcanzados, 0.00\% genes nuevos, 100.00\% clones, 100.00\% legales. También el número contra el que se mide cada paso posterior: elegir libremente entre los padres permite 2⁶ = \textbf{64} cromosomas}
+
+% ================= descendencia_02_un_punto =================
+\section{Cruza de un punto, y el tamaño de su alcance}
+
+\begin{frame}{Cruza de un punto, y el tamaño de su alcance}
+El operador de libro de texto: cortar a ambos padres en el mismo punto, intercambiar las colas. Vale
+la pena comenzar aquí no porque sea el mejor sino porque su conjunto alcanzable es lo
+suficientemente pequeño como para escribirlo completo - que es la única manera de ver lo que el
+operador puede y no puede hacer.
+\end{frame}
+
+\begin{frame}[fragile]{(1) cruza\_un\_punto()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=129,lastline=141]{../src/descendencia_02_un_punto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) el conjunto alcanzable}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=149,lastline=181]{../src/descendencia_02_un_punto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la figura de cortes}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=184,lastline=209]{../src/descendencia_02_un_punto.py}
+\end{frame}
+
+\marcoresultado{Cruza de un punto, y el tamaño de su alcance}{../figures/descendencia_02_un_punto.png}{%
+    2,000 extracciones producen \textbf{10} hijos distintos; enumerar los 5 puntos de corte produce los mismos 10. \textbf{0.00\%} genes nuevos: el operador elige qué padre, nunca qué valor}
+
+\marcoresultado{El mecanismo: un corte, dos hijos}{../figures/descendencia_02_un_punto_esquema.png}{%
+    Corte tras el gen 3. Los genes azules vienen del padre 1, los rojos del padre 2.
+    El hijo es un padre hasta el corte y el otro después. Ningún gen se inventa.}
+
+% ================= descendencia_03_mas_cortes =================
+\section{Más puntos de corte, y lo que la familia nunca puede hacer}
+
+\begin{frame}{Más puntos de corte, y lo que la familia nunca puede hacer}
+Si un corte es bueno, ¿son tres mejor? Medido en este par la respuesta es no,
+y la razón vale más que la respuesta. Lo que separa a los miembros de esta
+familia no es cuántos cortes hacen sino cuántas de las 64 combinaciones de los
+genes de los padres pueden realmente alcanzar: la cruza uniforme llega a todas,
+los operadores de n puntos llegan a unas pocas.
+\end{frame}
+
+\begin{frame}[fragile]{(1) cruza\_n\_puntos()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=147,lastline=167]{../src/descendencia_03_mas_cortes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_uniforme()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=170,lastline=187]{../src/descendencia_03_mas_cortes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la tabla de alcance}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=195,lastline=242]{../src/descendencia_03_mas_cortes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la figura de patrones}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=245,lastline=267]{../src/descendencia_03_mas_cortes.py}
+\end{frame}
+
+\marcoresultado{Más puntos de corte, y lo que la familia nunca puede hacer}{../figures/descendencia_03_mas_cortes.png}{%
+    El alcance no es monótono en los cortes: un punto \textbf{10}, 2 puntos \textbf{12}, 3 puntos \textbf{8}, uniforme \textbf{64 de 64}. El precio de la uniforme: \textbf{3.20\%} de sus hijos son un padre devuelto}
+
+% ================= descendencia_04_mezcla =================
+\section{Aritmética sobre genes, y los primeros hijos ilegales}
+
+\begin{frame}{Aritmética sobre genes, y los primeros hijos ilegales}
+Cada operador hasta ahora elegía entre los genes de los padres. Estos dos
+calculan nuevos valores - lo cual solo es posible porque un gen aquí es un
+NÚMERO, y los números pueden promediarse, interpolarse y extrapolarse. Esa
+única suposición sobre la representación es lo que el paso 6 quitará.
+\end{frame}
+
+\begin{frame}[fragile]{(1) acotar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=179,lastline=188]{../src/descendencia_04_mezcla.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_mezcla()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=191,lastline=222]{../src/descendencia_04_mezcla.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) cruza\_lineal()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=225,lastline=246]{../src/descendencia_04_mezcla.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la tabla de alcance}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=254,lastline=340]{../src/descendencia_04_mezcla.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) la figura de mezcla}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=343,lastline=372]{../src/descendencia_04_mezcla.py}
+\end{frame}
+
+\marcoresultado{Aritmética sobre genes, y los primeros hijos ilegales}{../figures/descendencia_04_mezcla.png}{%
+    Los primeros genes calculados (\textbf{99.57\%} nuevos) y los primeros hijos ilegales. alpha = 0: \textbf{0.00\%} de genes más allá de los padres, 100\% legal — El colapso interno de la Lección 01, medido. alpha = 0.5: \textbf{49.63\%} más allá, solo \textbf{50.08\%} legal; con \texttt{acotar()}, 100\% legal y aún 49.63\% más allá. Lineal: 100.00\% genes nuevos y exactamente \textbf{2} hijos alcanzables}
+
+% ================= descendencia_05_guiada_por_aptitud =================
+\section{Dejar que el operador vea lo que produjo}
+
+\begin{frame}{Dejar que el operador vea lo que produjo}
+Cada operador hasta ahora era ciego: producía dos hijos y los entregaba
+sin preguntar si eran buenos. La variante guiada por aptitud de Gridin
+agrega una línea - clasifica los dos padres y los dos hijos juntos, devuelve
+los mejores dos - y con ella la garantía de que la cruza nunca puede empeorar
+el par.
+\end{frame}
+
+\begin{frame}[fragile]{(1) objetivo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=182,lastline=191]{../src/descendencia_05_guiada_por_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_guiada\_por\_aptitud()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=194,lastline=213]{../src/descendencia_05_guiada_por_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) los sobrevivientes}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=221,lastline=290]{../src/descendencia_05_guiada_por_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la figura de aptitud}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=293,lastline=324]{../src/descendencia_05_guiada_por_aptitud.py}
+\end{frame}
+
+\marcoresultado{Dejar que el operador vea lo que produjo}{../figures/descendencia_05_guiada_por_aptitud.png}{%
+    La mezcla ciega es peor que sus padres en \textbf{41.70\%} de las extracciones — la cruza no garantiza nada. La regla guiada por aptitud es peor en \textbf{0.00\%}, y paga por ello: \textbf{16.50\%} de las extracciones devuelven a los padres sin cambios, y solo el \textbf{56.10\%} de lo que devuelve es un hijo}
+
+% ================= descendencia_06_la_division =================
+\section{Los mismos operadores, en un cromosoma que es una permutación}
+
+\begin{frame}{Los mismos operadores, en un cromosoma que es una permutación}
+Nada de los operadores cambia en este paso. El cromosoma cambia: nueve genes
+en lugar de seis, y los genes son las nueve paradas de una ronda de entregas,
+cada una de las cuales debe aparecer exactamente una vez.
+\end{frame}
+
+\begin{frame}[fragile]{(1) las nueve paradas}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=196,lastline=217]{../src/descendencia_06_la_division.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) longitud\_recorrido()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=220,lastline=225]{../src/descendencia_06_la_division.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) es\_legal\_recorrido()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=228,lastline=244]{../src/descendencia_06_la_division.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) los mismos operadores}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=252,lastline=328]{../src/descendencia_06_la_division.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) la figura del mapa}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=331,lastline=364]{../src/descendencia_06_la_division.py}
+\end{frame}
+
+\marcoresultado{Los mismos operadores, en un cromosoma que es una permutación}{../figures/descendencia_06_la_division.png}{%
+    Los mismos operadores, una ruta en lugar de un punto. \textbf{8 de 8} puntos de corte dan una ruta que visita una parada dos veces y otra ninguna. Hijos legales: un punto \textbf{0.00\%}, 3 puntos \textbf{0.00\%}, mezcla \textbf{0.00\%}, lineal \textbf{0.00\%}, uniforme \textbf{0.95\%} — y el recuento de hijos legales de la uniforme que no eran simplemente un padre es \textbf{0}}
+
+% ================= descendencia_07_ordenada =================
+\section{Cruza ordenada, y la división leída en ambas direcciones}
+
+\begin{frame}{Cruza ordenada, y la división leída en ambas direcciones}
+La cruza ordenada (OX1) es la respuesta al paso 6: nunca intercambia valores de genes
+posición a posición, así que una permutación entra y una permutación sale, por
+construcción en lugar de por suerte. Este paso verifica que es legal, verifica lo que
+realmente hereda, y luego hace lo que cierra la lección - entrega OX1 los padres de
+valores reales del paso 1 y observa qué pasa.
+\end{frame}
+
+\begin{frame}[fragile]{(1) cruza\_ordenada()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=233,lastline=263]{../src/descendencia_07_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la prueba de adyacencia}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=271,lastline=329]{../src/descendencia_07_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la otra dirección}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=332,lastline=355]{../src/descendencia_07_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la comparación completa}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=358,lastline=425]{../src/descendencia_07_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) la figura de la división}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=428,lastline=449]{../src/descendencia_07_ordenada.py}
+\end{frame}
+
+\marcoresultado{Cruza ordenada, y la división leída en ambas direcciones}{../figures/descendencia_07_ordenada.png}{%
+    OX1 es legal el \textbf{100.00\%} en las rutas y mantiene \textbf{7.17 de 9} tramos de los padres, frente a \textbf{3.71} de una ruta aleatoria. Al recibir los padres con valores reales no falla: alcanza \textbf{2} hijos, el \textbf{100.00\%} de ellos un padre. Tabla final: operadores útiles en ambas representaciones — \textbf{0}}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+En una ruta de nueve paradas, un punto, n puntos, blend y lineal producen un hijo legal el 0\% de las veces. La cruza ordenada es legal el 100\% en rutas y en genes reales devuelve a los padres en silencio. Cero operadores sirven en las dos.
+
+\vspace{0.8em}
+\textbf{Lección 05 --- Mutación}
+
+El tercer operador. OX1 en un tour fue un no-op silencioso aquí; esa cuenta se paga en la Lección 10, donde el orden es el cromosoma.
+\end{frame}
+\end{document}

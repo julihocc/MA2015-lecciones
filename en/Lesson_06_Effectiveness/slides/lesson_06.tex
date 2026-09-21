@@ -1,0 +1,190 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{06}{Effectiveness}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 03 postponed run-level evidence for selection pressure. This lesson is that instrument: success rate, uncertainty, budget.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item A success rate needs a verdict from outside the run, and a target with volume.
+    \item One plug-in standard error is tens of points at eight runs and about one at a thousand; it is not a confidence interval.
+    \item Effectiveness and efficiency pull opposite ways.
+\end{itemize}
+\end{frame}
+
+% ================= success_rate_01_one_run =================
+\begin{frame}{A rate is an estimate}
+For \(s\) successes in \(n\) independent runs,
+\[
+\hat p=\frac{s}{n},\qquad
+\widehat{\operatorname{SE}}(\hat p)=
+\sqrt{\frac{\hat p(1-\hat p)}{n}}.
+\]
+This is one estimated standard deviation, not a confidence interval. The lesson
+also reports a 95\% Wilson interval, which still expresses uncertainty at
+0/\(n\) or \(n\)/\(n\). The grid optimum is a sampled reference.
+\end{frame}
+
+\begin{frame}{The 95\% Wilson interval}
+With (z=1.96), let
+\[
+d=1+z^2/n,\quad c=\frac{\hat p+z^2/(2n)}d,\quad
+h=\frac z d\sqrt{\frac{\hat p(1-\hat p)}n+\frac{z^2}{4n^2}}.
+\]
+The interval is ([c-h,c+h]). Unlike the plug-in SE alone, it remains
+non-degenerate at 0 successes or all successes.
+\end{frame}
+
+\section{One run, and what it is worth}
+
+\begin{frame}{One run, and what it is worth}
+Every lesson so far ended by reading a single run. Lesson 01 read one run and
+concluded the algorithm works; Lesson 02 read one run and concluded a stopping
+rule is free; Lesson 03 and Lesson 05 both closed with an open question they
+could not answer, and both questions had the same shape: does this change help,
+over runs? This lesson is the machinery for answering that, and it starts by
+showing why the question cannot be dodged.
+\end{frame}
+
+\resultframe{One run, and what it is worth}{../figures/success_rate_01_one_run.png}{%
+    Spread across seeds is 0.8946 — 1.5× the tracked run's whole gain (+0.5822); seed 3 reports -0.0129, seed 4 reports -0.9076, and both reports are true}
+
+% ================= success_rate_02_the_verdict =================
+\section{What counts as success}
+
+\begin{frame}{What counts as success}
+Step 1 showed eight answers to one question. Before they can be averaged into
+anything, one word has to be defined: success. A run cannot judge itself - it
+reports the best thing it found, never how good that was - so the judgement has
+to come from outside, and Lesson 02 step 5 built exactly that instrument: brute
+force the landscape on a grid, and measure every run against the result. It also
+left a warning attached to it, in its own closing lines: that reference "works
+because x is one number; from Lesson 08 onwards it is not, and the honest answer
+to 'did this run succeed?' becomes genuinely hard to get".
+\end{frame}
+
+\begin{frame}[fragile]{(1) brute\_force\_optimum()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=178,lastline=196]{../src/success_rate_02_the_verdict.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) TOLERANCE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=199,lastline=210]{../src/success_rate_02_the_verdict.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) within\_tolerance\_share()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=213,lastline=247]{../src/success_rate_02_the_verdict.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) SINE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=86,lastline=101]{../src/success_rate_02_the_verdict.py}
+\end{frame}
+
+\resultframe{What counts as success}{../figures/success_rate_02_the_verdict.png}{%
+    The 2-D optimum is real (+0.500000) but occupies 0.003197\% of the grid — all 128 winning points sit exactly on y = 10 — so 0 of 8 runs "succeed"; on sine 1-D the target is 1.4299\% of the box (0.286 wide) and 5 of 8 runs find it: 62.5\% ± 17.1\%}
+
+% ================= success_rate_03_a_thousand_runs =================
+\section{A thousand runs}
+
+\begin{frame}{A thousand runs}
+Step 2 ended with a success rate measured on eight runs - 62.5\% - and a
+warning about what such a rate is worth: if 62.5\% were the true rate, the
+count in 8 runs would still wander by 1.4 runs from one experiment to the
+next. This step pays that warning off. It runs the experiment a thousand
+times, the way Gridin's Chapter 6 does, and replaces the anecdote with a
+measurement: a rate, its standard error, and the full distribution of
+answers behind it.
+\end{frame}
+
+\begin{frame}[fragile]{(1) success\_rate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=185,lastline=198]{../src/success_rate_03_a_thousand_runs.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) standard\_error()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=201,lastline=211]{../src/success_rate_03_a_thousand_runs.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) RUNS = 1000}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=53,lastline=53]{../src/success_rate_03_a_thousand_runs.py}
+\end{frame}
+
+\resultframe{A thousand runs}{../figures/success_rate_03_a_thousand_runs.png}{%
+    The observed rate is 79.4\%; one plug-in SE is 1.3\% and the script reports a separate 95\% Wilson interval. The 8-run estimate differs by 16.9 points; 71/1000 runs end on Lesson 01's local peak at x = -4.51}
+
+% ================= success_rate_04_the_budget =================
+\section{The budget}
+
+\begin{frame}{The budget}
+Step 3 measured effectiveness: a success rate of 79.4\% at population 10, and
+it closed with the question a rate cannot answer - what did those evaluations
+cost, and were they well spent? This step counts them. Gridin's Chapter 6
+does it with a class attribute on Individual that counts every fitness
+evaluation, and with a sweep of population sizes that plots the final fitness
+against the number of individuals evaluated.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the evaluation counter}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=77,lastline=98]{../src/success_rate_04_the_budget.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the population sweep}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=211,lastline=235]{../src/success_rate_04_the_budget.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) blind\_success()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=193,lastline=203]{../src/success_rate_04_the_budget.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) RUNS = 500}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=54,lastline=54]{../src/success_rate_04_the_budget.py}
+\end{frame}
+
+\resultframe{The budget}{../figures/success_rate_04_the_budget.png}{%
+    Population 10→30: success 80.0\%→99.4\%, cost 100→300 evaluations, yield falls 8.00→3.31 successes per 1000 evaluations; blind draws at equal budget reach 76.2\% and 98.7\% — the GA's margin is +3.8 and +0.7 points}
+
+\section{Next}
+
+\begin{frame}{Next}
+On a wide target the GA barely beats blind search at equal budget --- a property of the problem, not a defect of the algorithm.
+
+\vspace{0.8em}
+\textbf{Lesson 07 --- Parameter Tuning}
+
+The same instruments, now on the three knobs: crossover, mutation, population. Every knob is secretly a budget knob until evaluations are counted.
+\end{frame}
+\end{document}

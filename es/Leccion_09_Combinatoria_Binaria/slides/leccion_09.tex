@@ -1,0 +1,370 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{09}{Optimización Combinatoria Binaria}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 08 mezcló tipos en una caja que no se podía dibujar. Hoy el cromosoma es bits, y tres problemas comparten los operadores.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Mochila, horarios, radar: los mismos bits, distinto significado, distinta factibilidad.
+    \item Reparar cambia la distribución que se busca; no es plomería gratis.
+    \item Las instancias chicas hay que comprobarlas exactamente.
+\end{itemize}
+\end{frame}
+
+% ================= knapsack_01_la_instancia =================
+\begin{frame}{Tres modelos binarios}
+\small
+\textbf{Mochila:}\quad
+\(\max\sum_i v_ix_i\) sujeto a \(\sum_i w_ix_i\le C\).\par
+\medskip
+\textbf{Radar:}\quad
+\(\min\;U(x)(|S|+1)+\sum_i x_i\). Como a lo sumo hay \(|S|\) radares,
+reducir en uno el número de objetivos sin cobertura domina cualquier cambio de cantidad.\par
+\medskip
+\textbf{Horarios:}\quad
+\(\min\sum_{eds}c_{eds}x_{eds}\), con
+\(\sum_e x_{eds}=d_s\) y \(\sum_{ds}x_{eds}\le5\).
+Reparar cambia la distribución que realmente se busca.
+\end{frame}
+
+\section{La instancia}
+
+\begin{frame}{La instancia}
+Cada bit responde a una pregunta: tomar este artículo o dejarlo. Antes de introducir un
+AG, enumere esta instancia deliberadamente pequeña para que las ejecuciones posteriores tengan una
+respuesta honesta contra la cual comparar.
+\end{frame}
+
+\marcoafirmacion{La instancia}{%
+    La instancia de 12 artículos tiene 4,096 cromosomas; el óptimo exacto tiene un valor de 50 con un peso de 20}
+
+% ================= knapsack_02_poblacion_aleatoria =================
+\section{Una población aleatoria}
+
+\begin{frame}{Una población aleatoria}
+Una población aleatoria
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=69]{../src/knapsack_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) individuo\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=72,lastline=77]{../src/knapsack_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) TAMANO\_POBLACION}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=80,lastline=82]{../src/knapsack_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) el censo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=85,lastline=90]{../src/knapsack_02_poblacion_aleatoria.py}
+\end{frame}
+
+\marcoafirmacion{Una población aleatoria}{%
+    233 de 1,000 cromosomas aleatorios son factibles; el mejor valor aleatorio es 47}
+
+% ================= knapsack_03_reparacion =================
+\section{La reparación crea presión de selección}
+
+\begin{frame}{La reparación crea presión de selección}
+La reparación crea presión de selección
+\end{frame}
+
+\begin{frame}[fragile]{(1) reparar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=77,lastline=88]{../src/knapsack_03_reparacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la comparación}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=91,lastline=97]{../src/knapsack_03_reparacion.py}
+\end{frame}
+
+\marcoafirmacion{La reparación crea presión de selección}{%
+    La reparación hace factibles a 1,000/1,000 y cambia 767 cromosomas}
+
+% ================= knapsack_04_seleccion_y_cruza =================
+\section{Selección y cruza}
+
+\begin{frame}{Selección y cruza}
+Selección y cruza
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=85,lastline=88]{../src/knapsack_04_seleccion_y_cruza.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=91,lastline=97]{../src/knapsack_04_seleccion_y_cruza.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) una\_generacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=100,lastline=109]{../src/knapsack_04_seleccion_y_cruza.py}
+\end{frame}
+
+\marcoafirmacion{Selección y cruza}{%
+    Una generación eleva el valor medio de 39.00 a 40.73; todos los hijos almacenados siguen siendo factibles}
+
+% ================= knapsack_05_la_busqueda_completa =================
+\section{La búsqueda completa}
+
+\begin{frame}{La búsqueda completa}
+La búsqueda completa
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=102]{../src/knapsack_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=113,lastline=127]{../src/knapsack_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el reporte de brecha}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=130,lastline=135]{../src/knapsack_05_la_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda completa}{../figures/knapsack_05_la_busqueda_completa.png}{%
+    El AG alcanza el valor exacto 50 con un peso de 20 con brecha cero en 4,060 evaluaciones}
+
+% ================= radar_01_el_paisaje =================
+\section{Un paisaje de cobertura}
+
+\begin{frame}{Un paisaje de cobertura}
+Cada bit decide si instalar un radar en un sitio candidato. Un radar
+cubre un objetivo cuando su distancia euclidiana es a lo sumo el radio fijo.
+\end{frame}
+
+\marcoafirmacion{Un paisaje de cobertura}{%
+    Nueve sitios definen 512 planes y juntos cubren los 36 objetivos}
+
+% ================= radar_02_el_cromosoma =================
+\section{El cromosoma}
+
+\begin{frame}{El cromosoma}
+El cromosoma
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=49]{../src/radar_02_el_cromosoma.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) individuo\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=52,lastline=59]{../src/radar_02_el_cromosoma.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el censo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=62,lastline=66]{../src/radar_02_el_cromosoma.py}
+\end{frame}
+
+\marcoafirmacion{El cromosoma}{%
+    21 de 500 planes aleatorios cubren todos los objetivos}
+
+% ================= radar_03_la_penalizacion =================
+\section{Una penalización lexicográfica}
+
+\begin{frame}{Una penalización lexicográfica}
+Una penalización lexicográfica
+\end{frame}
+
+\begin{frame}[fragile]{(1) objetivo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=61]{../src/radar_03_la_penalizacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la auditoría de clasificación}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=70]{../src/radar_03_la_penalizacion.py}
+\end{frame}
+
+\marcoafirmacion{Una penalización lexicográfica}{%
+    La penalización auditada clasifica a cada plan factible por encima de cada plan no factible}
+
+% ================= radar_04_operadores =================
+\section{Operadores binarios}
+
+\begin{frame}{Operadores binarios}
+Operadores binarios
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=58,lastline=61]{../src/radar_04_operadores.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=68]{../src/radar_04_operadores.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=71,lastline=77]{../src/radar_04_operadores.py}
+\end{frame}
+
+\marcoafirmacion{Operadores binarios}{%
+    Una generación reduce el objetivo medio de 86.0 a 42.6}
+
+% ================= radar_05_la_busqueda_completa =================
+\section{La búsqueda completa}
+
+\begin{frame}{La búsqueda completa}
+La búsqueda completa
+\end{frame}
+
+\begin{frame}[fragile]{(1) optimo\_exacto()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=76,lastline=80]{../src/radar_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=83,lastline=98]{../src/radar_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el mapa de cobertura}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=110,lastline=126]{../src/radar_05_la_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda completa}{../figures/radar_05_la_busqueda_completa.png}{%
+    El AG y la enumeración exhaustiva encuentran cinco radares con cobertura completa}
+
+% ================= schedule_01_los_requisitos =================
+\section{Los requisitos}
+
+\begin{frame}{Los requisitos}
+Un bit asigna a un empleado a un turno. La instancia necesita 35 asignaciones
+en 21 turnos, mientras que ocho empleados pueden cubrir como máximo cinco turnos cada uno.
+\end{frame}
+
+\marcoafirmacion{Los requisitos}{%
+    168 bits codifican 35 asignaciones requeridas bajo la capacidad 40}
+
+% ================= schedule_02_horarios_aleatorios =================
+\section{Horarios aleatorios}
+
+\begin{frame}{Horarios aleatorios}
+Horarios aleatorios
+\end{frame}
+
+\begin{frame}[fragile]{(1) horario\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=34,lastline=39]{../src/schedule_02_horarios_aleatorios.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) violaciones()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=42,lastline=56]{../src/schedule_02_horarios_aleatorios.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el censo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=64]{../src/schedule_02_horarios_aleatorios.py}
+\end{frame}
+
+\marcoafirmacion{Horarios aleatorios}{%
+    0 de 500 horarios aleatorios son factibles; el mejor todavía tiene 14 violaciones}
+
+% ================= schedule_03_reparacion =================
+\section{Reparar las restricciones}
+
+\begin{frame}{Reparar las restricciones}
+Reparar las restricciones
+\end{frame}
+
+\begin{frame}[fragile]{(1) costo\_preferencia()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=55,lastline=59]{../src/schedule_03_reparacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) reparar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=62,lastline=94]{../src/schedule_03_reparacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la comparación}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=103]{../src/schedule_03_reparacion.py}
+\end{frame}
+
+\marcoafirmacion{Reparar las restricciones}{%
+    La reparación hace factibles a 500/500 horarios; los costos reparados van desde 58 en adelante}
+
+% ================= schedule_04_operadores =================
+\section{Operadores bajo reparación}
+
+\begin{frame}{Operadores bajo reparación}
+Operadores bajo reparación
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=84]{../src/schedule_04_operadores.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=87,lastline=92]{../src/schedule_04_operadores.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=95,lastline=106]{../src/schedule_04_operadores.py}
+\end{frame}
+
+\marcoafirmacion{Operadores bajo reparación}{%
+    Todos los 100 hijos son factibles; el costo medio cae de 77.8 a 61.2}
+
+% ================= schedule_05_la_busqueda_completa =================
+\section{La búsqueda completa}
+
+\begin{frame}{La búsqueda completa}
+La búsqueda completa
+\end{frame}
+
+\begin{frame}[fragile]{(1) una\_generacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=102,lastline=109]{../src/schedule_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=112,lastline=123]{../src/schedule_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el reporte base}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=126,lastline=131]{../src/schedule_05_la_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda completa}{../figures/schedule_05_la_busqueda_completa.png}{%
+    El AG con un costo de 41 vence al mejor de 5,100 horarios aleatorios reparados, con costo 52, con igual conteo de evaluaciones}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+El AG de la mochila da el valor exacto 50 a peso 20. El horario arranca en 0/500 factibles y aun así vence al aleatorio reparado a igual presupuesto.
+
+\vspace{0.8em}
+\textbf{Lección 10 --- Optimización combinatoria ordenada}
+
+El orden y la unicidad ahora son parte de la corrección. El OX1 que en la 04 era un no-op silencioso es aquí el operador legal.
+\end{frame}
+\end{document}

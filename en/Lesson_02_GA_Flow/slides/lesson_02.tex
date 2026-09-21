@@ -1,0 +1,210 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{02}{GA Flow}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 01 step 6, with the loop still unnamed, is reproduced here to the digit. Naming the flow must not change the answer.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Five named phases; one generation is one function.
+    \item The problem is an argument, not welded into the driver.
+    \item A cheap stopping rule reports that a run stopped improving --- not that it finished.
+\end{itemize}
+\end{frame}
+
+% ================= ga_flow_01_the_five_phases =================
+\begin{frame}{Mathematical model}
+\[
+P_{t+1}=R\!\left(M\!\left(C\!\left(S(P_t)\right)\right)\right)
+\]
+One generation is a random population transition. A patience test such as
+\(b_t-b_{t-k}<\varepsilon\) detects little recent improvement; it does not
+prove convergence and says nothing about the unknown global optimum.
+
+For \(r\lfloor(T-s|x-x_0|)/h\rfloor\), ordinary one-sided bands have width
+\(h/s=0.5\); here the top is \(|x-4|\le0.25\), width 0.5 rather than a point.
+\end{frame}
+
+\section{The flow, named}
+
+\begin{frame}{The flow, named}
+Lesson 01 finished with a genetic algorithm that worked. Its loop body, though,
+was a run of unnamed comment blocks, and you cannot discuss "the flow" when the
+flow has no name and no boundary. This step names it.
+\end{frame}
+
+\begin{frame}[fragile]{(1) evolve\_one\_generation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=94,lastline=127]{../src/ga_flow_01_the_five_phases.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=130,lastline=148]{../src/ga_flow_01_the_five_phases.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the phase trace}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=153,lastline=184]{../src/ga_flow_01_the_five_phases.py}
+\end{frame}
+
+\resultframe{The flow, named}{../figures/ga_flow_01_the_five_phases.png}{%
+    Same seed, same answer as Lesson 01: \texttt{x=+1.372 f=+0.706}. The run cost \textbf{107} fitness evaluations, not the obvious 110 — an individual selected but neither crossed nor mutated is the same object and is never re-evaluated}
+
+% ================= ga_flow_02_injected_fitness =================
+\section{The problem becomes an argument}
+
+\begin{frame}{The problem becomes an argument}
+In step 1 the word \texttt{objective} appears inside Individual. That single reference
+welds the flow to one problem: to solve a second one you would copy the file.
+The book splits \texttt{fitness.py} from \texttt{individual.py} for exactly this reason.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the two problems}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=61]{../src/ga_flow_02_injected_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) Individual(genes, f)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=69,lastline=82]{../src/ga_flow_02_injected_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the building operators}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=99,lastline=115]{../src/ga_flow_02_injected_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) run(fitness\_function)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=147,lastline=165]{../src/ga_flow_02_injected_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the two runs}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=168,lastline=190]{../src/ga_flow_02_injected_fitness.py}
+\end{frame}
+
+\resultframe{The problem becomes an argument}{../figures/ga_flow_02_injected_fitness.png}{%
+    One driver, two problems: the sine run reproduces step 1 exactly, the target run lands \textbf{0.0038} from +4.200. The only difference between the runs is which function was passed in}
+
+% ================= ga_flow_03_population_metrics =================
+\section{Measuring the population, not the leader}
+
+\begin{frame}{Measuring the population, not the leader}
+Every trace so far reports the best individual. That is the one number a GA is
+least honest about: the best can sit still for five generations while the
+population underneath it changes completely, or it can be a single lucky outlier
+in a population that has learned nothing.
+\end{frame}
+
+\begin{frame}[fragile]{(1) population\_metrics()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=67,lastline=83]{../src/ga_flow_03_population_metrics.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the history table}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=188,lastline=230]{../src/ga_flow_03_population_metrics.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the metrics figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=232,lastline=257]{../src/ga_flow_03_population_metrics.py}
+\end{frame}
+
+\resultframe{Measuring the population, not the leader}{../figures/ga_flow_03_population_metrics.png}{%
+    On the sine problem, average fitness climbs from −1.5588 to +0.6228 while gene spread falls from \textbf{6.665 to 0.064} by generation 8. The champion stands still while the population collapses underneath it}
+
+% ================= ga_flow_04_stopping_condition =================
+\section{Knowing when to stop}
+
+\begin{frame}{Knowing when to stop}
+Every run so far stopped after exactly ten generations, because ten was written
+at the top of the file. The book lists three ways to end a run: an acceptable
+solution is found, a generation count is reached, or the improvements dry up.
+Step 3 measured exactly when the improvements dry up, so the third condition is
+now available for free.
+\end{frame}
+
+\begin{frame}[fragile]{(1) MAX\_GENERATIONS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=40,lastline=40]{../src/ga_flow_04_stopping_condition.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) PATIENCE, MIN\_IMPROVEMENT}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=45,lastline=52]{../src/ga_flow_04_stopping_condition.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) stop on stagnation}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=186,lastline=195]{../src/ga_flow_04_stopping_condition.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the control runs}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=273,lastline=326]{../src/ga_flow_04_stopping_condition.py}
+\end{frame}
+
+\resultframe{Knowing when to stop}{../figures/ga_flow_04_stopping_condition.png}{%
+    The rule saves \textbf{49 to 51} of the 60 allowed generations and costs less than \texttt{MIN\_IMPROVEMENT} on both problems. It also exposes a wart: on 1 of 2 problems the final generation no longer holds the champion — nothing here protects it}
+
+% ================= ga_flow_05_stepped_landscapes =================
+\section{Stepped landscapes, and a guess that turned out wrong}
+
+\begin{frame}{Stepped landscapes, and a guess that turned out wrong}
+Step 4 priced the stopping rule on two smooth landscapes and found it free. The
+natural suspicion is that smoothness was doing the work: on a landscape where
+progress arrives in jumps instead of slopes, a flat stretch would mean the
+population has not yet found the next step, not that the search is over - and a
+patience rule cannot tell those apart.
+\end{frame}
+
+\begin{frame}[fragile]{(1) staircase()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=81,lastline=112]{../src/ga_flow_05_stepped_landscapes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) PROBLEMS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=238,lastline=242]{../src/ga_flow_05_stepped_landscapes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the verdict}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=365,lastline=436]{../src/ga_flow_05_stepped_landscapes.py}
+\end{frame}
+
+\resultframe{Stepped landscapes, and a guess that turned out wrong}{../figures/ga_flow_05_stepped_landscapes.png}{%
+    The staircase does \textbf{not} break the rule: the run reaches \texttt{+2.0000}, the landscape's dense-grid reference, and the rule stops it having lost nothing. Every one of the three problems matches its grid reference, shortfall \texttt{+0.0000}}
+
+\section{Next}
+
+\begin{frame}{Next}
+On the staircase the patience rule never quits too early: the steps rise, so every boundary is a comparison selection can act on. The hypothesis is refuted, and kept.
+
+\vspace{0.8em}
+\textbf{Lesson 03 --- Selection}
+
+The first operator to open, still on one generation of one population. Run-level evidence for pressure is postponed to Lesson 06.
+\end{frame}
+\end{document}

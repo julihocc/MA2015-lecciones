@@ -1,0 +1,228 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{12}{Adaptive GA}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 07 tuned three knobs and called a fixed setting a compromise. Lesson 10 supplied the TSP. Today the parameters are allowed to move.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item A run can sense its own stall without knowing the optimum.
+    \item The advertised adaptive branch must be audited (it may never fire).
+    \item Equal-budget, paired against a \emph{tuned} rival, not against the defaults.
+\end{itemize}
+\end{frame}
+
+% ================= tsp_01_fixed_parameters =================
+\begin{frame}{The sensor and the update}
+Let \(m_t\) be the current mean and \(\bar m\) the preceding ten-generation mean:
+\[
+\text{improving}_t=[m_t<(1-0.001)\bar m].
+\]
+Probabilities are multiplied by 0.99 while improving and 1.1 while stalled,
+then clipped. Removing an individual costs no evaluation; every immigrant does.
+Paired two-SE summaries below are approximate descriptions, not significance
+tests.
+\end{frame}
+
+\section{One run with fixed parameters}
+
+\begin{frame}{One run with fixed parameters}
+Every lesson so far has written the parameters at the top of the file as
+constants; Lesson 07 then tuned them by grid search and reported which fixed
+values were best. This lesson asks a different question: should they be fixed
+at all? A run has an early phase, when the population is spread out and the
+search needs reach, and a late phase, when the population is nearly identical
+and the search needs refinement. One constant has to serve both.
+\end{frame}
+
+\resultframe{One run with fixed parameters}{../figures/tsp_01_fixed_parameters.png}{%
+    Seed 1 spends 11,901 evaluations in 99 generations and returns a legal route of \textbf{57,076}, 40.8\% longer than the nearest-neighbour baseline of 40,526}
+
+% ================= tsp_02_the_stall =================
+\section{Finding the stall}
+
+\begin{frame}{Finding the stall}
+Step 1 spent its whole budget at one setting. This step asks where that budget
+went. The algorithm cannot see how far it is from the optimum -- it has no
+optimum to compare against -- but it can see its own recent history, and that
+is enough to tell a generation that is still making progress from one that is
+not. The signal is the book's: compare the population mean of this generation
+with the mean of the previous ten. If it has not improved by at least a tenth
+of a percent, the generation is stalled.
+\end{frame}
+
+\begin{frame}[fragile]{(1) average()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=100,lastline=109]{../src/tsp_02_the_stall.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) is\_improving()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=112,lastline=124]{../src/tsp_02_the_stall.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) stall\_trend}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=145,lastline=147]{../src/tsp_02_the_stall.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) shade\_stalls()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=180,lastline=186]{../src/tsp_02_the_stall.py}
+\end{frame}
+
+\resultframe{Finding the stall}{../figures/tsp_02_the_stall.png}{%
+    The signal calls \textbf{14 of 99} generations stalled, the first at generation 74, and 14\% of the budget is spent inside them; the first half of the budget buys \textbf{85\%} of the run's total improvement, the second half 15\%}
+
+% ================= tsp_03_adaptive_probabilities =================
+\section{Probabilities that move}
+
+\begin{frame}{Probabilities that move}
+The sensor from step 2 says, every generation, whether the population is still
+improving. This step wires it to the two probabilities: when the run stalls,
+raise them -- more recombination, more mutation, more reach; while the run
+improves, ease them down towards a floor and let selection refine what it has.
+The rule is the book's, and it is deliberately blunt: multiply by 1.1 when
+stalled, by 0.99 when improving, and clip.
+\end{frame}
+
+\begin{frame}[fragile]{(1) adaptation\_constants}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=50,lastline=56]{../src/tsp_03_adaptive_probabilities.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) adapt\_probabilities()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=128,lastline=141]{../src/tsp_03_adaptive_probabilities.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) run(adaptive)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=148,lastline=153]{../src/tsp_03_adaptive_probabilities.py}
+\end{frame}
+
+\resultframe{Probabilities that move}{../figures/tsp_03_adaptive_probabilities.png}{%
+    Same seed, same budget: adaptive \textbf{48,830} against fixed \textbf{57,076} (−14.4\%). But the stalled branch fires \textbf{0 of 99} times — crossover walks 0.90 → 0.33 and mutation 0.25 → 0.09 and never comes back up. The rule is behaving as a decay schedule, not as adaptation}
+
+% ================= tsp_04_adaptive_population =================
+\section{A population that resizes itself}
+
+\begin{frame}{A population that resizes itself}
+The second half of the book's adaptive algorithm changes the population itself.
+While the run improves it drops the worst individual, so each generation gets
+cheaper and the budget buys more of them. When the run stalls it injects fresh
+random routes -- immigrants -- so there is new material to recombine.
+\end{frame}
+
+\begin{frame}[fragile]{(1) population\_constants}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=50,lastline=54]{../src/tsp_04_adaptive_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) resize\_population()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=140,lastline=160]{../src/tsp_04_adaptive_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) run(resize)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=172,lastline=176]{../src/tsp_04_adaptive_population.py}
+\end{frame}
+
+\resultframe{A population that resizes itself}{../figures/tsp_04_adaptive_population.png}{%
+    Resizing alone: 35 stalls, 70 immigrants, 103 culls, population 68–120, \textbf{138} generations for the same budget and \textbf{49,374}. With the probabilities too: 41 stalls, population down to 40, 155 generations, crossover ranging 0.39–1.00 — resizing brings back the stalls step 3 had made disappear — and \textbf{52,295}, worse on this seed than resizing alone}
+
+% ================= tsp_05_twelve_runs =================
+\section{Twelve runs of each}
+
+\begin{frame}{Twelve runs of each}
+Steps 3 and 4 each showed one seed, and one seed decides nothing: Lesson 06
+measured the spread of this kind of result and Lesson 07 showed a parameter
+ranking flipping from seed to seed. So every regime is now run twelve times,
+run i on seed i, which makes the comparison paired -- the same twelve starting
+populations face all four regimes, and the difference can be read run by run.
+\end{frame}
+
+\begin{frame}[fragile]{(1) RUNS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=56,lastline=58]{../src/tsp_05_twelve_runs.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) measure()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=238,lastline=248]{../src/tsp_05_twelve_runs.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) paired\_summary()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=251,lastline=266]{../src/tsp_05_twelve_runs.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the\_comparison}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=276,lastline=334]{../src/tsp_05_twelve_runs.py}
+\end{frame}
+
+\resultframe{Twelve runs of each}{../figures/tsp_05_twelve_runs.png}{%
+    Over 12 paired runs (run \(i\) on seed \(i\)): fixed \textbf{58,195}, probabilities \textbf{50,145} (−8,050 ± 1,022, wins 12/12), resize \textbf{53,555} (−4,640 ± 926, 10/12), both \textbf{52,622} (−5,573 ± 1,127, 11/12). Every regime spends 11,901–11,946 evaluations. The approximate mean-difference ± two-SE intervals exclude zero here; this is descriptive, not a significance test}
+
+% ================= tsp_06_a_tuned_rival =================
+\section{The tuned rival}
+
+\begin{frame}{The tuned rival}
+Step 5 showed all three adaptive regimes beating the fixed algorithm, the best of
+them by eight thousand units of route length. But the fixed algorithm they beat was never tuned: its
+crossover and mutation probabilities were inherited from Lesson 10, where they
+were chosen for a different budget and never questioned. Lesson 07 spent a whole
+session on the right way to choose them, and the adaptive scheme has not yet
+been asked to beat that.
+\end{frame}
+
+\begin{frame}[fragile]{(1) run(rates)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=175,lastline=189]{../src/tsp_06_a_tuned_rival.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) FIXED\_SETTINGS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=63,lastline=68]{../src/tsp_06_a_tuned_rival.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the\_verdict}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=297,lastline=366]{../src/tsp_06_a_tuned_rival.py}
+\end{frame}
+
+\resultframe{The tuned rival}{../figures/tsp_06_a_tuned_rival.png}{%
+    Against four fixed settings at the same budget: 0.90/0.25 → 58,195 (adaptive wins 12/12), \textbf{0.60/0.05 → 48,870} (adaptive wins 4/12, \textbf{+1,274 ± 727}), 0.40/0.15 → 49,675 (6/12, +469 ± 480), 0.20/0.30 → 49,626 (5/12, +519 ± 835). Adaptive trails 3 of 4 means; its approximate two-SE interval against the best includes zero. ``Best'' means best among four on these same seeds}
+
+\section{Next}
+
+\begin{frame}{Next}
+Adaptation beats the untuned setting 12/12. Against the best of four fixed settings on these same twelve seeds, the approximate two-SE interval includes zero; this exploratory study does not resolve the difference.
+
+\vspace{0.8em}
+\textbf{Lesson 13 --- Improving Performance}
+
+Lesson 02 counted 107 evaluations instead of 110 and could not say why. Lesson 13 is the technique that makes that census the truth.
+\end{frame}
+\end{document}

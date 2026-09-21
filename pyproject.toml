@@ -1,0 +1,14 @@
+[project]
+name = "ma2015-genetic-algorithms"
+version = "0.1.0"
+description = "Public academic lessons for bioinspired mathematical algorithms."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "pandas>=2.0",
+    "python-igraph>=0.11",
+    "ipykernel>=7.3.0",
+    "nbformat>=5.11.1",
+    "nbconvert>=7.17.1",
+]

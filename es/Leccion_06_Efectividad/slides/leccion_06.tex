@@ -1,0 +1,191 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{06}{Midiendo la Efectividad}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 03 aplazó la evidencia a nivel de corrida para la presión de selección. Esta lección es ese instrumento: tasa de éxito, incertidumbre, presupuesto.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Una tasa de éxito necesita un veredicto de fuera de la corrida, y un blanco con volumen.
+    \item Ocho corridas cargan una barra de decenas de puntos; mil, de alrededor de uno.
+    \item Efectividad y eficiencia tiran en direcciones opuestas.
+\end{itemize}
+\end{frame}
+
+% ================= tasa_exito_01_una_corrida =================
+\begin{frame}{Una tasa es una estimación}
+Para \(s\) éxitos en \(n\) corridas independientes,
+\[
+\hat p=\frac{s}{n},\qquad
+\widehat{\operatorname{EE}}(\hat p)=
+\sqrt{\frac{\hat p(1-\hat p)}{n}}.
+\]
+Es una desviación estándar estimada, no un intervalo de confianza. La lección
+también reporta un intervalo de Wilson al 95\%, que conserva incertidumbre en
+0/\(n\) o \(n\)/\(n\). El óptimo de cuadrícula es una referencia muestreada.
+\end{frame}
+
+\begin{frame}{El intervalo de Wilson al 95\%}
+Con (z=1.96), sean
+\[
+d=1+z^2/n,\quad c=\frac{\hat p+z^2/(2n)}d,\quad
+h=\frac z d\sqrt{\frac{\hat p(1-\hat p)}n+\frac{z^2}{4n^2}}.
+\]
+El intervalo es ([c-h,c+h]). A diferencia del EE por sustitución solo,
+no degenera con cero éxitos ni con todos los éxitos.
+\end{frame}
+
+\section{Una corrida, y lo que vale}
+
+\begin{frame}{Una corrida, y lo que vale}
+Cada lección hasta ahora terminó leyendo una sola corrida. La Lección 01 leyó
+una corrida y concluyó que el algoritmo funciona; la Lección 02 leyó una corrida
+y concluyó que una regla de paro es gratuita; la Lección 03 y la Lección 05
+ambas cerraron con una pregunta abierta que no pudieron responder, y ambas
+preguntas tenían la misma forma: ¿ayuda este cambio, a lo largo de las corridas?
+Esta lección es la maquinaria para responder eso, y comienza mostrando por qué
+la pregunta no puede evadirse.
+\end{frame}
+
+\marcoresultado{Una corrida, y lo que vale}{../figures/tasa_exito_01_una_corrida.png}{%
+    La dispersión entre semillas es 0.8946 — 1.5× toda la ganancia de la corrida rastreada (+0.5822); la semilla 3 reporta -0.0129, la semilla 4 reporta -0.9076, y ambos reportes son verdaderos}
+
+% ================= tasa_exito_02_el_veredicto =================
+\section{Qué cuenta como éxito}
+
+\begin{frame}{Qué cuenta como éxito}
+El paso 1 mostró ocho respuestas a una pregunta. Antes de que puedan promediarse
+en algo, se debe definir una palabra: éxito. Una corrida no puede juzgarse a sí misma -
+reporta lo mejor que encontró, nunca qué tan bueno fue eso - por lo que el juicio
+tiene que venir de afuera, y el paso 5 de la Lección 02 construyó exactamente
+ese instrumento: fuerza bruta sobre el paisaje en una cuadrícula, y medir cada corrida
+contra el resultado. También dejó una advertencia adjunta, en sus propias líneas finales:
+esa referencia "funciona porque x es un número; a partir de la Lección 08 no lo es,
+y la respuesta honesta a '¿tuvo éxito esta corrida?' se vuelve genuinamente difícil de obtener".
+\end{frame}
+
+\begin{frame}[fragile]{(1) optimo\_fuerza\_bruta()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=179,lastline=197]{../src/tasa_exito_02_el_veredicto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) TOLERANCIA}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=200,lastline=211]{../src/tasa_exito_02_el_veredicto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) proporcion\_dentro\_de\_tolerancia()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=214,lastline=248]{../src/tasa_exito_02_el_veredicto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) SENO}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=87,lastline=102]{../src/tasa_exito_02_el_veredicto.py}
+\end{frame}
+
+\marcoresultado{Qué cuenta como éxito}{../figures/tasa_exito_02_el_veredicto.png}{%
+    El óptimo 2-D es real (+0.500000) pero ocupa el 0.003197\% de la cuadrícula — los 128 puntos ganadores se sitúan exactamente en y = 10 — así que 0 de 8 corridas "tienen éxito"; en seno 1-D el objetivo es el 1.4299\% de la caja (0.286 de ancho) y 5 de 8 corridas lo encuentran: 62.5\% ± 17.1\%}
+
+% ================= tasa_exito_03_mil_corridas =================
+\section{Mil corridas}
+
+\begin{frame}{Mil corridas}
+El paso 2 terminó con una tasa de éxito medida en ocho corridas - 62.5\% - y una
+advertencia sobre lo que vale tal tasa: si 62.5\% fuera la tasa verdadera, el
+conteo en 8 corridas aún divagaría por 1.4 corridas de un experimento al
+siguiente. Este paso paga esa advertencia. Ejecuta el experimento mil
+veces, de la manera en que lo hace el Capítulo 6 de Gridin, y reemplaza la anécdota con una
+medición: una tasa, su error estándar, y la distribución completa de
+respuestas detrás de ella.
+\end{frame}
+
+\begin{frame}[fragile]{(1) tasa\_exito()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=185,lastline=198]{../src/tasa_exito_03_mil_corridas.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) error\_estandar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=201,lastline=211]{../src/tasa_exito_03_mil_corridas.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) CORRIDAS = 1000}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=53,lastline=53]{../src/tasa_exito_03_mil_corridas.py}
+\end{frame}
+
+\marcoresultado{Mil corridas}{../figures/tasa_exito_03_mil_corridas.png}{%
+    La tasa observada es 79.4\%; un error estándar por sustitución es 1.3\% y el script reporta aparte un intervalo de Wilson al 95\%. La estimación de 8 corridas difiere por 16.9 puntos; 71/1000 terminan en el pico local x = -4.51}
+
+% ================= tasa_exito_04_el_presupuesto =================
+\section{El presupuesto}
+
+\begin{frame}{El presupuesto}
+El paso 3 midió la efectividad: una tasa de éxito del 79.4\% con población 10, y
+cerró con la pregunta que una tasa no puede responder - ¿cuánto costaron esas evaluaciones
+y estuvieron bien gastadas? Este paso las cuenta. El Capítulo 6 de Gridin
+lo hace con un atributo de clase en Individuo que cuenta cada evaluación de
+aptitud, y con un barrido de tamaños de población que grafica la aptitud final
+contra el número de individuos evaluados.
+\end{frame}
+
+\begin{frame}[fragile]{(1) el contador de evaluaciones}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=77,lastline=98]{../src/tasa_exito_04_el_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) el barrido de población}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=211,lastline=235]{../src/tasa_exito_04_el_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) exito\_ciegas()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=193,lastline=203]{../src/tasa_exito_04_el_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) CORRIDAS = 500}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=54,lastline=54]{../src/tasa_exito_04_el_presupuesto.py}
+\end{frame}
+
+\marcoafirmacion{El presupuesto}{%
+    Población 10→30: éxito 80.0\%→99.4\%, costo 100→300 evaluaciones, el rendimiento cae 8.00→3.31 éxitos por cada 1000 evaluaciones; extracciones a ciegas con igual presupuesto alcanzan 76.2\% y 98.7\% — el margen del AG es +3.8 y +0.7 puntos}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+En un blanco ancho el AG apenas vence a la búsqueda ciega a igual presupuesto --- una propiedad del problema, no un defecto del algoritmo.
+
+\vspace{0.8em}
+\textbf{Lección 07 --- Ajuste de parámetros}
+
+Los mismos instrumentos, ahora sobre las tres perillas: cruza, mutación, población. Cada perilla es en secreto una perilla de presupuesto hasta que se cuentan las evaluaciones.
+\end{frame}
+\end{document}

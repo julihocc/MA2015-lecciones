@@ -1,0 +1,234 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{03}{Selection}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 02 named the five phases. Selection is the first operator to look at on its own, still without measuring a whole run.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Proportional, rank, SUS, tournament: different ways to discard.
+    \item Elitism is the cheap insurance that the best so far survives.
+    \item One generation is not a verdict; that measurement is Lesson 06.
+\end{itemize}
+\end{frame}
+
+% ================= selection_pressure_01_the_population =================
+\begin{frame}{Selection probabilities}
+\[
+p_i=\frac{w_i}{\sum_j w_j},\qquad \mathbb E[N_i]=Np_i,
+\qquad \Pr(R=r)=\left(\frac{N-r+1}{N}\right)^k-
+\left(\frac{N-r}{N}\right)^k .
+\]
+Proportional selection changes when its shift floor changes. Rank selection
+uses order instead of scale; SUS changes sampling variance, not expectation.
+Here (r=1) is best; tournament probabilities telescope to one. Elitism preserves the best only for stationary deterministic fitness and an
+unchanged elite copy.
+\end{frame}
+
+\section{The population, and how to measure what selection does}
+
+\begin{frame}{The population, and how to measure what selection does}
+Selection never invents anything. It takes a population of N and returns a
+population of N, built only from copies of what was already there. So the only
+thing worth measuring is the BOOKKEEPING: who got copied, how many times, and
+who disappeared.
+\end{frame}
+
+\resultframe{The population, and how to measure what selection does}{../figures/selection_pressure_01_the_population.png}{%
+    Copying everyone once: 0 extinct, diversity 6.665, 1 copy of the best — the zero of every later measurement. Fitness is negative almost everywhere, so no wheel can be built yet}
+
+% ================= selection_pressure_02_proportional =================
+\section{Proportional selection, and the floor nobody mentions}
+
+\begin{frame}{Proportional selection, and the floor nobody mentions}
+The standard picture of selection is a roulette wheel whose sectors are as wide
+as the individuals' fitness. On this population the picture does not fit: every
+fitness is negative, and a sector cannot have a negative width. The usual
+repair is to shift all the values up until the worst one is non-negative - and
+that repair silently introduces a parameter, the floor, which turns out to
+control the selection pressure more strongly than the fitness values do.
+\end{frame}
+
+\begin{frame}[fragile]{(1) shift\_to\_positive()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=119,lastline=130]{../src/selection_pressure_02_proportional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) select\_proportional()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=133,lastline=154]{../src/selection_pressure_02_proportional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) pressure\_report()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=157,lastline=205]{../src/selection_pressure_02_proportional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the two floors}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=208,lastline=260]{../src/selection_pressure_02_proportional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the wheel figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=262,lastline=285]{../src/selection_pressure_02_proportional.py}
+\end{frame}
+
+\resultframe{Proportional selection, and the floor nobody mentions}{../figures/selection_pressure_02_proportional.png}{%
+    The floor *is* the pressure: the best expects \textbf{2.35} copies at floor 0.001 but \textbf{1.30} at floor 3.0 — same population, same wheel}
+
+% ================= selection_pressure_03_rank =================
+\section{Rank selection, or pressure that does not depend on scale}
+
+\begin{frame}{Rank selection, or pressure that does not depend on scale}
+Step 2 left an embarrassment: the same wheel, on the same population, applies
+very different pressure depending on a floor we invented. Rank selection throws
+the fitness values away and keeps only their ORDER. The sector widths then
+depend on the population size alone, so the pressure is the same whatever the
+fitness scale is - and in particular it cannot be changed by adding a constant.
+\end{frame}
+
+\begin{frame}[fragile]{(1) select\_rank()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=199,lastline=221]{../src/selection_pressure_03_rank.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the rank row}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=227,lastline=279]{../src/selection_pressure_03_rank.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the sector figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=281,lastline=312]{../src/selection_pressure_03_rank.py}
+\end{frame}
+
+\resultframe{Rank selection, or pressure that does not depend on scale}{../figures/selection_pressure_03_rank.png}{%
+    Order alone fixes the pressure at one definite value, immune to rescaling — but the best individual is still lost in \textbf{13.6\%} of draws}
+
+% ================= selection_pressure_04_elitism =================
+\section{Elitism, the cheapest guarantee in the course}
+
+\begin{frame}{Elitism, the cheapest guarantee in the course}
+Steps 2 and 3 both share a flaw that is easy to overlook: the best individual
+is drawn at random like everybody else, so it is sometimes not drawn at all. A
+generation can be strictly worse than its parent generation. Elitism fixes that
+by copying the top few individuals into the new generation before any draw
+happens. It is one line of code, it removes the regression completely, and it
+costs diversity - all three of which this step measures.
+\end{frame}
+
+\begin{frame}[fragile]{(1) select\_rank\_with\_elite()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=224,lastline=247]{../src/selection_pressure_04_elitism.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the elite rows}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=253,lastline=307]{../src/selection_pressure_04_elitism.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the elitism figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=309,lastline=337]{../src/selection_pressure_04_elitism.py}
+\end{frame}
+
+\resultframe{Elitism, the cheapest guarantee in the course}{../figures/selection_pressure_04_elitism.png}{%
+    One line takes the loss of the best from 13.6\% to \textbf{0.0\%}, raises pressure (1.80 → 2.64 copies) and costs diversity (5.448 → 5.210)}
+
+% ================= selection_pressure_05_sus =================
+\section{Stochastic universal sampling, or the same wheel spun once}
+
+\begin{frame}{Stochastic universal sampling, or the same wheel spun once}
+Proportional selection spins the wheel N times, so luck accumulates: an
+individual owning a quarter of the wheel can still end up with nothing, and
+another can win four slots in a row. SUS keeps exactly the same wheel and the
+same expected number of copies, but takes all N samples in one go, with evenly
+spaced pointers. The expectation does not move. The spread collapses.
+\end{frame}
+
+\begin{frame}[fragile]{(1) select\_stochastic\_universal\_sampling()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=247,lastline=271]{../src/selection_pressure_05_sus.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the SUS rows}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=277,lastline=339]{../src/selection_pressure_05_sus.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the spread figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=341,lastline=389]{../src/selection_pressure_05_sus.py}
+\end{frame}
+
+\resultframe{Stochastic universal sampling, or the same wheel spun once}{../figures/selection_pressure_05_sus.png}{%
+    Same wheel, same expectation, spread collapses. And it does \textbf{not} fix the floor: 2.35 vs 1.31 copies, the same split step 2 found}
+
+% ================= selection_pressure_06_tournament =================
+\section{Tournament selection, and all five methods on one scale}
+
+\begin{frame}{Tournament selection, and all five methods on one scale}
+Tournament selection needs no wheel, no sort, no sum and no floor: pick a few
+individuals at random, keep the fittest, repeat. This is the method Lesson 01
+used, and with the same seed this file reproduces Lesson 01's draw exactly. Its
+real virtue is the one thing none of the other four offer: a single integer that
+sets the selection pressure, from none at all to almost total.
+\end{frame}
+
+\begin{frame}[fragile]{(1) select\_tournament()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=279,lastline=294]{../src/selection_pressure_06_tournament.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the draw from Lesson 01}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=300,lastline=313]{../src/selection_pressure_06_tournament.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the pressure dial}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=315,lastline=332]{../src/selection_pressure_06_tournament.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the whole comparison}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=334,lastline=388]{../src/selection_pressure_06_tournament.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the dial figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=390,lastline=421]{../src/selection_pressure_06_tournament.py}
+\end{frame}
+
+\resultframe{Tournament selection, and all five methods on one scale}{../figures/selection_pressure_06_tournament.png}{%
+    One integer sets the pressure: k=3 → 2.74 copies, k=5 → 4.13, k=10 → 6.52. Across all 13 configurations, pressure vs quality \textbf{+0.95}, pressure vs diversity \textbf{−0.92}}
+
+\section{Next}
+
+\begin{frame}{Next}
+The two worst individuals were not selected zero times --- the table in the step has to be read, not a slogan above it.
+
+\vspace{0.8em}
+\textbf{Lesson 04 --- Crossover}
+
+The second operator, still measured on a fixed pair of parents. Cut-and-swap copies; arithmetic computes. Those families do not swap.
+\end{frame}
+\end{document}

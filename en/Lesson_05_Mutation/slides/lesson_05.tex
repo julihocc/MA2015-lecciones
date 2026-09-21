@@ -1,0 +1,220 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{05}{Mutation}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 04 split crossover into two families that cannot be swapped. Mutation is the remaining operator, still measured on one chromosome.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Reach is a rate times a step; both have to be visible.
+    \item A permutation chromosome cannot take Gaussian noise.
+    \item An optimum with no volume is an artefact a search cannot occupy.
+\end{itemize}
+\end{frame}
+
+% ================= mutation_reach_01_the_instrument =================
+\begin{frame}{A mutation kernel}
+For gene \(i\),
+\[
+B_i\sim\operatorname{Bernoulli}(p),\qquad
+\Delta_i\sim\mathcal N(\mu,\sigma^2),\qquad
+x_i'=\Pi_{[l,u]}(x_i+B_i\Delta_i).
+\]
+Thus \(\mathbb E[\sum_i B_i]=Lp\): the rate controls how many genes are
+activated, while \(\sigma\) controls displacement. Measure changed positions by
+\(H=\sum_i\mathbf 1[x_i\ne x_i']\) and permutation travel by
+\(D=\sum_v|\operatorname{pos}_\pi(v)-\operatorname{pos}_{\pi'}(v)|\). A zero-width optimum has
+probability zero under an ideal continuous proposal, even if a grid contains it.
+\end{frame}
+
+\section{The reach of one mutation, and how to measure it}
+
+\begin{frame}{The reach of one mutation, and how to measure it}
+Selection discards and crossover recombines; both work only with values the
+population already holds. Mutation is the one operator that can produce a value
+nobody had. The whole of this lesson is therefore about one question: HOW FAR
+can one mutation go?
+\end{frame}
+
+\resultframe{The reach of one mutation, and how to measure it}{../figures/mutation_reach_01_the_instrument.png}{%
+    Lesson 01's two numbers reappear exactly — sigma 1.0 arrives \textbf{0 of 2000}, sigma 3.0 \textbf{110 of 2000}. Mean travel is 0.798·sigma until the walls start eating it: at sigma 6.0, \textbf{19.4\%} of proposals are clamped and the ratio drops to 0.690. The trade in one table: sigma 0.5 finds the most uphill moves (\textbf{272}) and arrives \textbf{0} times}
+
+% ================= mutation_reach_02_rate_and_step =================
+\section{Mutation has two dials, not one}
+
+\begin{frame}{Mutation has two dials, not one}
+Step 1 measured a single gene, so sigma was the only thing there was to set.
+A real chromosome has many genes, and the operator then has a second dial: the
+per-gene probability p that a gene is touched at all. Gridin's
+\texttt{mutation\_random\_deviation(ind, mu, sigma, p)} carries both.
+\end{frame}
+
+\begin{frame}[fragile]{(1) GENE\_COUNT}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=37,lastline=43]{../src/mutation_reach_02_rate_and_step.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) Individual.fitness}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=65,lastline=65]{../src/mutation_reach_02_rate_and_step.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutate\_random\_deviation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=96]{../src/mutation_reach_02_rate_and_step.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) regime\_report()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=99,lastline=135]{../src/mutation_reach_02_rate_and_step.py}
+\end{frame}
+
+\resultframe{Mutation has two dials, not one}{../figures/mutation_reach_02_rate_and_step.png}{%
+    Genes touched never differs from \texttt{p·n} by more than \textbf{0.015}. Three regimes with the same \texttt{p·sigma = 0.30} travel 1.904 / 2.179 / 2.304 in total but their longest single step differs by a factor of \textbf{7.1} (10.253 vs 1.449). At p = 0.1, \textbf{718 of 2000} mutations change nothing at all, against a predicted (1−p)¹⁰ = 0.3487}
+
+% ================= mutation_reach_03_fitness_driven =================
+\section{Mutation that refuses to make things worse}
+
+\begin{frame}{Mutation that refuses to make things worse}
+Every mutation so far has been blind: it moves the genes and accepts whatever
+the objective says about the result. Most of the time the result is worse -
+step 1 already showed that at sigma = 3.0 only 144 of 2000 mutations were
+uphill. Gridin's last operator refuses those: it retries, up to MAX\_TRIES
+times, and returns the first mutant that beats its parent.
+\end{frame}
+
+\begin{frame}[fragile]{(1) MAX\_TRIES}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=44]{../src/mutation_reach_03_fitness_driven.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutate\_fitness\_driven()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=95,lastline=119]{../src/mutation_reach_03_fitness_driven.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) compare()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=122,lastline=165]{../src/mutation_reach_03_fitness_driven.py}
+\end{frame}
+
+\resultframe{Mutation that refuses to make things worse}{../figures/mutation_reach_03_fitness_driven.png}{%
+    The filter turns a mean fitness change of \textbf{−1.0337 into +0.0548} and doubles arrivals (102 → 273) — but spends \textbf{5,603 fitness calls against 2,000}, so per thousand calls it arrives \textbf{48.7} times against blind mutation's \textbf{51.0}. Acceptance 20.2\% is exactly 1−(1−q)³ for the blind uphill rate q}
+
+% ================= mutation_reach_04_the_dead_staircase =================
+\section{The run Lesson 02 left for dead}
+
+\begin{frame}{The run Lesson 02 left for dead}
+An earlier version of Lesson 02 step 5 ended with a run that stopped six
+generations in, 0.2000 short of the staircase's optimum, with almost no gene
+spread left, and pointed here: mutation "is the one operator that could put it
+back". This step is where that promise came due - and it did not come due the way
+it was written. What the investigation found instead sent a correction back to
+Lesson 02, which no longer makes that claim.
+\end{frame}
+
+\begin{frame}[fragile]{(1) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=115,lastline=201]{../src/mutation_reach_04_the_dead_staircase.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) staircase()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=93,lastline=107]{../src/mutation_reach_04_the_dead_staircase.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) step\_widths()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=204,lastline=223]{../src/mutation_reach_04_the_dead_staircase.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) PEAK\_HEIGHT\_REPAIRED}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=226,lastline=233]{../src/mutation_reach_04_the_dead_staircase.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) sweep()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=236,lastline=264]{../src/mutation_reach_04_the_dead_staircase.py}
+\end{frame}
+
+\resultframe{The run Lesson 02 left for dead}{../figures/mutation_reach_04_the_dead_staircase.png}{%
+    Lesson 02's run reproduced (6 generations, best \textbf{+1.8000}, spread 0.192, \textbf{0.2000} short). Then eight mutation regimes × 100 runs: the top step is reached \textbf{0 times in 800 runs}, while mean gene spread goes from 0.462 to 3.194. \texttt{step\_widths()} says why — the top step is \textbf{0.000 wide}. Repaired (peak height 10.0 → 10.5, top step 0.500 wide), Lesson 02's own regime reaches it \textbf{96 of 100} times}
+
+% ================= permutation_mutation_01_illegal_noise =================
+\section{permutation mutation 01 illegal noise}
+
+\begin{frame}{permutation mutation 01 illegal noise}
+Lesson 05 - Step 1 of the second example: when noise is not a legal move
+=========================================================================
+Every operator so far has added a number to a gene. That works because a gene
+was a real value and any real value in [-10, +10] was a legal gene.
+\end{frame}
+
+\resultframe{permutation mutation 01 illegal noise}{../figures/permutation_mutation_01_illegal_noise.png}{%
+    Random deviation on a permutation produces \textbf{1935 invalid mutants of 2000}, and \textbf{0} of the 65 survivors had any gene touched — the operator's only legal output is the untouched one, at a measured rate matching (1−p)¹⁰ to within \textbf{0.0025}. Bit flip changes exactly 1 position every time; exchange exactly 2}
+
+% ================= permutation_mutation_02_rearrangements =================
+\section{permutation mutation 02 rearrangements}
+
+\begin{frame}{permutation mutation 02 rearrangements}
+Lesson 05 - Step 2 of the second example: three bigger rearrangements
+======================================================================
+NEW IN THIS STEP: inversion, shift and shuffle, and the comparison that puts
+all four permutation operators on one scale.
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutation\_inversion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=79,lastline=97]{../src/permutation_mutation_02_rearrangements.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutation\_shift()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=100,lastline=119]{../src/permutation_mutation_02_rearrangements.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutation\_shuffle()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=122,lastline=140]{../src/permutation_mutation_02_rearrangements.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) compare\_operators()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=167,lastline=199]{../src/permutation_mutation_02_rearrangements.py}
+\end{frame}
+
+\resultframe{permutation mutation 02 rearrangements}{../figures/permutation_mutation_02_rearrangements.png}{%
+    The two measurements of reach rank the operators differently: by positions disturbed \textbf{shift (4.663) > inversion (4.230) > shuffle (3.708) > exchange (2.000)}, by distance travelled \textbf{inversion (1.308) > shuffle (0.876) > exchange (0.733) = shift (0.733)}. Exchange and shift give identical total travel on \textbf{90 of 90} position pairs. Shuffle returns the individual unchanged \textbf{271 of 2000} times (13.6\%)}
+
+\section{Next}
+
+\begin{frame}{Next}
+Lesson 02's staircase once had a top step of width zero. This lesson keeps the broken geometry as the specimen it diagnoses.
+
+\vspace{0.8em}
+\textbf{Lesson 06 --- Measuring Effectiveness}
+
+A genetic algorithm is a random variable. One generation, and one run, prove nothing. Lesson 03 postponed that evidence here.
+\end{frame}
+\end{document}

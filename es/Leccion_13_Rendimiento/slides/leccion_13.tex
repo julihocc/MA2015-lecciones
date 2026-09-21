@@ -1,0 +1,282 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{13}{Mejorando el Rendimiento}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+El censo de evaluaciones de la Lección 02 era un número sin método. Esta lección es el método: dos contadores, una plantilla, siete pasos, la misma respuesta.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Evaluar una vez y guardar: misma semilla, mismo \(-87\), 54\% menos llamadas.
+    \item Una caché vale lo que la búsqueda repite --- medido, no supuesto.
+    \item Solo un objetivo más grueso achica de verdad el problema, y hay que juzgarlo en el real.
+\end{itemize}
+\end{frame}
+
+% ================= turnos_01_el_costo_de_una_ejecucion =================
+\begin{frame}{Un modelo de trabajo}
+\[
+T\approx N_{\mathrm{llamadas}}W_{\mathrm{llamada}}+T_{\mathrm{serial}}
++T_{\mathrm{procesos}}.
+\]
+Una caché exige un objetivo determinista indexado por el genoma inmutable
+completo. Un reinicio exacto también necesita población, estado de
+aptitudes/caché, contadores de generación y estado
+pseudoaleatorio. Los workers tienen memoria separada con spawn de Windows y con
+fork de copia al escribir en Unix; sus cachés y contadores no se comparten solos.
+\end{frame}
+
+\section{El costo real de una ejecución}
+
+\begin{frame}{El costo real de una ejecución}
+Esta es la última lección del curso, y es la única sobre el costo de
+ejecutar un algoritmo genético en lugar de sobre el algoritmo en sí. Todo lo
+que sigue es un intento de hacer que esta ejecución sea más barata. Así que lo primero que hay que construir
+no es una optimización: es el medidor.
+\end{frame}
+
+\marcoresultado{El costo real de una ejecución}{../figuras/turnos_01_el_costo_de_una_ejecucion.png}{%
+    La ejecución construye \textbf{428} individuos y llama a la aptitud \textbf{930} veces — \textbf{2.17 evaluaciones por individuo}, dividido en SELECCIÓN 300 / REPRODUCCIÓN 0 / ESTADÍSTICAS 630. \textbf{195,300} unidades de trabajo, mejor aptitud \textbf{−87}}
+
+% ================= turnos_02_evaluar_una_vez =================
+\section{Evaluar la función de aptitud una vez}
+
+\begin{frame}{Evaluar la función de aptitud una vez}
+Esta es la sección 13.1 del libro, y es el mejor trato de todo el curso.
+Los genes de un individuo no cambian después de que se construye, por lo que su aptitud tampoco puede
+cambiar. A pesar de esto, el paso 1 lo recalculaba cada vez que se necesitaba un valor
+- una vez por individuo dentro del ordenamiento, dos veces más por individuo en las
+estadísticas - y pagaba una evaluación completa de 210 celdas cada vez.
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=102,lastline=115]{../src/turnos_02_evaluar_una_vez.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) aptitud\_de()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=118,lastline=122]{../src/turnos_02_evaluar_una_vez.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=220,lastline=288]{../src/turnos_02_evaluar_una_vez.py}
+\end{frame}
+
+\marcoresultado{Evaluar la función de aptitud una vez}{../figuras/turnos_02_evaluar_una_vez.png}{%
+    \textbf{428} llamadas, \textbf{89,880} unidades de trabajo: \textbf{54.0\%} menos, con SELECCIÓN y ESTADÍSTICAS en \textbf{0}. La mejor aptitud sigue siendo \textbf{−87} — el ahorro no costó nada}
+
+% ================= turnos_03_la_cache =================
+\section{Una caché para genomas que regresan}
+
+\begin{frame}{Una caché para genomas que regresan}
+El paso 2 puso la factura en una evaluación por individuo construido. Ese es un piso
+solo para genomas *nuevos*. Un algoritmo genético no produce genomas nuevos todo
+el tiempo: las élites se copian hacia adelante, la selección elige a los mismos padres dos veces,
+la cruza entre dos copias de una asignación devuelve esa asignación sin cambios, y
+una mutación puede deshacer una anterior. Cada uno de esos es un genoma que el programa
+ya ha cotizado.
+
+(h=H/(H+M)). Si domina el trabajo del objetivo, la aceleración ideal por
+trabajo es (1/(1-h)); la observada también paga búsqueda y procesos.
+\end{frame}
+
+\begin{frame}[fragile]{(1) CACHE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=103]{../src/turnos_03_la_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) aptitud\_en\_cache()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=112,lastline=126]{../src/turnos_03_la_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=139,lastline=139]{../src/turnos_03_la_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=244,lastline=310]{../src/turnos_03_la_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) escaneo\_tasa\_aciertos()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=313,lastline=351]{../src/turnos_03_la_cache.py}
+\end{frame}
+
+\marcoafirmacion{Una caché para genomas que regresan}{%
+    \textbf{19} aciertos en 428 construcciones, \textbf{409} genomas distintos, 4.4\% menos trabajo, respuesta sin cambios en \textbf{−87}. El escaneo muestra que la tasa de aciertos es propiedad de la *búsqueda*: \textbf{14.4\%} con mutación p=0.10, \textbf{6.1\%} a 0.25, \textbf{4.4\%} a 0.50, \textbf{3.2\%} a 0.75}
+
+% ================= turnos_04_instantanea =================
+\section{Instantáneas, y lo que olvida una instantánea}
+
+\begin{frame}{Instantáneas, y lo que olvida una instantánea}
+Las ejecuciones largas se interrumpen: una laptop se suspende, un trabajo en cola alcanza su tiempo límite, un
+estudio de afinación quiere ramificarse de una ejecución que ya costó una hora. La respuesta del libro
+(sección 13.4) es escribir los genes de la población en un archivo y leerlos
+de nuevo más tarde.
+\end{frame}
+
+\begin{frame}[fragile]{(1) INSTANTANEAS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=60,lastline=64]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) volcar\_poblacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=152,lastline=158]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) restaurar\_poblacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=161,lastline=166]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) volcar\_cache()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=169,lastline=175]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) restaurar\_cache()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=178,lastline=184]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\begin{frame}[fragile]{(6) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=283,lastline=382]{../src/turnos_04_instantanea.py}
+\end{frame}
+
+\marcoafirmacion{Instantáneas, y lo que olvida una instantánea}{%
+    30 asignaciones se restauran por \textbf{30 evaluaciones / 6,300 unidades de trabajo} a partir de genes solos, y por \textbf{0 / 0} cuando la caché se restaura primero. El archivo de caché es \textbf{14.0×} el tamaño del archivo de genes — un mal intercambio a 210 unidades por llamada, uno excelente a un minuto por llamada}
+
+% ================= turnos_05_evaluacion_paralela =================
+\section{Evaluando una generación en un pool de procesos}
+
+\begin{frame}{Evaluando una generación en un pool de procesos}
+Esta es la sección 13.5 del libro, y la primera técnica en esta lección que
+no elimina ningún trabajo en absoluto. La caché elimina evaluaciones. Un pool no elimina
+ninguna: ejecuta las mismas evaluaciones en otro lugar, al mismo tiempo.
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individuo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=155,lastline=169]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluar\_lote()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=172,lastline=182]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) materializar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=185,lastline=201]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) operacion\_cruza()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=274,lastline=285]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) operacion\_mutacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=288,lastline=299]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(6) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=311,lastline=338]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\begin{frame}[fragile]{(7) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=344,lastline=481]{../src/turnos_05_evaluacion_paralela.py}
+\end{frame}
+
+\marcoafirmacion{Evaluando una generación en un pool de procesos}{%
+    El solo agrupamiento reduce la ejecución de 409 a \textbf{291} evaluaciones (\textbf{−28.9\%}), porque un hijo cruzado-luego-mutado solía evaluarse dos veces. La ejecución agrupada da la misma respuesta y el mismo mejor-hasta-ahora en las 10 generaciones — mientras que los contadores del padre leen \textbf{0 evaluaciones, 0 unidades de trabajo}}
+
+% ================= turnos_06_cache_entre_procesos =================
+\section{Llevando la caché y el medidor de vuelta a través de la frontera}
+
+\begin{frame}{Llevando la caché y el medidor de vuelta a través de la frontera}
+El paso 5 terminó con una ejecución agrupada cuyos contadores leían cero evaluaciones y cero
+unidades de trabajo, para una ejecución que claramente había hecho ambas cosas.
+Un worker tiene memoria separada: Windows usa spawn y Unix inicia con fork y
+copia al escribir. En ambos casos, su caché y sus contadores no se comparten
+automáticamente con el proceso padre.
+\end{frame}
+
+\begin{frame}[fragile]{(1) evaluar\_con\_costo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=137,lastline=148]{../src/turnos_06_cache_entre_procesos.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluar\_lote()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=151,lastline=184]{../src/turnos_06_cache_entre_procesos.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=338,lastline=417]{../src/turnos_06_cache_entre_procesos.py}
+\end{frame}
+
+\marcoafirmacion{Llevando la caché y el medidor de vuelta a través de la frontera}{%
+    La ejecución agrupada ahora reporta \textbf{291 / 8 aciertos / 61,110}, igualando a la ejecución secuencial en los tres, respuesta sigue en \textbf{−87}. Las cachés privadas por trabajador del paso 5 descartaban todos los aciertos}
+
+% ================= turnos_07_aptitud_gruesa =================
+\section{Una aptitud gruesa, y lo que cuesta ser barato}
+
+\begin{frame}{Una aptitud gruesa, y lo que cuesta ser barato}
+Cada optimización hasta ahora ha sido gratuita. La sección 13.1 dejó de recalcular un
+número conocido; la caché dejó de recalcular un genoma conocido; el agrupamiento dejó de
+evaluar hijos que estaban a punto de ser descartados; el pool movió el trabajo
+sin cambiarlo. Ninguna de ellas alteró un solo valor de aptitud, y cada
+una se verificó contra la respuesta del paso anterior para demostrarlo.
+
+Para el sustituto \(\tilde f\), \(e(x)=\tilde f(x)-f(x)\). La selección puede
+usar \(\tilde f\), pero los candidatos finales deben calificarse con el \(f\) real.
+\end{frame}
+
+\begin{frame}[fragile]{(1) aptitud\_gruesa()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=138,lastline=149]{../src/turnos_07_aptitud_gruesa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluar\_con\_costo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=152,lastline=164]{../src/turnos_07_aptitud_gruesa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el\_reporte}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=352,lastline=448]{../src/turnos_07_aptitud_gruesa.py}
+\end{frame}
+
+\marcoafirmacion{Una aptitud gruesa, y lo que cuesta ser barato}{%
+    \textbf{105} unidades de trabajo por llamada en lugar de 210, \textbf{51.0\%} menos trabajo para la ejecución. La búsqueda gruesa llega a \textbf{0 en su propio objetivo} — y su asignación puntúa \textbf{−160} en el real frente a \textbf{−87}, con \textbf{32} violaciones de descanso en lugar de 17}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+Los pasos 1--6 reportan todos la mejor aptitud \(-87\). El contenido es la factura que baja debajo. La aptitud gruesa da 0 en sí misma y \(-160\) en el objetivo real.
+
+\vspace{0.8em}
+\textbf{El reto }
+
+Aplicar la misma disciplina: declarar el modelo matemático, mantener visible la factibilidad, comparar con una sola moneda de evaluación y separar desempeño observado de prueba. La especificación vigente vive en el repositorio del semestre.
+\end{frame}
+\end{document}

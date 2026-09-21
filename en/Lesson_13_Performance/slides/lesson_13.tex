@@ -1,0 +1,281 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{13}{Performance}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 02's evaluation census was a number without a method. This lesson is the method: two counters, one roster, seven steps, same answer.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Evaluate once and store: same seed, same \(-87\), 54\% fewer calls.
+    \item A cache is worth what the search repeats --- measured, not assumed.
+    \item Only a coarser objective actually shrinks the problem, and it must be judged on the real one.
+\end{itemize}
+\end{frame}
+
+% ================= shifts_01_the_cost_of_a_run =================
+\begin{frame}{A work model}
+\[
+T\approx N_{\mathrm{calls}}W_{\mathrm{call}}+T_{\mathrm{serial}}
++T_{\mathrm{process}}.
+\]
+A cache is valid only for a deterministic objective keyed by the complete
+immutable genome. An exact restart also needs the population, fitness/cache
+state, generation counters, and pseudorandom state.
+Workers have separate memory under Windows spawn and Unix fork copy-on-write;
+worker-local counters and caches are not automatically shared.
+\end{frame}
+
+\section{What a run actually costs}
+
+\begin{frame}{What a run actually costs}
+This is the last lesson of the course, and it is the only one about the cost of
+running a genetic algorithm rather than about the algorithm itself. Everything
+that follows is an attempt to make this run cheaper. So the first thing to build
+is not an optimisation: it is the meter.
+\end{frame}
+
+\resultframe{What a run actually costs}{../figures/shifts_01_the_cost_of_a_run.png}{%
+    The run builds \textbf{428} individuals and calls fitness \textbf{930} times — \textbf{2.17 evaluations per individual}, split SELECT 300 / BREED 0 / STATS 630. \textbf{195,300} work units, best fitness \textbf{−87}}
+
+% ================= shifts_02_evaluate_once =================
+\section{Calculate the fitness function once}
+
+\begin{frame}{Calculate the fitness function once}
+This is the book's section 13.1, and it is the best deal in the whole course.
+An individual's genes do not change after it is built, so its fitness cannot
+change either. Step 1 nevertheless recomputed it every time a value was needed
+- once per individual inside the sort, twice more per individual in the
+statistics - and paid a full 210-cell evaluation each time.
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individual}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=102,lastline=115]{../src/shifts_02_evaluate_once.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) fitness\_of()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=118,lastline=122]{../src/shifts_02_evaluate_once.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=220,lastline=288]{../src/shifts_02_evaluate_once.py}
+\end{frame}
+
+\resultframe{Calculate the fitness function once}{../figures/shifts_02_evaluate_once.png}{%
+    \textbf{428} calls, \textbf{89,880} work units: \textbf{54.0\%} less, with SELECT and STATS at \textbf{0}. Best fitness still \textbf{−87} — the saving cost nothing}
+
+% ================= shifts_03_the_cache =================
+\section{A cache for genomes that come back}
+
+\begin{frame}{A cache for genomes that come back}
+Step 2 put the bill at one evaluation per individual built. That is a floor
+only for *new* genomes. A genetic algorithm does not produce new genomes all
+the time: elites are copied forward, selection picks the same parents twice,
+crossover between two copies of one roster returns that roster unchanged, and
+a mutation can undo an earlier one. Every one of those is a genome the program
+has already priced.
+
+(h=H/(H+M)). If objective work dominates, the ideal work-only speedup is
+(1/(1-h)); observed wall-clock speedup also pays lookup and process overhead.
+\end{frame}
+
+\begin{frame}[fragile]{(1) CACHE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=103]{../src/shifts_03_the_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cached\_fitness()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=112,lastline=126]{../src/shifts_03_the_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) Individual}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=139,lastline=139]{../src/shifts_03_the_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=244,lastline=310]{../src/shifts_03_the_cache.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) hit\_rate\_scan()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=313,lastline=351]{../src/shifts_03_the_cache.py}
+\end{frame}
+
+\resultframe{A cache for genomes that come back}{../figures/shifts_03_the_cache.png}{%
+    \textbf{19} hits in 428 builds, \textbf{409} distinct genomes, 4.4\% less work, answer unchanged at \textbf{−87}. The scan shows the hit rate is the *search's* property: \textbf{14.4\%} at mutation p=0.10, \textbf{6.1\%} at 0.25, \textbf{4.4\%} at 0.50, \textbf{3.2\%} at 0.75}
+
+% ================= shifts_04_snapshot =================
+\section{Snapshots, and what a snapshot forgets}
+
+\begin{frame}{Snapshots, and what a snapshot forgets}
+Long runs get interrupted: a laptop sleeps, a queue job hits its wall time, a
+tuning study wants to branch off a run that already cost an hour. The book's
+answer (section 13.4) is to write the population's genes to a file and read
+them back later.
+\end{frame}
+
+\begin{frame}[fragile]{(1) SNAPSHOTS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=60,lastline=64]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) dump\_population()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=152,lastline=158]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) restore\_population()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=161,lastline=166]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) dump\_cache()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=169,lastline=175]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) restore\_cache()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=178,lastline=184]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\begin{frame}[fragile]{(6) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=283,lastline=382]{../src/shifts_04_snapshot.py}
+\end{frame}
+
+\resultframe{Snapshots, and what a snapshot forgets}{../figures/shifts_04_snapshot.png}{%
+    30 rosters restore for \textbf{30 evaluations / 6,300 work units} from genes alone, and for \textbf{0 / 0} when the cache is restored first. The cache file is \textbf{14.0×} the size of the gene file — a bad trade at 210 units a call, an excellent one at a minute a call}
+
+% ================= shifts_05_parallel_evaluation =================
+\section{Evaluating a generation in a process pool}
+
+\begin{frame}{Evaluating a generation in a process pool}
+This is the book's section 13.5, and the first technique in this lesson that
+does not remove any work at all. Caching removes evaluations. A pool removes
+none: it runs the same evaluations somewhere else, at the same time.
+\end{frame}
+
+\begin{frame}[fragile]{(1) Individual}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=155,lastline=169]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluate\_batch()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=172,lastline=182]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) materialise()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=185,lastline=201]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) crossover\_operation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=274,lastline=285]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) mutation\_operation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=288,lastline=299]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(6) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=311,lastline=338]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(7) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=344,lastline=481]{../src/shifts_05_parallel_evaluation.py}
+\end{frame}
+
+\resultframe{Evaluating a generation in a process pool}{../figures/shifts_05_parallel_evaluation.png}{%
+    Batching alone drops the run from 409 to \textbf{291} evaluations (\textbf{−28.9\%}), because a crossed-then-mutated child used to be evaluated twice. The pooled run gives the identical answer and the identical best-so-far in all 10 generations — while the parent's counters read \textbf{0 evaluations, 0 work units}}
+
+% ================= shifts_06_cache_across_processes =================
+\section{Bringing the cache and the meter back across the boundary}
+
+\begin{frame}{Bringing the cache and the meter back across the boundary}
+Step 5 finished with a pooled run whose counters read zero evaluations and zero
+work units, for a run that had plainly done both. A worker process has separate
+memory. Windows spawns it; Unix fork starts with copy-on-write state. In either
+case, its cache and counters are not automatically shared with the parent.
+\end{frame}
+
+\begin{frame}[fragile]{(1) evaluate\_with\_cost()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=137,lastline=148]{../src/shifts_06_cache_across_processes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluate\_batch()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=151,lastline=184]{../src/shifts_06_cache_across_processes.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=338,lastline=417]{../src/shifts_06_cache_across_processes.py}
+\end{frame}
+
+\resultframe{Bringing the cache and the meter back across the boundary}{../figures/shifts_06_cache_across_processes.png}{%
+    Pooled run now reports \textbf{291 / 8 hits / 61,110}, matching the sequential run on all three, answer still \textbf{−87}. Step 5's private per-worker caches had been discarding every hit}
+
+% ================= shifts_07_coarse_fitness =================
+\section{A coarse fitness, and what it costs to be cheap}
+
+\begin{frame}{A coarse fitness, and what it costs to be cheap}
+Every optimisation so far has been free. Section 13.1 stopped recomputing a
+known number; the cache stopped recomputing a known genome; batching stopped
+evaluating children that were about to be thrown away; the pool moved work
+without changing it. Not one of them altered a single fitness value, and each
+one was checked against the previous step's answer to prove it.
+
+For surrogate \(\tilde f\), \(e(x)=\tilde f(x)-f(x)\). Selection may use
+\(\tilde f\), but the final candidates must be scored on the real \(f\).
+\end{frame}
+
+\begin{frame}[fragile]{(1) coarse\_fitness()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=138,lastline=149]{../src/shifts_07_coarse_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) evaluate\_with\_cost()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=152,lastline=164]{../src/shifts_07_coarse_fitness.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the\_report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=352,lastline=448]{../src/shifts_07_coarse_fitness.py}
+\end{frame}
+
+\resultframe{A coarse fitness, and what it costs to be cheap}{../figures/shifts_07_coarse_fitness.png}{%
+    \textbf{105} work units per call instead of 210, \textbf{51.0\%} less work for the run. The coarse search reaches \textbf{0 on its own objective} — and its roster scores \textbf{−160} on the real one against \textbf{−87}, with \textbf{32} rest violations instead of 17}
+
+\section{Next}
+
+\begin{frame}{Next}
+Steps 1--6 all report best fitness \(-87\). The content is the falling bill underneath. Coarse fitness scores 0 on itself and \(-160\) on the real objective.
+
+\vspace{0.8em}
+\textbf{The shared Planta F\'isica challenge}
+
+Apply the same discipline there: state the mathematical model, keep feasibility visible, compare under one evaluation currency, and separate observed performance from proof. The current specification lives in the semester repository.
+\end{frame}
+\end{document}

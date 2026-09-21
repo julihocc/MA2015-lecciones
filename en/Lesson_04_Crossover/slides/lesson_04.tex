@@ -1,0 +1,275 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{04}{Crossover}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 03 opened selection on one generation. Crossover is next, still on two fixed parents, with one instrument.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item A crossover is defined by the children it can reach.
+    \item More cut points is not a strength dial.
+    \item Cut-and-swap copies parental values; blend computes new ones --- and leaves the interval.
+\end{itemize}
+\end{frame}
+
+% ================= offspring_01_two_parents =================
+\begin{frame}{Reach is the support of an operator}
+For BLX-\(\alpha\), let \(m=\min(a,b)\), \(M=\max(a,b)\), and \(d=M-m\):
+\[
+x'\sim U[m-\alpha d,\,M+\alpha d],\qquad
+\Pr(x'\notin[m,M])=\frac{2\alpha}{1+2\alpha}.
+\]
+Uniform crossover has \(2^L\) possible first children when all \(L\) parental
+gene pairs differ; linear crossover reaches two affine children. Canonical
+(n)-point cuts use (1,\ldots,L-1), but this code excludes (L-1).
+Samples illustrate reach; enumeration establishes exact cardinality. OX1
+preserves permutation membership and uniqueness.
+\end{frame}
+
+\section{Two parents, and how to measure what an operator does to them}
+
+\begin{frame}{Two parents, and how to measure what an operator does to them}
+Crossover is the operator that takes two chromosomes and returns two new ones.
+Nothing else in a genetic algorithm creates a combination that was not there
+before, so the whole lesson turns on one question: GIVEN THESE TWO PARENTS,
+WHAT IS THE SET OF CHILDREN AN OPERATOR CAN PRODUCE?
+\end{frame}
+
+\resultframe{Two parents, and how to measure what an operator does to them}{../figures/offspring_01_two_parents.png}{%
+    The zero row: 2 children reached, 0.00\% new genes, 100.00\% clones, 100.00\% legal. Also the number every later step is measured against: choosing freely between the parents allows 2⁶ = \textbf{64} chromosomes}
+
+% ================= offspring_02_one_point =================
+\section{One-point crossover, and the size of its reach}
+
+\begin{frame}{One-point crossover, and the size of its reach}
+The textbook operator: cut both parents at the same point, swap the tails. It is
+worth starting here not because it is the best but because its reachable set is
+small enough to write down in full - which is the only way to see what the
+operator can and cannot do.
+\end{frame}
+
+\begin{frame}[fragile]{(1) crossover\_one\_point()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=129,lastline=142]{../src/offspring_02_one_point.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the reachable set}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=150,lastline=182]{../src/offspring_02_one_point.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the cut figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=185,lastline=210]{../src/offspring_02_one_point.py}
+\end{frame}
+
+\resultframe{One-point crossover, and the size of its reach}{../figures/offspring_02_one_point.png}{%
+    2,000 draws produce \textbf{10} distinct children; enumerating the 5 cut points produces the same 10. \textbf{0.00\%} new genes: the operator chooses which parent, never what value}
+
+\resultframe{The mechanism: one cut, two children}{../figures/offspring_02_one_point_schematic.png}{%
+    Cut after gene 3. Blue genes come from parent 1, red genes from parent 2.
+    The child is one parent up to the cut and the other after it. No gene is invented.}
+
+% ================= offspring_03_more_cuts =================
+\section{More cut points, and what the family can never do}
+
+\begin{frame}{More cut points, and what the family can never do}
+If one cut is good, are three better? Measured on this pair the answer is no,
+and the reason is worth more than the answer. What separates the members of this
+family is not how many cuts they make but how many of the 64 combinations of the
+parents' genes they can actually reach: uniform crossover reaches all of them,
+the n-point operators reach a handful.
+\end{frame}
+
+\begin{frame}[fragile]{(1) crossover\_n\_point()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=148,lastline=168]{../src/offspring_03_more_cuts.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover\_uniform()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=171,lastline=188]{../src/offspring_03_more_cuts.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the reach table}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=196,lastline=243]{../src/offspring_03_more_cuts.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the pattern figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=246,lastline=268]{../src/offspring_03_more_cuts.py}
+\end{frame}
+
+\resultframe{More cut points, and what the family can never do}{../figures/offspring_03_more_cuts.png}{%
+    Reach is not monotone in cuts: one-point \textbf{10}, 2-point \textbf{12}, 3-point \textbf{8}, uniform \textbf{64 of 64}. Uniform's price: \textbf{3.20\%} of its children are a parent handed back}
+
+% ================= offspring_04_blend =================
+\section{Arithmetic on genes, and the first illegal children}
+
+\begin{frame}{Arithmetic on genes, and the first illegal children}
+Every operator so far chose between the parents' genes. These two compute new
+ones - which is only possible because a gene here is a NUMBER, and numbers can
+be averaged, interpolated and extrapolated. That single assumption about the
+representation is what step 6 will take away.
+\end{frame}
+
+\begin{frame}[fragile]{(1) clamp()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=191,lastline=200]{../src/offspring_04_blend.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover\_blend()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=203,lastline=233]{../src/offspring_04_blend.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) crossover\_linear()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=236,lastline=254]{../src/offspring_04_blend.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the reach table}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=262,lastline=348]{../src/offspring_04_blend.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the blend figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=351,lastline=380]{../src/offspring_04_blend.py}
+\end{frame}
+
+\resultframe{Arithmetic on genes, and the first illegal children}{../figures/offspring_04_blend.png}{%
+    The first computed genes (\textbf{99.57\%} new) and the first illegal children. alpha = 0: \textbf{0.00\%} of genes beyond the parents, 100\% legal — Lesson 01's inward collapse, measured. alpha = 0.5: \textbf{49.63\%} beyond, only \textbf{50.08\%} legal; with \texttt{clamp()}, 100\% legal and still 49.63\% beyond. Linear: 100.00\% new genes and exactly \textbf{2} reachable children}
+
+% ================= offspring_05_fitness_driven =================
+\section{Letting the operator look at what it made}
+
+\begin{frame}{Letting the operator look at what it made}
+Every operator so far was blind: it produced two children and handed them over
+without ever asking whether they were any good. Gridin's fitness-driven variant
+adds one line - rank the two parents and the two children together, return the
+best two - and with it the guarantee that crossover can never make the pair
+worse.
+\end{frame}
+
+\begin{frame}[fragile]{(1) objective()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=252,lastline=261]{../src/offspring_05_fitness_driven.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover\_fitness\_driven()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=264,lastline=280]{../src/offspring_05_fitness_driven.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the survivors}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=288,lastline=357]{../src/offspring_05_fitness_driven.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the fitness figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=360,lastline=391]{../src/offspring_05_fitness_driven.py}
+\end{frame}
+
+\resultframe{Letting the operator look at what it made}{../figures/offspring_05_fitness_driven.png}{%
+    Blind blend is worse than its parents in \textbf{41.70\%} of draws — crossover guarantees nothing. The fitness-driven rule is worse in \textbf{0.00\%}, and pays for it: \textbf{16.50\%} of draws return the parents unchanged, and only \textbf{56.10\%} of what it returns is a child}
+
+% ================= offspring_06_the_divide =================
+\section{The same operators, on a chromosome that is a permutation}
+
+\begin{frame}{The same operators, on a chromosome that is a permutation}
+Nothing about the operators changes in this step. The chromosome changes: nine
+genes instead of six, and the genes are the nine stops of a delivery round, each
+of which must appear exactly once.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the nine stops}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=279,lastline=297]{../src/offspring_06_the_divide.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) tour\_length()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=300,lastline=305]{../src/offspring_06_the_divide.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) is\_legal\_tour()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=308,lastline=328]{../src/offspring_06_the_divide.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the same operators}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=336,lastline=408]{../src/offspring_06_the_divide.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the map figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=411,lastline=444]{../src/offspring_06_the_divide.py}
+\end{frame}
+
+\resultframe{The same operators, on a chromosome that is a permutation}{../figures/offspring_06_the_divide.png}{%
+    The same operators, a route instead of a point. \textbf{8 of 8} cut points give a route that visits one stop twice and another never. Legal children: one-point \textbf{0.00\%}, 3-point \textbf{0.00\%}, blend \textbf{0.00\%}, linear \textbf{0.00\%}, uniform \textbf{0.95\%} — and the count of uniform's legal children that were not simply a parent is \textbf{0}}
+
+% ================= offspring_07_ordered =================
+\section{Ordered crossover, and the divide read in both directions}
+
+\begin{frame}{Ordered crossover, and the divide read in both directions}
+Ordered crossover (OX1) is the answer to step 6: it never swaps gene values
+position by position, so a permutation goes in and a permutation comes out, by
+construction rather than by luck. This step checks that it is legal, checks what
+it actually inherits, and then does the thing that closes the lesson - hands OX1
+the real-valued parents of step 1 and watches what happens.
+\end{frame}
+
+\begin{frame}[fragile]{(1) crossover\_order()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=327,lastline=358]{../src/offspring_07_ordered.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the adjacency test}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=366,lastline=420]{../src/offspring_07_ordered.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the other direction}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=423,lastline=446]{../src/offspring_07_ordered.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the whole comparison}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=449,lastline=517]{../src/offspring_07_ordered.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) the divide figure}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=520,lastline=541]{../src/offspring_07_ordered.py}
+\end{frame}
+
+\resultframe{Ordered crossover, and the divide read in both directions}{../figures/offspring_07_ordered.png}{%
+    OX1 is legal \textbf{100.00\%} on routes and keeps \textbf{7.17 of 9} parent legs, against \textbf{3.71} for a random route. Handed the real-valued parents it does not crash: it reaches \textbf{2} children, \textbf{100.00\%} of them a parent. Final table: operators useful on both representations — \textbf{0}}
+
+\section{Next}
+
+\begin{frame}{Next}
+On a route of nine stops, one-point, n-point, blend and linear produce a legal child 0\% of the time. Ordered crossover is legal 100\% on routes and silently returns the parents on real genes. Zero operators work on both.
+
+\vspace{0.8em}
+\textbf{Lesson 05 --- Mutation}
+
+The third operator. OX1 on a tour was a silent no-op here; that bill is paid in Lesson 10, where order is the chromosome.
+\end{frame}
+\end{document}

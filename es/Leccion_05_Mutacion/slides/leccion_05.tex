@@ -1,0 +1,221 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{05}{Mutación}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 04 partió la cruza en dos familias que no se pueden intercambiar. La mutación es el operador que queda, todavía medida sobre un cromosoma.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item El alcance es una tasa por un paso; hay que ver las dos.
+    \item Un cromosoma de permutación no admite ruido gaussiano.
+    \item Un óptimo sin volumen es un artefacto que ninguna búsqueda puede ocupar.
+\end{itemize}
+\end{frame}
+
+% ================= alcance_mutacion_01_el_instrumento =================
+\begin{frame}{Un núcleo de mutación}
+Para el gen \(i\),
+\[
+B_i\sim\operatorname{Bernoulli}(p),\qquad
+\Delta_i\sim\mathcal N(\mu,\sigma^2),\qquad
+x_i'=\Pi_{[l,u]}(x_i+B_i\Delta_i).
+\]
+Entonces \(\mathbb E[\sum_iB_i]=Lp\): la tasa controla cuántos genes se
+activan y \(\sigma\) el desplazamiento. Se miden posiciones cambiadas con
+\(H=\sum_i\mathbf 1[x_i\ne x_i']\) y recorrido de permutación con
+\(D=\sum_v|\operatorname{pos}_\pi(v)-\operatorname{pos}_{\pi'}(v)|\). Un óptimo de ancho cero tiene
+probabilidad cero bajo una propuesta continua ideal, aunque una cuadrícula lo
+contenga.
+\end{frame}
+
+\section{El alcance de una mutación, y cómo medirlo}
+
+\begin{frame}{El alcance de una mutación, y cómo medirlo}
+La selección descarta y la cruza recombina; ambos trabajan solo con valores que la
+población ya posee. La mutación es el único operador que puede producir un valor
+que nadie tenía. Por lo tanto, toda esta lección trata sobre una pregunta: ¿QUÉ TAN LEJOS
+puede llegar una mutación?
+\end{frame}
+
+\marcoresultado{El alcance de una mutación, y cómo medirlo}{../figures/alcance_mutacion_01_el_instrumento.png}{%
+    Los dos números de la Lección 01 reaparecen exactamente — sigma 1.0 llega \textbf{0 de 2000}, sigma 3.0 \textbf{110 de 2000}. El viaje promedio es 0.798·sigma hasta que los muros empiezan a comerlo: en sigma 6.0, el \textbf{19.4\%} de las propuestas son acotadas y la proporción baja a 0.690. El intercambio en una tabla: sigma 0.5 encuentra la mayoría de los movimientos cuesta arriba (\textbf{272}) y llega \textbf{0} veces}
+
+% ================= alcance_mutacion_02_tasa_y_paso =================
+\section{La mutación tiene dos diales, no uno}
+
+\begin{frame}{La mutación tiene dos diales, no uno}
+El paso 1 midió un solo gen, por lo que sigma era lo único que había para ajustar.
+Un cromosoma real tiene muchos genes, y el operador tiene entonces un segundo dial: la
+probabilidad por gen p de que un gen sea tocado en absoluto. El
+\texttt{mutation\_random\_deviation(ind, mu, sigma, p)} de Gridin lleva ambos.
+\end{frame}
+
+\begin{frame}[fragile]{(1) CANTIDAD\_GENES}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=37,lastline=43]{../src/alcance_mutacion_02_tasa_y_paso.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) Individuo.aptitud}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=65,lastline=65]{../src/alcance_mutacion_02_tasa_y_paso.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutar\_desviacion\_aleatoria()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=96]{../src/alcance_mutacion_02_tasa_y_paso.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) reporte\_regimen()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=99,lastline=135]{../src/alcance_mutacion_02_tasa_y_paso.py}
+\end{frame}
+
+\marcoresultado{La mutación tiene dos diales, no uno}{../figures/alcance_mutacion_02_tasa_y_paso.png}{%
+    Los genes tocados nunca difieren de \texttt{p·n} por más de \textbf{0.015}. Tres regímenes con el mismo \texttt{p·sigma = 0.30} viajan 1.904 / 2.179 / 2.304 en total pero su salto individual más largo difiere por un factor de \textbf{7.1} (10.253 vs 1.449). En p = 0.1, \textbf{718 de 2000} mutaciones no cambian nada en absoluto, contra un predicho (1−p)¹⁰ = 0.3487}
+
+% ================= alcance_mutacion_03_guiada_por_aptitud =================
+\section{Mutación que se niega a empeorar las cosas}
+
+\begin{frame}{Mutación que se niega a empeorar las cosas}
+Cada mutación hasta ahora ha sido ciega: mueve los genes y acepta lo que sea que
+diga el objetivo sobre el resultado. La mayor parte del tiempo el resultado es peor -
+el paso 1 ya mostró que en sigma = 3.0 solo 144 de 2000 mutaciones fueron
+cuesta arriba. El último operador de Gridin las rechaza: reintenta, hasta MAX\_INTENTOS
+veces, y devuelve el primer mutante que supera a su padre.
+\end{frame}
+
+\begin{frame}[fragile]{(1) MAX\_INTENTOS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=44]{../src/alcance_mutacion_03_guiada_por_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutar\_guiada\_por\_aptitud()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=95,lastline=119]{../src/alcance_mutacion_03_guiada_por_aptitud.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) comparar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=122,lastline=165]{../src/alcance_mutacion_03_guiada_por_aptitud.py}
+\end{frame}
+
+\marcoresultado{Mutación que se niega a empeorar las cosas}{../figures/alcance_mutacion_03_guiada_por_aptitud.png}{%
+    El filtro convierte un cambio de aptitud promedio de \textbf{−1.0337 en +0.0548} y duplica las llegadas (102 → 273) — pero gasta \textbf{5,603 evaluaciones de aptitud contra 2,000}, así que por mil llamadas llega \textbf{48.7} veces contra \textbf{51.0} de la mutación ciega. La aceptación del 20.2\% es exactamente 1−(1−q)³ para la tasa ciega hacia arriba q}
+
+% ================= alcance_mutacion_04_la_escalera_muerta =================
+\section{La ejecución que la Lección 02 dio por muerta}
+
+\begin{frame}{La ejecución que la Lección 02 dio por muerta}
+Una versión anterior del paso 5 de la Lección 02 terminó con una ejecución que se detuvo a las seis
+generaciones, a 0.2000 por debajo del óptimo de la escalera, casi sin dispersión genética
+restante, y apuntó hacia aquí: la mutación "es el único operador que podría restaurarlo". Este paso es donde esa promesa
+venció - y no venció de la forma
+en que estaba escrita. Lo que la investigación encontró en su lugar envió una corrección de vuelta a
+la Lección 02, que ya no hace esa afirmación.
+\end{frame}
+
+\begin{frame}[fragile]{(1) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=115,lastline=201]{../src/alcance_mutacion_04_la_escalera_muerta.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) escalera()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=93,lastline=107]{../src/alcance_mutacion_04_la_escalera_muerta.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) anchos\_escalones()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=204,lastline=223]{../src/alcance_mutacion_04_la_escalera_muerta.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) ALTURA\_PICO\_REPARADA}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=226,lastline=233]{../src/alcance_mutacion_04_la_escalera_muerta.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) barrido()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=236,lastline=264]{../src/alcance_mutacion_04_la_escalera_muerta.py}
+\end{frame}
+
+\marcoresultado{La ejecución que la Lección 02 dio por muerta}{../figures/alcance_mutacion_04_la_escalera_muerta.png}{%
+    La ejecución de la Lección 02 reproducida (6 generaciones, mejor \textbf{+1.8000}, dispersión 0.192, \textbf{0.2000} por debajo). Luego ocho regímenes de mutación × 100 ejecuciones: el escalón superior se alcanza \textbf{0 veces en 800 ejecuciones}, mientras que la dispersión promedio de los genes va de 0.462 a 3.194. \texttt{anchos\_escalones()} dice por qué — el escalón superior es \textbf{0.000 de ancho}. Reparada (altura del pico 10.0 → 10.5, escalón superior 0.500 de ancho), el propio régimen de la Lección 02 lo alcanza \textbf{96 de 100} veces}
+
+% ================= mutacion_permutacion_01_ruido_ilegal =================
+\section{cuando el ruido no es un movimiento legal}
+
+\begin{frame}{cuando el ruido no es un movimiento legal}
+Cada operador hasta ahora ha sumado un número a un gen. Eso funciona porque un gen
+era un valor real y cualquier valor real en [-10, +10] era un gen legal.
+\end{frame}
+
+\marcoresultado{cuando el ruido no es un movimiento legal}{../figures/mutacion_permutacion_01_ruido_ilegal.png}{%
+    La desviación aleatoria en una permutación produce \textbf{1935 mutantes inválidos de 2000}, y \textbf{0} de los 65 sobrevivientes tuvo algún gen tocado — la única salida legal del operador es la intacta, a una tasa medida que coincide con (1−p)¹⁰ a menos de \textbf{0.0025}. La inversión de bit cambia exactamente 1 posición cada vez; el intercambio exactamente 2}
+
+% ================= mutacion_permutacion_02_reordenamientos =================
+\section{tres reordenamientos más grandes}
+
+\begin{frame}{tres reordenamientos más grandes}
+El intercambio es el movimiento legal mínimo. Gridin da tres más grandes, y los tres
+funcionan de la misma manera: elige dos posiciones y reordena el bloque entre
+ellas. La inversión lo invierte (le da la vuelta), el desplazamiento lo rota por un lugar, barajar
+lo aleatoriza. La pregunta que responde este paso es la que el primer ejemplo hizo sobre
+sigma - ¿qué tan lejos llega cada uno de ellos? - y la respuesta necesita dos números,
+no uno.
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutacion\_inversion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=79,lastline=97]{../src/mutacion_permutacion_02_reordenamientos.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutacion\_desplazamiento()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=100,lastline=119]{../src/mutacion_permutacion_02_reordenamientos.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutacion\_barajar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=122,lastline=140]{../src/mutacion_permutacion_02_reordenamientos.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) comparar\_operadores()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=167,lastline=199]{../src/mutacion_permutacion_02_reordenamientos.py}
+\end{frame}
+
+\marcoresultado{tres reordenamientos más grandes}{../figures/mutacion_permutacion_02_reordenamientos.png}{%
+    Las dos medidas de alcance clasifican a los operadores de manera diferente: por posiciones perturbadas \textbf{desplazamiento (4.663) > inversión (4.230) > barajar (3.708) > intercambio (2.000)}, por distancia viajada \textbf{inversion (1.308) > barajar (0.876) > intercambio (0.733) = desplazamiento (0.733)}. El intercambio y el desplazamiento dan idéntico viaje total en \textbf{90 de 90} pares de posiciones. Barajar devuelve el individuo sin cambios \textbf{271 de 2000} veces (13.6\%)}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+La escalera de la Lección 02 tuvo un peldaño de arriba de ancho cero. Esta lección conserva la geometría rota como el ejemplar que diagnostica.
+
+\vspace{0.8em}
+\textbf{Lección 06 --- Medir la efectividad}
+
+Un algoritmo genético es una variable aleatoria. Una generación, y una corrida, no prueban nada. La Lección 03 aplazó esa evidencia aquí.
+\end{frame}
+\end{document}

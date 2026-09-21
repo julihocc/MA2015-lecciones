@@ -1,0 +1,214 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{07}{Ajuste de Parámetros}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 06 construyó el instrumento de tasa de éxito y el contador de evaluaciones. Hoy esas herramientas se apuntan a los parámetros escritos arriba de cada archivo hasta ahora.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Afinar desde corridas sueltas es leer ruido.
+    \item La moneda honesta es el margen sobre la búsqueda ciega a igual presupuesto.
+    \item Un ajuste fijo es un compromiso --- por eso existe la Lección 12.
+\end{itemize}
+\end{frame}
+
+% ================= afinacion_01_corridas_sueltas =================
+\begin{frame}{Evidencia emparejada}
+El mismo índice de semilla se usa en ambas configuraciones:
+\[
+d_i=I_{i,B}-I_{i,A}\in\{-1,0,1\},\qquad
+\widehat\Delta=\bar d,\qquad
+\widehat{\operatorname{EE}}(\widehat\Delta)=\frac{s_d}{\sqrt n}.
+\]
+Este error emparejado sustituye la aproximación independiente. El mapa de 36
+celdas es exploratorio para este paisaje y semillas, no un óptimo universal ni
+un estudio confirmatorio de comparaciones múltiples.
+\end{frame}
+
+\section{El metodo del libro, fielmente}
+
+\begin{frame}{El metodo del libro, fielmente}
+El Capitulo 7 es el capitulo de laboratorio del libro - 42 figuras, tres
+perillas (probabilidad de cruza, probabilidad de mutacion, tamano de poblacion),
+cada una girada en su propio paisaje, cada configuracion mostrada como una
+corrida, generacion por generacion. Es la forma natural de afinar, y es
+exactamente el metodo que la Leccion 06 demolio. Este paso mantiene el
+protocolo del libro y sus numeros - poblacion 16, probabilidad de mutacion 0.2,
+probabilidades de cruza 0.0, 0.4, 0.7, semilla 63 - en el paisaje del curso, y
+lo lee de la forma en que lo lee el libro. Luego lo lee siete veces mas.
+\end{frame}
+
+\marcoresultado{El metodo del libro, fielmente}{../figuras/afinacion_01_corridas_sueltas.png}{%
+    Una corrida por config corona pc = 0.7 por 0.0021; sobre 8 semillas las victorias van 0/3/5, la división más estrecha es 0.000004 (semilla 3) y la más ancha 0.6284 (semilla 1) — el ranking es inestable}
+
+% ================= afinacion_02_el_instrumento =================
+\section{El instrumento}
+
+\begin{frame}{El instrumento}
+El Paso 1 corrio el metodo del libro y lo vio fallar: una corrida por configuracion, un
+ranking decidido en el cuarto decimal, conteos de victorias que cambian con la semilla.
+La Leccion 06 construyo la cura - una tasa de exito sobre cientos de corridas, juzgada desde
+afuera por una referencia de cuadricula densa y una tolerancia establecida. Este paso apunta ese
+instrumento a la primera perilla, la probabilidad de cruza, en la linea base
+del curso: poblacion 10, probabilidad de mutacion 0.1, el paisaje de seno de la
+Leccion 01, diez generaciones.
+\end{frame}
+
+\begin{frame}[fragile]{(1) las perillas son argumentos}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=113,lastline=142]{../src/afinacion_02_el_instrumento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) error\_estandar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=159,lastline=167]{../src/afinacion_02_el_instrumento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) medir()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=170,lastline=188]{../src/afinacion_02_el_instrumento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la linea base del curso}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=46,lastline=46]{../src/afinacion_02_el_instrumento.py}
+\end{frame}
+
+\marcoresultado{El instrumento}{../figuras/afinacion_02_el_instrumento.png}{%
+    La tasa observada sube 55.6\% → 83.0\%; la brecha de 27.4 puntos se reporta con el error estándar de diferencias 0/1 emparejadas. A la tabla aún le falta la columna de costo}
+
+% ================= afinacion_03_la_perilla_del_presupuesto =================
+\section{La perilla del presupuesto}
+
+\begin{frame}{La perilla del presupuesto}
+El Paso 2 midio la perilla de cruza y encontro una subida monotona limpia: 55.6\%
+en 0.0 a 83.0\% en 1.0. Cerro con la columna faltante. La cruza no
+viene gratis - cada par cruzado crea dos nuevos individuos, y cada
+nuevo individuo es una evaluacion de aptitud, la unica moneda que gasta un AG. Asi
+que el dial que "mejora" el algoritmo tambien infla su presupuesto, y la
+pregunta se vuelve: ¿cuanto de la subida es mejor busqueda, y cuanto es
+simplemente mas gasto?
+\end{frame}
+
+\begin{frame}[fragile]{(1) el contador de evaluaciones}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=67,lastline=88]{../src/afinacion_03_la_perilla_del_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) exito\_ciego()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=195,lastline=205]{../src/afinacion_03_la_perilla_del_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la columna de margen}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=221,lastline=230]{../src/afinacion_03_la_perilla_del_presupuesto.py}
+\end{frame}
+
+\marcoresultado{La perilla del presupuesto}{../figuras/afinacion_03_la_perilla_del_presupuesto.png}{%
+    Cruza 0.0 gasta 20 evals/corrida, 1.0 gasta 120; el margen sobre ciego cae +30.6 → +0.8 puntos; las 100 evaluaciones extra le compran al AG 27.4 puntos donde 100 extracciones ciegas compran 57.2 — la perilla es de presupuesto}
+
+% ================= afinacion_04_mutacion =================
+\section{Mutacion, y donde se esconde la curva de campana}
+
+\begin{frame}{Mutacion, y donde se esconde la curva de campana}
+Todos los libros de texto dibujan la curva de mutacion como una campana: muy poca mutacion y
+la busqueda se estanca, demasiada y degenera en una caminata aleatoria, con un
+punto optimo en el medio. El Capitulo 7 de Gridin muestra corridas sueltas en 0.0, 0.3 y
+1.0 y hace gestos hacia la misma forma. Este paso mide la perilla correctamente -
+siete configuraciones, 500 corridas cada una, cruza fija en 0.8 - y la curva de campana
+no esta ahi. La tasa de exito bruta sube monotonicamente hasta
+la mutacion 1.0.
+\end{frame}
+
+\begin{frame}[fragile]{(1) la segunda perilla VALORES\_PM barridos, cruza fija en 0.8}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=199,lastline=204]{../src/afinacion_04_mutacion.py}
+\end{frame}
+
+\marcoresultado{Mutacion, y donde se esconde la curva de campana}{../figuras/afinacion_04_mutacion.png}{%
+    La tasa bruta es monótona hasta mutación 1.0 (61.8\% → 89.8\%) — no hay curva de campana; el margen se dobla: −10.9\% en 0.0 (peor que dados), pico +5.9\% cerca de 0.2, −3.7\% en 1.0 — la curva vive en el margen}
+
+% ================= afinacion_05_poblacion =================
+\section{Poblacion, la perilla de presupuesto mas pura}
+
+\begin{frame}{Poblacion, la perilla de presupuesto mas pura}
+La cruza y la mutacion al menos fingen tratar sobre estrategia de busqueda.
+El tamano de la poblacion no finge nada: una poblacion mas grande es mas evaluaciones,
+punto. Es la perilla del presupuesto sin ningun disfraz, y el paso 4 de la Leccion 06
+ya la atrapo una vez - la efectividad sube, la eficiencia cae. Este paso
+la vuelve a medir dentro del estudio de afinacion, con las configuraciones del propio
+libro (6, 10, 20, 50, mutacion 0.2 del libro), para cerrar el patron antes del
+mapa final.
+\end{frame}
+
+\begin{frame}[fragile]{(1) la tercera perilla TAMANOS\_POBLACION barridos, cruza 0.8 y mutacion 0.2 fijas}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=200,lastline=206]{../src/afinacion_05_poblacion.py}
+\end{frame}
+
+\marcoresultado{Poblacion, la perilla de presupuesto mas pura}{../figuras/afinacion_05_poblacion.png}{%
+    Población 50 registra 500/500 éxitos (intervalo de Wilson al 95\%: 99.2\%--100\%) a 550 evals/corrida; el rendimiento colapsa 9.25 → 1.82 éxitos por 1000 evals; el margen hace pico en población 10 (+5.9\%) y desaparece en 50 — "¿cuál es mejor?" no tiene respuesta sin moneda}
+
+% ================= afinacion_06_la_cuadricula =================
+\section{La cuadricula, y el veredicto}
+
+\begin{frame}{La cuadricula, y el veredicto}
+Los pasos 2 a 5 giraron una perilla a la vez y cada perilla confeso ser una
+perilla de presupuesto. La pregunta final honesta es si interactuan - si
+la mejor cruza depende de la configuracion de mutacion, de la manera que los libros de texto
+asumen cuando recomiendan pares como "0.8 y 0.1". Este paso mide la
+cuadricula completa: seis configuraciones de cruza por seis configuraciones de mutacion, poblacion
+10, 100 corridas por celda, cada celda valorada contra la busqueda ciega en su propio
+presupuesto.
+\end{frame}
+
+\begin{frame}[fragile]{(1) la cuadricula}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=192,lastline=204]{../src/afinacion_06_la_cuadricula.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) CORRIDAS = 100 cambiado de 500: treinta y seis celdas tienen que encajar en el reloj}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=47]{../src/afinacion_06_la_cuadricula.py}
+\end{frame}
+
+\marcoresultado{La cuadricula, y el veredicto}{../figuras/afinacion_06_la_cuadricula.png}{%
+    La esquina (0, 0) recupera la búsqueda ciega (9.0\% ± 2.9\% vs 13.4\% para 10 extra ciegos — el instrumento está calibrado); la mejor celda (1.0, 0.5) puntúa 90.0\% a 160 evals con margen de −0.01\%; solo 20 de 36 celdas superan su presupuesto — los operadores se ganan el sueldo en las baratas}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+La población es la perilla de presupuesto sin disfraz: una tasa de éxito perfecta se puede comprar, a costa de un colapso en el rendimiento por evaluación.
+
+\vspace{0.8em}
+\textbf{Lección 08 --- Funciones de caja negra}
+
+Hasta ahora cada paisaje se podía dibujar y recorrer por fuerza bruta. La 08 quita la imagen. Un ajuste fijo como compromiso es la 12.
+\end{frame}
+\end{document}

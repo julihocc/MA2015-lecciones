@@ -1,0 +1,214 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{07}{Tuning}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 06 built the success-rate instrument and the evaluation counter. Today those tools are aimed at the parameters written at the top of every file so far.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Tuning from single runs is reading noise.
+    \item The honest currency is the margin over blind search at equal budget.
+    \item A fixed setting is a compromise --- which is why Lesson 12 exists.
+\end{itemize}
+\end{frame}
+
+% ================= tuning_01_single_runs =================
+\begin{frame}{Paired evidence, not two independent rates}
+The same seed index is used for both settings. For success indicators,
+\[
+d_i=I_{i,B}-I_{i,A}\in\{-1,0,1\},\qquad
+\widehat\Delta=\bar d,\qquad
+\widehat{\operatorname{SE}}(\widehat\Delta)=\frac{s_d}{\sqrt n}.
+\]
+This paired error replaces the independent-rate approximation. The final
+36-cell map is exploratory for this landscape and seed set; it is not a
+universal optimum or a confirmatory multiple-comparison study.
+\end{frame}
+
+\section{The book's method, faithfully}
+
+\begin{frame}{The book's method, faithfully}
+Chapter 7 is the book's laboratory chapter - 42 figures, three knobs
+(crossover probability, mutation probability, population size), each turned
+on its own landscape, each setting shown as one run, generation by
+generation. It is the natural way to tune, and it is exactly the method
+Lesson 06 demolished. This step keeps the book's protocol and its numbers -
+population 16, mutation probability 0.2, crossover probabilities 0.0, 0.4,
+0.7, seed 63 - on the course's landscape, and reads it the way the book
+reads it. Then it reads it seven more times.
+\end{frame}
+
+\resultframe{The book's method, faithfully}{../figures/tuning_01_single_runs.png}{%
+    One run per setting crowns pc = 0.7 by 0.0021; over 8 seeds the win counts go 0/3/5, the tightest split is 0.000004 (seed 3) and the widest 0.6284 (seed 1) — the ranking is unstable}
+
+% ================= tuning_02_the_instrument =================
+\section{The instrument}
+
+\begin{frame}{The instrument}
+Step 1 ran the book's method and watched it fail: one run per setting, a
+ranking decided in the fourth decimal, win counts that flip with the seed.
+Lesson 06 built the cure - a success rate over hundreds of runs, judged from
+outside by a dense-grid reference and a stated tolerance. This step aims that
+instrument at the first knob, crossover probability, on the course's
+baseline: population 10, mutation probability 0.1, Lesson 01's sine
+landscape, ten generations.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the knobs become arguments}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=113,lastline=142]{../src/tuning_02_the_instrument.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) standard\_error()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=159,lastline=167]{../src/tuning_02_the_instrument.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) measure()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=170,lastline=188]{../src/tuning_02_the_instrument.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the course's baseline}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=46,lastline=46]{../src/tuning_02_the_instrument.py}
+\end{frame}
+
+\resultframe{The instrument}{../figures/tuning_02_the_instrument.png}{%
+    The observed crossover rate rises 55.6\% → 83.0\%; the 27.4-point endpoint gap is reported with the standard error of paired 0/1 differences. The table is still missing the cost column}
+
+% ================= tuning_03_the_budget_knob =================
+\section{The budget knob}
+
+\begin{frame}{The budget knob}
+Step 2 measured the crossover knob and found a clean monotone climb: 55.6\%
+at 0.0 to 83.0\% at 1.0. It closed with the missing column. Crossover does
+not come free - every crossed pair creates two new individuals, and every
+new individual is a fitness evaluation, the only currency a GA spends. So
+the dial that "improves" the algorithm also inflates its budget, and the
+question becomes: how much of the climb is better search, and how much is
+just more spending?
+\end{frame}
+
+\begin{frame}[fragile]{(1) the evaluation counter}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=67,lastline=88]{../src/tuning_03_the_budget_knob.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) blind\_success()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=195,lastline=205]{../src/tuning_03_the_budget_knob.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the margin column}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=221,lastline=230]{../src/tuning_03_the_budget_knob.py}
+\end{frame}
+
+\resultframe{The budget knob}{../figures/tuning_03_the_budget_knob.png}{%
+    Crossover 0.0 spends 20 evals/run, 1.0 spends 120; the margin over blind falls +30.6 → +0.8 points; the 100 extra evaluations buy the GA 27.4 points where 100 blind draws buy 57.2 — the knob is a budget knob}
+
+% ================= tuning_04_mutation =================
+\section{Mutation, and where the bell curve hides}
+
+\begin{frame}{Mutation, and where the bell curve hides}
+Every textbook draws the mutation curve as a bell: too little mutation and
+the search stagnates, too much and it degenerates into random walk, with a
+sweet spot in between. Gridin's Chapter 7 shows single runs at 0.0, 0.3 and
+1.0 and gestures at the same shape. This step measures the knob properly -
+seven settings, 500 runs each, crossover fixed at 0.8 - and the bell curve
+is not there. The raw success rate climbs monotonically all the way to
+mutation 1.0.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the second knob}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=199,lastline=204]{../src/tuning_04_mutation.py}
+\end{frame}
+
+\resultframe{Mutation, and where the bell curve hides}{../figures/tuning_04_mutation.png}{%
+    The raw rate is monotone to mutation 1.0 (61.8\% → 89.8\%) — no bell curve; the margin bends: −10.9\% at 0.0 (worse than dice), peak +5.9\% near 0.2, −3.7\% at 1.0 — the bell curve lives in the margin}
+
+% ================= tuning_05_population =================
+\section{Population, the purest budget knob}
+
+\begin{frame}{Population, the purest budget knob}
+Crossover and mutation at least pretend to be about search strategy.
+Population size pretends nothing: a bigger population is more evaluations,
+full stop. It is the budget knob with no disguise, and Lesson 06 step 4
+already caught it once - effectiveness climbs, efficiency falls. This step
+re-measures it inside the tuning study, with the book's own settings
+(6, 10, 20, 50, the book's mutation 0.2), to close the pattern before the
+final map.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the third knob}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=200,lastline=206]{../src/tuning_05_population.py}
+\end{frame}
+
+\resultframe{Population, the purest budget knob}{../figures/tuning_05_population.png}{%
+    Population 50 records 500/500 successes (95\% Wilson interval 99.2\%--100\%) at 550 evals/run; yield collapses 9.25 → 1.82 successes per 1000 evals; the margin peaks at population 10 (+5.9\%) and vanishes at 50 — "which is best?" has no answer without a currency}
+
+% ================= tuning_06_the_grid =================
+\section{The grid, and the verdict}
+
+\begin{frame}{The grid, and the verdict}
+Steps 2 to 5 turned one knob at a time and every knob confessed to being a
+budget knob. The honest final question is whether they interact - whether
+the best crossover depends on the mutation setting, the way the textbooks
+assume when they recommend pairs like "0.8 and 0.1". This step measures the
+full grid: six crossover settings times six mutation settings, population
+10, 100 runs per cell, every cell priced against blind search at its own
+budget.
+\end{frame}
+
+\begin{frame}[fragile]{(1) the grid}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=192,lastline=204]{../src/tuning_06_the_grid.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) RUNS = 100}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=47]{../src/tuning_06_the_grid.py}
+\end{frame}
+
+\resultframe{The grid, and the verdict}{../figures/tuning_06_the_grid.png}{%
+    The (0, 0) corner recovers blind search (9.0\% ± 2.9\% vs 13.4\% for 10 blind draws — the instrument is calibrated); the best cell (1.0, 0.5) scores 90.0\% at 160 evals with a margin of −0.01\%; only 20 of 36 cells beat their own budget — the operators earn their keep in the cheap cells}
+
+\section{Next}
+
+\begin{frame}{Next}
+Population is the budget knob with no disguise: a perfect success score can simply be bought, at a collapse in yield per evaluation.
+
+\vspace{0.8em}
+\textbf{Lesson 08 --- Black-Box Functions}
+
+So far every landscape could be drawn and brute-forced. Lesson 08 takes the picture away. A fixed setting as a compromise is Lesson 12.
+\end{frame}
+\end{document}

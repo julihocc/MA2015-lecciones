@@ -1,0 +1,226 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{12}{El Algoritmo Genético Adaptativo}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 07 afinó tres perillas y llamó compromiso a un ajuste fijo. La 10 puso el TSP. Hoy se deja mover a los parámetros.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Una corrida puede sentir su propio estancamiento sin conocer el óptimo.
+    \item La rama adaptativa que se anuncia hay que auditarla (puede no dispararse nunca).
+    \item Presupuesto igual, emparejado contra un rival \emph{afinado}, no contra los defaults.
+\end{itemize}
+\end{frame}
+
+% ================= ag_adaptativo_01_parametros_fijos =================
+\begin{frame}{El sensor y la actualización}
+Sea \(m_t\) la media actual y \(\bar m\) la media de las diez generaciones
+anteriores:
+\[
+\text{mejora}_t=[m_t<(1-0.001)\bar m].
+\]
+Las probabilidades se multiplican por 0.99 al mejorar y por 1.1 al estancarse,
+y después se recortan. Eliminar no evalúa; cada inmigrante sí. Los resúmenes
+emparejados de dos errores estándar son aproximados, no pruebas de significancia.
+\end{frame}
+
+\section{Una ejecución con parámetros fijos}
+
+\begin{frame}{Una ejecución con parámetros fijos}
+Hasta ahora, cada lección ha escrito los parámetros en la parte superior del archivo como
+constantes; la Lección 07 luego los afinó por búsqueda en cuadrícula y reportó qué valores fijos
+eran mejores. Esta lección hace una pregunta diferente: ¿deberían ser fijos
+en absoluto? Una ejecución tiene una fase temprana, cuando la población está dispersa y la
+búsqueda necesita alcance, y una fase tardía, cuando la población es casi idéntica
+y la búsqueda necesita refinamiento. Una constante tiene que servir a ambas.
+\end{frame}
+
+\marcoresultado{Una ejecución con parámetros fijos}{../figures/ag_adaptativo_01_parametros_fijos.png}{%
+    La semilla 1 gasta 11,901 evaluaciones en 99 generaciones y devuelve una ruta legal de \textbf{57,076}, un 40.8\% más larga que la línea base del vecino más cercano de 40,526}
+
+% ================= ag_adaptativo_02_el_estancamiento =================
+\section{Encontrando el estancamiento}
+
+\begin{frame}{Encontrando el estancamiento}
+El paso 1 gastó todo su presupuesto en una sola configuración. Este paso pregunta a dónde fue ese presupuesto.
+El algoritmo no puede ver qué tan lejos está del óptimo -- no tiene óptimo para comparar -- pero puede
+ver su propia historia reciente, y eso es suficiente para distinguir una generación que todavía está haciendo
+progreso de una que no. La señal es la del libro: compare la media de la población de esta generación
+con la media de las diez anteriores. Si no ha mejorado al menos en una décima de porcentaje, la generación está estancada.
+\end{frame}
+
+\begin{frame}[fragile]{(1) promedio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=106]{../src/ag_adaptativo_02_el_estancamiento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) esta\_mejorando()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=109,lastline=121]{../src/ag_adaptativo_02_el_estancamiento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) tendencia\_estancamiento}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=142,lastline=144]{../src/ag_adaptativo_02_el_estancamiento.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) sombrear\_estancamientos()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=177,lastline=183]{../src/ag_adaptativo_02_el_estancamiento.py}
+\end{frame}
+
+\marcoafirmacion{Encontrando el estancamiento}{%
+    La señal llama a \textbf{14 de 99} generaciones estancadas, la primera en la generación 74, y el 14\% del presupuesto se gasta dentro de ellas; la primera mitad del presupuesto compra el \textbf{85\%} de la mejora total de la ejecución, la segunda mitad el 15\%}
+
+% ================= ag_adaptativo_03_probabilidades_adaptativas =================
+\section{Probabilidades que se mueven}
+
+\begin{frame}{Probabilidades que se mueven}
+El sensor del paso 2 dice, en cada generación, si la población sigue
+mejorando. Este paso lo conecta a las dos probabilidades: cuando la ejecución se estanca,
+súbalas -- más recombinación, más mutación, más alcance; mientras la ejecución
+mejora, bájelas hacia un piso y deje que la selección refine lo que tiene.
+La regla es la del libro, y es deliberadamente contundente: multiplicar por 1.1 cuando
+se estanca, por 0.99 cuando mejora, y acotar.
+\end{frame}
+
+\begin{frame}[fragile]{(1) constantes\_adaptacion}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=50,lastline=56]{../src/ag_adaptativo_03_probabilidades_adaptativas.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) adaptar\_probabilidades()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=128,lastline=141]{../src/ag_adaptativo_03_probabilidades_adaptativas.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) ejecutar(adaptativo)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=148,lastline=153]{../src/ag_adaptativo_03_probabilidades_adaptativas.py}
+\end{frame}
+
+\marcoafirmacion{Probabilidades que se mueven}{%
+    Misma semilla, mismo presupuesto: adaptativo \textbf{48,830} contra fijo \textbf{57,076} (−14.4\%). Pero la rama estancada se dispara \textbf{0 de 99} veces — la cruza baja 0.90 → 0.33 y la mutación 0.25 → 0.09 y nunca vuelven a subir. La regla se comporta como un programa de decaimiento, no como adaptación}
+
+% ================= ag_adaptativo_04_poblacion_adaptativa =================
+\section{Una población que se redimensiona sola}
+
+\begin{frame}{Una población que se redimensiona sola}
+La segunda mitad del algoritmo adaptativo del libro cambia la población misma.
+Mientras la ejecución mejora, elimina al peor individuo, de modo que cada generación es
+más barata y el presupuesto compra más de ellas. Cuando la ejecución se estanca, inyecta rutas
+aleatorias frescas -- inmigrantes -- para que haya material nuevo que recombinar.
+\end{frame}
+
+\begin{frame}[fragile]{(1) constantes\_poblacion}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=50,lastline=54]{../src/ag_adaptativo_04_poblacion_adaptativa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) redimensionar\_poblacion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=140,lastline=160]{../src/ag_adaptativo_04_poblacion_adaptativa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) ejecutar(redimensionar)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=172,lastline=176]{../src/ag_adaptativo_04_poblacion_adaptativa.py}
+\end{frame}
+
+\marcoafirmacion{Una población que se redimensiona sola}{%
+    Solo redimensionamiento: 35 estancamientos, 70 inmigrantes, 103 descartes, población 68–120, \textbf{138} generaciones para el mismo presupuesto y \textbf{49,374}. Con las probabilidades también: 41 estancamientos, población reducida a 40, 155 generaciones, cruza en el rango de 0.39–1.00 — el redimensionamiento trae de vuelta los estancamientos que el paso 3 había hecho desaparecer — y \textbf{52,295}, peor en esta semilla que el redimensionamiento solo}
+
+% ================= ag_adaptativo_05_doce_ejecuciones =================
+\section{Doce ejecuciones de cada uno}
+
+\begin{frame}{Doce ejecuciones de cada uno}
+Los pasos 3 y 4 mostraron cada uno una semilla, y una semilla no decide nada: la Lección 06
+midió la dispersión de este tipo de resultado y la Lección 07 mostró una clasificación de
+parámetros volteándose de semilla en semilla. Así que cada régimen se ejecuta ahora doce veces,
+la ejecución i en la semilla i, lo que hace que la comparación sea emparejada -- las mismas doce poblaciones
+iniciales enfrentan a los cuatro regímenes, y la diferencia se puede leer ejecución por ejecución.
+\end{frame}
+
+\begin{frame}[fragile]{(1) EJECUCIONES}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=56,lastline=58]{../src/ag_adaptativo_05_doce_ejecuciones.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) medir()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=238,lastline=248]{../src/ag_adaptativo_05_doce_ejecuciones.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) resumen\_emparejado()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=251,lastline=266]{../src/ag_adaptativo_05_doce_ejecuciones.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la\_comparacion}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=276,lastline=335]{../src/ag_adaptativo_05_doce_ejecuciones.py}
+\end{frame}
+
+\marcoafirmacion{Doce ejecuciones de cada uno}{%
+    Sobre 12 ejecuciones emparejadas (ejecución \(i\) en semilla \(i\)): fijo \textbf{58,195}, probabilidades \textbf{50,145} (−8,050 ± 1,022, victorias 12/12), redimensionar \textbf{53,555} (−4,640 ± 926, 10/12), ambos \textbf{52,622} (−5,573 ± 1,127, 11/12). Cada régimen gasta 11,901–11,946 evaluaciones. Los intervalos aproximados diferencia-media ± dos EE excluyen cero aquí; es descripción, no prueba de significancia}
+
+% ================= ag_adaptativo_06_un_rival_afinado =================
+\section{El rival afinado}
+
+\begin{frame}{El rival afinado}
+El paso 5 mostró a los tres regímenes adaptativos superando al algoritmo fijo, el mejor de
+ellos por ocho mil unidades de longitud de ruta. Pero el algoritmo fijo que superaron nunca fue afinado: sus
+probabilidades de cruza y mutación se heredaron de la Lección 10, donde
+se eligieron para un presupuesto diferente y nunca se cuestionaron. La Lección 07 dedicó una sesión
+entera a la forma correcta de elegirlas, y aún no se le ha pedido al esquema adaptativo
+que supere eso.
+\end{frame}
+
+\begin{frame}[fragile]{(1) ejecutar(tasas)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=175,lastline=189]{../src/ag_adaptativo_06_un_rival_afinado.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) CONFIGURACIONES\_FIJAS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=63,lastline=68]{../src/ag_adaptativo_06_un_rival_afinado.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el\_veredicto}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=297,lastline=363]{../src/ag_adaptativo_06_un_rival_afinado.py}
+\end{frame}
+
+\marcoresultado{El rival afinado}{../figures/ag_adaptativo_06_un_rival_afinado.png}{%
+    Contra cuatro configuraciones fijas con el mismo presupuesto: 0.90/0.25 → 58,195 (adaptativo gana 12/12), \textbf{0.60/0.05 → 48,870} (adaptativo gana 4/12, \textbf{+1,274 ± 727}), 0.40/0.15 → 49,675 (6/12, +469 ± 480), 0.20/0.30 → 49,626 (5/12, +519 ± 835). Adaptativo queda detrás de 3 de 4 medias; su intervalo aproximado de dos EE contra la mejor incluye cero. ``Mejor'' significa mejor entre cuatro en las mismas semillas}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+La adaptación vence al ajuste no afinado 12/12. Contra la mejor de cuatro configuraciones fijas en estas mismas doce semillas, el intervalo aproximado de dos errores estándar incluye cero; este estudio exploratorio no resuelve la diferencia.
+
+\vspace{0.8em}
+\textbf{Lección 13 --- Mejorar el rendimiento}
+
+La Lección 02 contó 107 evaluaciones en lugar de 110 y no pudo decir por qué. La 13 es la técnica que hace que ese censo sea la verdad.
+\end{frame}
+\end{document}

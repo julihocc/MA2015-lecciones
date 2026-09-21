@@ -1,0 +1,198 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{01}{Tu primer algoritmo genético}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+El encuadre mostró cómo se lee una lección y cómo se corre el código. Hoy se construye el primer algoritmo, un operador a la vez.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Una población, no un punto; la selección descarta, la cruza recombina, la mutación inventa.
+    \item El ciclo de esos tres, unas cuantas generaciones.
+    \item El mismo código, otra semilla, una colina local: un AG no es una garantía.
+\end{itemize}
+\end{frame}
+
+% ================= primer_ejemplo_01_el_paisaje =================
+\begin{frame}{Modelo matemático}
+\[
+\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|
+\]
+Un individuo guarda un candidato \(x\) y su aptitud \(f(x)\). Una población es
+una muestra finita, así que su campeón es el \emph{mejor observado}. La
+cuadrícula densa es una referencia numérica, no una prueba del maximizador.
+\end{frame}
+
+\section{El problema}
+
+\begin{frame}{El problema}
+Antes de escribir cualquier algoritmo, veamos qué estamos buscando.
+\end{frame}
+
+\marcoresultado{El problema}{../figuras/primer_ejemplo_01_el_paisaje.png}{%
+    Hay cuatro cimas; subir por la pendiente se detiene en aquella donde empezó}
+
+% ================= primer_ejemplo_02_poblacion_aleatoria =================
+\section{Una población}
+
+\begin{frame}{Una población}
+Un algoritmo genético no sigue la pista de una sola solución candidata, sigue
+muchas. Aquí simplemente esparcimos diez al azar y vemos dónde caen.
+\end{frame}
+
+\begin{frame}[fragile]{(1a) Individuo: estado y aptitud}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=46,lastline=62]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(1b) Individuo: acceso y representación}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=64,lastline=71]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crear\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=74,lastline=88]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la población}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=91,lastline=114]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\end{frame}
+
+\marcoresultado{Una población}{../figuras/primer_ejemplo_02_poblacion_aleatoria.png}{%
+    Diez suposiciones a ciegas no caen cerca del óptimo}
+
+% ================= primer_ejemplo_03_seleccion =================
+\section{Selección}
+
+\begin{frame}{Selección}
+La población del paso 2 es aleatoria y en su mayoría mala. La selección es la
+primera fuerza de la evolución: decide quién llega a reproducirse. Aquí no se
+crea nada nuevo: solo elegimos, con repetición, entre lo que ya existe.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=79,lastline=103]{../src/primer_ejemplo_03_seleccion.py}
+\end{frame}
+
+\marcoresultado{Selección}{../figuras/primer_ejemplo_03_seleccion.png}{%
+    No aparece ningún valor nuevo de \texttt{x} — la selección solo copia; 4 de 10 individuos se extinguen}
+
+% ================= primer_ejemplo_04_cruza =================
+\section{Cruza}
+
+\begin{frame}{Cruza}
+La selección por sí sola solo puede copiar. La cruza es el primer operador que
+crea valores que antes no estaban en la población, combinando dos progenitores.
+\end{frame}
+
+\begin{frame}[fragile]{(1) acotar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=46,lastline=65]{../src/primer_ejemplo_04_cruza.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_mezcla()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=88,lastline=118]{../src/primer_ejemplo_04_cruza.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) cruza()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=121,lastline=137]{../src/primer_ejemplo_04_cruza.py}
+\end{frame}
+
+\marcoresultado{Cruza}{../figuras/primer_ejemplo_04_cruza.png}{%
+    14 de 20 hijos caen fuera del intervalo de los progenitores — eso es lo que compra \texttt{alfa > 0}}
+
+% ================= primer_ejemplo_05_mutacion =================
+\section{Mutación}
+
+\begin{frame}{Mutación}
+Cuando los genes de los progenitores quedan muy agrupados en una colina, esta
+cruza tiene poco alcance. La mutación agrega un desplazamiento independiente y
+todavía puede proponer valores lejanos.
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutacion\_gaussiana()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=82,lastline=103]{../src/primer_ejemplo_05_mutacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=105,lastline=119]{../src/primer_ejemplo_05_mutacion.py}
+\end{frame}
+
+\marcoresultado{Mutación}{../figuras/primer_ejemplo_05_mutacion.png}{%
+    En esta muestra, sigma = 1.0 alcanza la colina global 0 veces de 2000 y sigma = 3.0 la alcanza 110; cero eventos observados no prueba probabilidad cero}
+
+% ================= primer_ejemplo_06_el_ciclo_completo =================
+\section{El algoritmo genético completo}
+
+\begin{frame}{El algoritmo genético completo}
+inicializar -> [ SELECCIONAR -> CRUZAR -> MUTAR -> reemplazar ] x N
+\end{frame}
+
+\begin{frame}[fragile]{(1) el ciclo generacional}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=138,lastline=162]{../src/primer_ejemplo_06_el_ciclo_completo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la gráfica de convergencia}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=170,lastline=180]{../src/primer_ejemplo_06_el_ciclo_completo.py}
+\end{frame}
+
+\marcoresultado{El algoritmo genético completo}{../figuras/primer_ejemplo_06_el_ciclo_completo.png}{%
+    Diez generaciones encuentran \texttt{x = +1.372, f = +0.706}, cerca de la cima más alta (referencia de 400 puntos: \texttt{x = +1.378, f = +0.706})}
+
+% ================= primer_ejemplo_07_optimo_local =================
+\section{Cuando falla}
+
+\begin{frame}{Cuando falla}
+SEMILLA = 52  ->  SEMILLA = 16
+\end{frame}
+
+\begin{frame}[fragile]{(1) SEMILLA}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=32,lastline=32]{../src/primer_ejemplo_07_optimo_local.py}
+\end{frame}
+
+\marcoresultado{Cuando falla}{../figuras/primer_ejemplo_07_optimo_local.png}{%
+    El mismo algoritmo se asienta en \texttt{x = -4.417, f = +0.073} y nunca sale}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+La semilla 52 encuentra la cima más alta observada; la 16 se queda en \(x = -4.417\), \(f = +0.073\) y no sale. Ninguna corrida prueba optimalidad global.
+
+\vspace{0.8em}
+\textbf{Lección 02 --- El flujo del algoritmo genético}
+
+El ciclo que acabamos de escribir sigue siendo una ristra de comentarios sin nombre. La 02 nombra las cinco fases. Misma semilla, mismas cifras que el paso 6.
+\end{frame}
+\end{document}

@@ -1,0 +1,249 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{08}{BlackBox}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 07 tuned knobs on a landscape we could still see. This function arrives from somewhere else: five arguments, three kinds, no honest plot.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item A black box states legal inputs and says nothing about the output.
+    \item Mixed real, integer and categorical genes need explicit legality.
+    \item Twelve searches agreeing on \(x\) while fitness differs by thousands is not a maximum.
+\end{itemize}
+\end{frame}
+
+% ================= black_box_01_no_picture =================
+\begin{frame}{A mixed domain, and a dangerous objective}
+\[
+\mathcal X=[a_l,a_u]\times[b_l,b_u]\times[x_l,x_u]
+\times\mathcal N\times\mathcal F.
+\]
+Constructor repair projects proposals back to this Cartesian product and changes
+their distribution. Here
+\(D=(n+1)^2(1+a+b)(120-x^2)r_\phi(x;b,n)+\tfrac12\) changes sign.
+Bisection locates \(D(x^*)=0\). That point is a pole, so the maximization problem
+is unbounded or ill-posed on a domain containing \(x^*\), not ``solved''.
+\end{frame}
+
+\section{The function you cannot look at}
+
+\begin{frame}{The function you cannot look at}
+Every lesson so far has optimised f(x) = sin(x) - 0.2*|x| or a close relative:
+one real gene, one curve, one picture on the slide, and - crucially - a
+brute-force optimum on a grid to check the run against. Lesson 02 step 5 said so
+in as many words and warned that the honest answer to "did this run succeed?"
+gets hard once x stops being one number.
+\end{frame}
+
+\resultframe{The function you cannot look at}{../figures/black_box_01_no_picture.png}{%
+    Five live slices agree on \texttt{x = -10.950}, but their maxima differ by \texttt{9.23×}; the picture has not resolved the value}
+
+% ================= black_box_02_the_grid =================
+\section{The grid, priced and then refined}
+
+\begin{frame}{The grid, priced and then refined}
+Every earlier lesson checked its runs against a brute-force optimum on a grid.
+That check is what made "did this run succeed?" answerable. This step tries to
+buy it here, and fails twice.
+\end{frame}
+
+\begin{frame}[fragile]{(1) evaluation\_cost()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=67,lastline=87]{../src/black_box_02_the_grid.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) BOOK\_GRID}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=89,lastline=101]{../src/black_box_02_the_grid.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) grid\_maximum()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=120,lastline=143]{../src/black_box_02_the_grid.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) REFINEMENTS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=145,lastline=154]{../src/black_box_02_the_grid.py}
+\end{frame}
+
+\resultframe{The grid, priced and then refined}{../figures/black_box_02_the_grid.png}{%
+    The book grid costs 105,525,000 calls; refinement makes the reported maximum grow 61,099-fold instead of converge}
+
+% ================= black_box_03_the_chromosome =================
+\section{One chromosome, three kinds of gene}
+
+\begin{frame}{One chromosome, three kinds of gene}
+Until now a chromosome was a real number, or a vector of real numbers, and
+"legal" meant "inside [-10, 10]". Here one individual carries three different
+kinds of gene at once:
+\end{frame}
+
+\begin{frame}[fragile]{(1) clamp()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=80,lastline=89]{../src/black_box_03_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) closest()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=91,lastline=102]{../src/black_box_03_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) Individual}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=104,lastline=134]{../src/black_box_03_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) create\_random()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=136,lastline=153]{../src/black_box_03_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) repair\_report()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=155,lastline=171]{../src/black_box_03_the_chromosome.py}
+\end{frame}
+
+\resultframe{One chromosome, three kinds of gene}{../figures/black_box_03_the_chromosome.png}{%
+    The constructor repairs all five illegal examples; the initial population samples only 10\% of the declared \texttt{x} range}
+
+% ================= black_box_04_the_operators =================
+\section{The operators, and what silent repair costs}
+
+\begin{frame}{The operators, and what silent repair costs}
+Step 3 put all legality in the constructor, so the operators can be written
+as if every gene were a real number. This step writes them - the book's
+design, and a deliberate one: every gene gets its own coin and its own step
+size, because the genes are different kinds of object. Blend alpha 0.3 for
+a, 0.5 for b, 1.0 for x; gaussian sigma 0.2 for a and b, 1.0 for x and n;
+the label gene mutates by re-choosing, the only mutation a set admits.
+\end{frame}
+
+\begin{frame}[fragile]{(1) crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=126,lastline=151]{../src/black_box_04_the_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=153,lastline=174]{../src/black_box_04_the_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the repair census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=192,lastline=223]{../src/black_box_04_the_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the drift demo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=225,lastline=248]{../src/black_box_04_the_operators.py}
+\end{frame}
+
+\resultframe{The operators, and what silent repair costs}{../figures/black_box_04_the_operators.png}{%
+    41.5\% of forced integer mutations snap back unchanged; coarse lattices can silence mutation completely}
+
+% ================= black_box_05_the_search =================
+\section{The search, and an answer that will not sit still}
+
+
+
+\begin{frame}[fragile]{(1) select\_rank\_with\_elite()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=166,lastline=191]{../src/black_box_05_the_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the generational loop}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=194,lastline=219]{../src/black_box_05_the_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the diagnostics}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=229,lastline=254]{../src/black_box_05_the_search.py}
+\end{frame}
+
+\resultframe{The search, and an answer that will not sit still}{../figures/black_box_05_the_search.png}{%
+    The best fitness reaches \texttt{2.278e-09}, but the curve is still rising and 97.5\% of the final population has left the initial \texttt{x} interval}
+
+% ================= black_box_06_the_verdict =================
+\section{The verdict, twelve times over}
+
+\begin{frame}{The verdict, twelve times over}
+Step 5's run looked like a success, and one run is an anecdote. This step
+repeats the whole search twelve times, from twelve seeds, and lays the
+twelve champions side by side. Nothing about the algorithm changes: same
+chromosome, same operators, same knobs, same 100 generations. Only the seed
+moves.
+\end{frame}
+
+\begin{frame}[fragile]{(1) run\_search()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=180,lastline=203]{../src/black_box_06_the_verdict.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the Monte Carlo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=208,lastline=225]{../src/black_box_06_the_verdict.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the two readings}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=227,lastline=243]{../src/black_box_06_the_verdict.py}
+\end{frame}
+
+\resultframe{The verdict, twelve times over}{../figures/black_box_06_the_verdict.png}{%
+    Champions occupy a narrow \texttt{x} interval while their fitness differs by 21,504×, which is inconsistent with convergence to a finite maximum}
+
+% ================= black_box_07_opening_the_box =================
+\section{Opening the box}
+
+\begin{frame}{Opening the box}
+Six steps have treated complicated\_one() as a black box, the way the book
+presents it. The searches are done; now we read the one line that was doing
+all the damage. Every term of the sum is a numerator over a denominator, and
+the denominator is
+\end{frame}
+
+\begin{frame}[fragile]{(1) denominator()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=75,lastline=87]{../src/black_box_07_opening_the_box.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the pole}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=98,lastline=119]{../src/black_box_07_opening_the_box.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the ladder}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=121,lastline=141]{../src/black_box_07_opening_the_box.py}
+\end{frame}
+
+\resultframe{Opening the box}{../figures/black_box_07_opening_the_box.png}{%
+    The apparent optimum is a pole near \texttt{x = -10.9535836}; the reported fitness measures distance to the singularity}
+
+\section{Next}
+
+\begin{frame}{Next}
+The apparent optimum is a pole near \(x = -10.9535836\). The reported fitness was distance to a singularity.
+
+\vspace{0.8em}
+\textbf{Lesson 09 --- Binary Combinatorial Optimisation}
+
+The picture is gone for good. Bits encode selection, assignment, placement. Feasibility has to stay visible: penalty, repair, or an exact check.
+\end{frame}
+\end{document}

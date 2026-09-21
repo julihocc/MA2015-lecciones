@@ -1,0 +1,266 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{10}{Optimización Combinatoria Ordenada}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 09 eran bits. Un tour no es una máscara: la cruza de un punto duplica ciudades. La cruza ordenada es el operador que sigue siendo legal.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Un cromosoma ordenado legal contiene cada miembro requerido exactamente una vez.
+    \item La cruza ordinaria de un punto suele duplicar y perder miembros.
+    \item Un resultado válido de AG todavía necesita una línea base (vecino más cercano; un presupuesto).
+\end{itemize}
+\end{frame}
+
+% ================= equipo_01_la_plantilla =================
+\begin{frame}{Dos modelos de permutación restringida}
+Para una ruta \(\pi\), con \(\pi_{n+1}=\pi_1\),
+\[
+L(\pi)=\sum_{i=1}^{n}d(\pi_i,\pi_{i+1}).
+\]
+OX1 e inversión conservan pertenencia y unicidad. Una plantilla legal usa
+identificadores distintos en posiciones por rol, respeta el presupuesto y
+maximiza habilidad. Estos resultados certifican legalidad y comparan líneas
+base; no prueban optimalidad global.
+\end{frame}
+
+\section{Once espacios ordenados}
+
+\begin{frame}{Once espacios ordenados}
+El cromosoma es una lista ordenada de once identificadores distintos de jugadores. El orden
+de los espacios codifica un portero, cuatro defensas, tres mediocampistas y tres
+delanteros, así que tanto la pertenencia como la posición deben sobrevivir a todo operador.
+\end{frame}
+
+\marcoafirmacion{Once espacios ordenados}{%
+    El grupo respaldado por la fuente contiene 12 candidatos para cada bloque de rol y un presupuesto explícito de €600m}
+
+% ================= equipo_02_plantillas_aleatorias =================
+\section{Roles legales aleatorios}
+
+\begin{frame}{Roles legales aleatorios}
+Roles legales aleatorios
+\end{frame}
+
+\begin{frame}[fragile]{(1) equipo\_aleatorio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=54]{../src/equipo_02_plantillas_aleatorias.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) metricas\_equipo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=61]{../src/equipo_02_plantillas_aleatorias.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el censo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=70]{../src/equipo_02_plantillas_aleatorias.py}
+\end{frame}
+
+\marcoafirmacion{Roles legales aleatorios}{%
+    Todas las 1,000 plantillas contienen once jugadores distintos; solo 440 cumplen con el presupuesto}
+
+% ================= equipo_03_reparacion_presupuesto =================
+\section{Reparación de presupuesto}
+
+\begin{frame}{Reparación de presupuesto}
+Reparación de presupuesto
+\end{frame}
+
+\begin{frame}[fragile]{(1) reparar\_presupuesto()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=58,lastline=75]{../src/equipo_03_reparacion_presupuesto.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la auditoria}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=78,lastline=85]{../src/equipo_03_reparacion_presupuesto.py}
+\end{frame}
+
+\marcoafirmacion{Reparación de presupuesto}{%
+    La reparación hace que 1,000/1,000 equipos sean asequibles y preserva la unicidad}
+
+% ================= equipo_04_operadores_ordenados =================
+\section{Operadores ordenados}
+
+\begin{frame}{Operadores ordenados}
+Operadores ordenados
+\end{frame}
+
+\begin{frame}[fragile]{(1) cruza\_roles()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=70,lastline=78]{../src/equipo_04_operadores_ordenados.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=86]{../src/equipo_04_operadores_ordenados.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) una generacion}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=89,lastline=94]{../src/equipo_04_operadores_ordenados.py}
+\end{frame}
+
+\marcoafirmacion{Operadores ordenados}{%
+    Todos los 100 hijos siguen siendo legales; la habilidad media sube de 979.6 a 985.3}
+
+% ================= equipo_05_la_busqueda_completa =================
+\section{La búsqueda completa de plantilla}
+
+\begin{frame}{La búsqueda completa de plantilla}
+La búsqueda completa de plantilla
+\end{frame}
+
+\begin{frame}[fragile]{(1) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=99,lastline=112]{../src/equipo_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la linea base}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=115,lastline=118]{../src/equipo_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la plantilla}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=121,lastline=124]{../src/equipo_05_la_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda completa de plantilla}{../figures/equipo_05_la_busqueda_completa.png}{%
+    El AG alcanza una habilidad de 991 con €597.5m y empata a la mejor plantilla aleatoria reparada a iguales evaluaciones}
+
+% ================= tsp_01_la_ruta =================
+\section{Una ruta es un ordenamiento}
+
+\begin{frame}{Una ruta es un ordenamiento}
+Un cromosoma del TSP contiene cada ciudad exactamente una vez. Sus genes no son opciones separadas: cambiar una posición cambia el significado de toda la ruta.
+\end{frame}
+
+\marcoafirmacion{Una ruta es un ordenamiento}{%
+    La instancia proporcionada contiene 48 ciudades; la ruta identidad es legal pero larga}
+
+% ================= tsp_02_poblacion_aleatoria =================
+\section{Rutas legales aleatorias}
+
+\begin{frame}{Rutas legales aleatorias}
+Rutas legales aleatorias
+\end{frame}
+
+\begin{frame}[fragile]{(1) ruta\_aleatoria()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=35,lastline=40]{../src/tsp_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) TAMANO\_POBLACION}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=43,lastline=45]{../src/tsp_02_poblacion_aleatoria.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el censo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=48,lastline=53]{../src/tsp_02_poblacion_aleatoria.py}
+\end{frame}
+
+\marcoafirmacion{Rutas legales aleatorias}{%
+    Todas las 500 rutas barajadas son legales, con una amplia distribución de longitudes}
+
+% ================= tsp_03_cruza_ordenada =================
+\section{La cruza debe preservar una permutación}
+
+\begin{frame}{La cruza debe preservar una permutación}
+La cruza debe preservar una permutación
+\end{frame}
+
+\begin{frame}[fragile]{(1) un\_punto()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=43]{../src/tsp_03_cruza_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) cruza\_ordenada()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=46,lastline=56]{../src/tsp_03_cruza_ordenada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el experimento}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=68]{../src/tsp_03_cruza_ordenada.py}
+\end{frame}
+
+\marcoafirmacion{La cruza debe preservar una permutación}{%
+    La cruza de un punto produce 0/1,000 hijos legales; la cruza ordenada produce 1,000/1,000}
+
+% ================= tsp_04_mutacion =================
+\section{La mutación cambia el orden, no la pertenencia}
+
+\begin{frame}{La mutación cambia el orden, no la pertenencia}
+La mutación cambia el orden, no la pertenencia
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutacion\_intercambio()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=48,lastline=54]{../src/tsp_04_mutacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutacion\_inversion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=63]{../src/tsp_04_mutacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la auditoria de distancia}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=66,lastline=73]{../src/tsp_04_mutacion.py}
+\end{frame}
+
+\marcoafirmacion{La mutación cambia el orden, no la pertenencia}{%
+    El intercambio y la inversión preservan cada ciudad; sus cambios medios de longitud son +451.0 y +238.9}
+
+% ================= tsp_05_la_busqueda_completa =================
+\section{La búsqueda ordenada completa}
+
+\begin{frame}{La búsqueda ordenada completa}
+La búsqueda ordenada completa
+\end{frame}
+
+\begin{frame}[fragile]{(1) vecino\_mas\_cercano()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=65]{../src/tsp_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=68,lastline=71]{../src/tsp_05_la_busqueda_completa.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) ejecutar()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=74,lastline=91]{../src/tsp_05_la_busqueda_completa.py}
+\end{frame}
+
+\marcoresultado{La búsqueda ordenada completa}{../figures/tsp_05_la_busqueda_completa.png}{%
+    La ruta del AG es legal pero 57.2\% más larga que el vecino más cercano después de 10,100 evaluaciones}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+Esta instancia del TSP es la que reutilizará la Lección 12, reescrita en local. Es la única importación genuina entre capítulos del libro.
+
+\vspace{0.8em}
+\textbf{Lección 11 --- Otros problemas}
+
+Aquí ambos resultados se comprueban por legalidad y contra líneas base nombradas. Ninguna comparación prueba un óptimo global --- justo la distinción que exige la Lección 08.
+\end{frame}
+\end{document}

@@ -1,0 +1,235 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{03}{Selección}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+La Lección 02 nombró las cinco fases. La selección es el primer operador que se mira solo, todavía sin medir una corrida entera.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Proporcional, rango, SUS, torneo: distintas formas de descartar.
+    \item El elitismo es el seguro barato de que el mejor hasta ahora sobrevive.
+    \item Una generación no es un veredicto; esa medición es la Lección 06.
+\end{itemize}
+\end{frame}
+
+% ================= presion_seleccion_01_la_poblacion =================
+\begin{frame}{Probabilidades de selección}
+\[
+p_i=\frac{w_i}{\sum_j w_j},\qquad \mathbb E[N_i]=Np_i,
+\qquad \Pr(R=r)=\left(\frac{N-r+1}{N}\right)^k-
+\left(\frac{N-r}{N}\right)^k .
+\]
+El piso altera la selección proporcional. Rango usa orden; SUS cambia la
+varianza, no la esperanza. Aquí (r=1) es el mejor y las probabilidades telescopan a uno. El elitismo requiere aptitud determinista y
+estacionaria y una copia sin cambios para conservar al mejor.
+\end{frame}
+
+\section{La población, y cómo medir lo que hace la selección}
+
+\begin{frame}{La población, y cómo medir lo que hace la selección}
+La selección nunca inventa nada. Toma una población de N y devuelve una
+población de N, construida solo con copias de lo que ya estaba allí. Así que lo único
+que vale la pena medir es la CONTABILIDAD: quién fue copiado, cuántas veces y
+quién desapareció.
+\end{frame}
+
+\marcoresultado{La población, y cómo medir lo que hace la selección}{../figures/presion_seleccion_01_la_poblacion.png}{%
+    Copiar a todos una vez: 0 extintos, diversidad 6.665, 1 copia del mejor — el cero de cada medición posterior. La aptitud es negativa casi en todas partes, por lo que aún no se puede construir ninguna ruleta}
+
+% ================= presion_seleccion_02_proporcional =================
+\section{Selección proporcional, y el piso que nadie menciona}
+
+\begin{frame}{Selección proporcional, y el piso que nadie menciona}
+La imagen estándar de la selección es una ruleta cuyos sectores son tan anchos
+como la aptitud de los individuos. En esta población la imagen no encaja: todas
+las aptitudes son negativas, y un sector no puede tener un ancho negativo. La
+reparación habitual es desplazar todos los valores hacia arriba hasta que el
+peor sea no negativo - y esa reparación introduce silenciosamente un parámetro,
+el piso, que resulta controlar la presión de selección más fuertemente que
+los valores de aptitud.
+\end{frame}
+
+\begin{frame}[fragile]{(1) desplazar\_a\_positivo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=120,lastline=131]{../src/presion_seleccion_02_proporcional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) seleccion\_proporcional()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=134,lastline=155]{../src/presion_seleccion_02_proporcional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) reporte\_presion()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=158,lastline=206]{../src/presion_seleccion_02_proporcional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) los dos pisos}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=209,lastline=261]{../src/presion_seleccion_02_proporcional.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) la figura de la ruleta}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=263,lastline=286]{../src/presion_seleccion_02_proporcional.py}
+\end{frame}
+
+\marcoresultado{Selección proporcional, y el piso que nadie menciona}{../figures/presion_seleccion_02_proporcional.png}{%
+    El piso *es* la presión: el mejor espera \textbf{2.35} copias en el piso 0.001 pero \textbf{1.30} en el piso 3.0 — misma población, misma ruleta}
+
+% ================= presion_seleccion_03_rango =================
+\section{Selección por rango, o presión que no depende de la escala}
+
+\begin{frame}{Selección por rango, o presión que no depende de la escala}
+El paso 2 dejó una incomodidad: la misma ruleta, en la misma población, aplica
+una presión muy diferente dependiendo de un piso que inventamos. La selección
+por rango descarta los valores de aptitud y mantiene solo su ORDEN. Así, los
+anchos de sector dependen únicamente del tamaño de la población, por lo que la
+presión es la misma independientemente de la escala de aptitud - y, en
+particular, no se puede cambiar sumando una constante.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_rango()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=149,lastline=171]{../src/presion_seleccion_03_rango.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la fila de rango}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=177,lastline=229]{../src/presion_seleccion_03_rango.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la figura de sectores}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=231,lastline=262]{../src/presion_seleccion_03_rango.py}
+\end{frame}
+
+\marcoresultado{Selección por rango, o presión que no depende de la escala}{../figures/presion_seleccion_03_rango.png}{%
+    El orden por sí solo fija la presión en un valor definido, inmune a la reescala — pero el mejor individuo todavía se pierde en el \textbf{13.6\%} de las muestras}
+
+% ================= presion_seleccion_04_elitismo =================
+\section{Elitismo, la garantía más barata del curso}
+
+\begin{frame}{Elitismo, la garantía más barata del curso}
+Los pasos 2 y 3 comparten un defecto fácil de pasar por alto: el mejor individuo
+se extrae al azar como todos los demás, por lo que a veces no se extrae en absoluto. Una
+generación puede ser estrictamente peor que su generación padre. El elitismo arregla eso
+copiando a los mejores individuos en la nueva generación antes de que ocurra cualquier
+extracción. Es una línea de código, elimina la regresión por completo, y
+cuesta diversidad - las tres cosas las mide este paso.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_rango\_con\_elite()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=167,lastline=190]{../src/presion_seleccion_04_elitismo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) las filas de élite}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=196,lastline=250]{../src/presion_seleccion_04_elitismo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la figura de elitismo}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=252,lastline=280]{../src/presion_seleccion_04_elitismo.py}
+\end{frame}
+
+\marcoresultado{Elitismo, la garantía más barata del curso}{../figures/presion_seleccion_04_elitismo.png}{%
+    Una línea reduce la pérdida del mejor de 13.6\% a \textbf{0.0\%}, aumenta la presión (1.80 → 2.64 copias) y cuesta diversidad (5.448 → 5.210)}
+
+% ================= presion_seleccion_05_sus =================
+\section{Muestreo universal estocástico, o la misma ruleta girada una vez}
+
+\begin{frame}{Muestreo universal estocástico, o la misma ruleta girada una vez}
+La selección proporcional gira la ruleta N veces, por lo que la suerte se acumula: un
+individuo que posea un cuarto de la ruleta puede terminar sin nada, y
+otro puede ganar cuatro lugares seguidos. SUS mantiene exactamente la misma ruleta y el
+mismo número esperado de copias, pero toma las N muestras de una vez, con punteros
+espaciados uniformemente. La expectativa no se mueve. La dispersión colapsa.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_muestreo\_universal\_estocastico()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=184,lastline=208]{../src/presion_seleccion_05_sus.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) las filas de SUS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=214,lastline=276]{../src/presion_seleccion_05_sus.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la figura de dispersión}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=278,lastline=326]{../src/presion_seleccion_05_sus.py}
+\end{frame}
+
+\marcoresultado{Muestreo universal estocástico, o la misma ruleta girada una vez}{../figures/presion_seleccion_05_sus.png}{%
+    Misma ruleta, misma expectativa, la dispersión colapsa. Y \textbf{no} arregla el piso: 2.35 vs 1.31 copias, la misma división que encontró el paso 2}
+
+% ================= presion_seleccion_06_torneo =================
+\section{Selección por torneo, y los cinco métodos en una escala}
+
+\begin{frame}{Selección por torneo, y los cinco métodos en una escala}
+La selección por torneo no necesita ruleta, ni ordenamiento, ni suma, ni piso: elige a unos
+cuantos individuos al azar, quédate con el más apto, repite. Este es el método que usó
+la Lección 01, y con la misma semilla este archivo reproduce la extracción de la Lección 01 exactamente. Su
+verdadera virtud es la única cosa que ninguno de los otros cuatro ofrece: un solo número entero que
+establece la presión de selección, desde ninguna en absoluto hasta casi total.
+\end{frame}
+
+\begin{frame}[fragile]{(1) seleccion\_torneo()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=210,lastline=225]{../src/presion_seleccion_06_torneo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la extracción de Lección 01}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=231,lastline=244]{../src/presion_seleccion_06_torneo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el dial de presión}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=246,lastline=263]{../src/presion_seleccion_06_torneo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) la comparación completa}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=265,lastline=319]{../src/presion_seleccion_06_torneo.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) la figura del dial}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=321,lastline=356]{../src/presion_seleccion_06_torneo.py}
+\end{frame}
+
+\marcoresultado{Selección por torneo, y los cinco métodos en una escala}{../figures/presion_seleccion_06_torneo.png}{%
+    Un entero establece la presión: k=3 → 2.74 copias, k=5 → 4.13, k=10 → 6.52. En las 13 configuraciones, presión vs calidad \textbf{+0.95}, presión vs diversidad \textbf{−0.92}}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+Los dos peores individuos no fueron seleccionados cero veces --- hay que leer la tabla del paso, no un lema encima de ella.
+
+\vspace{0.8em}
+\textbf{Lección 04 --- Cruza}
+
+El segundo operador, todavía medido sobre un par fijo de padres. Cortar-y-copiar copia; lo aritmético calcula. Esas familias no se intercambian.
+\end{frame}
+\end{document}

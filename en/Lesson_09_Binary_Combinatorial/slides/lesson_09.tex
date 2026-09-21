@@ -1,0 +1,370 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{09}{Binary Combinatorial}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 08 mixed types in a box we could not draw. Today the chromosome is bits, and three problems share the operators.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Knapsack, roster, radar: same bits, different meaning, different feasibility.
+    \item Repair changes the distribution being searched; it is not free plumbing.
+    \item Small instances should be checked exactly.
+\end{itemize}
+\end{frame}
+
+% ================= knapsack_01_the_instance =================
+\begin{frame}{Three binary models}
+\small
+\textbf{Knapsack:}\quad
+\(\max\sum_i v_ix_i\) subject to \(\sum_i w_ix_i\le C\).\par
+\medskip
+\textbf{Radar:}\quad
+\(\min\;U(x)(|S|+1)+\sum_i x_i\). Since at most \(|S|\) radars are active,
+one fewer uncovered target dominates every radar-count change.\par
+\medskip
+\textbf{Scheduling:}\quad
+\(\min\sum_{eds}c_{eds}x_{eds}\), with
+\(\sum_e x_{eds}=d_s\) and \(\sum_{ds}x_{eds}\le5\).
+Repair changes the distribution actually searched.
+\end{frame}
+
+\section{The instance}
+
+\begin{frame}{The instance}
+Each bit answers one question: take this item or leave it. Before introducing a
+GA, enumerate this deliberately small instance so later runs have an honest
+answer to compare against.
+\end{frame}
+
+\resultframe{The instance}{../figures/knapsack_01_the_instance.png}{%
+    The 12-item instance has 4,096 chromosomes; exact optimum is value 50 at weight 20}
+
+% ================= knapsack_02_random_population =================
+\section{A random population}
+
+\begin{frame}{A random population}
+A random population
+\end{frame}
+
+\begin{frame}[fragile]{(1) Candidate}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=69]{../src/knapsack_02_random_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) random\_candidate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=72,lastline=77]{../src/knapsack_02_random_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) POPULATION\_SIZE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=80,lastline=82]{../src/knapsack_02_random_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) the census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=85,lastline=90]{../src/knapsack_02_random_population.py}
+\end{frame}
+
+\resultframe{A random population}{../figures/knapsack_02_random_population.png}{%
+    233 of 1,000 random chromosomes are feasible; best random value is 47}
+
+% ================= knapsack_03_repair =================
+\section{Repair creates selection pressure}
+
+\begin{frame}{Repair creates selection pressure}
+Repair creates selection pressure
+\end{frame}
+
+\begin{frame}[fragile]{(1) repair()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=77,lastline=88]{../src/knapsack_03_repair.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the comparison}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=91,lastline=97]{../src/knapsack_03_repair.py}
+\end{frame}
+
+\resultframe{Repair creates selection pressure}{../figures/knapsack_03_repair.png}{%
+    Repair makes 1,000/1,000 feasible and changes 767 chromosomes}
+
+% ================= knapsack_04_selection_and_crossover =================
+\section{Selection and crossover}
+
+\begin{frame}{Selection and crossover}
+Selection and crossover
+\end{frame}
+
+\begin{frame}[fragile]{(1) tournament()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=85,lastline=88]{../src/knapsack_04_selection_and_crossover.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=91,lastline=97]{../src/knapsack_04_selection_and_crossover.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) one\_generation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=100,lastline=109]{../src/knapsack_04_selection_and_crossover.py}
+\end{frame}
+
+\resultframe{Selection and crossover}{../figures/knapsack_04_selection_and_crossover.png}{%
+    One generation raises mean value from 39.00 to 40.73; all stored children remain feasible}
+
+% ================= knapsack_05_the_full_search =================
+\section{The full search}
+
+\begin{frame}{The full search}
+The full search
+\end{frame}
+
+\begin{frame}[fragile]{(1) mutate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=102]{../src/knapsack_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=113,lastline=127]{../src/knapsack_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the exact-gap report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=130,lastline=135]{../src/knapsack_05_the_full_search.py}
+\end{frame}
+
+\resultframe{The full search}{../figures/knapsack_05_the_full_search.png}{%
+    The GA reaches the exact value 50 at weight 20 with zero gap in 4,060 evaluations}
+
+% ================= radar_01_the_landscape =================
+\section{A coverage landscape}
+
+\begin{frame}{A coverage landscape}
+Each bit decides whether to install a radar at one candidate site. A radar
+covers a target when their Euclidean distance is at most the fixed radius.
+\end{frame}
+
+\resultframe{A coverage landscape}{../figures/radar_01_the_landscape.png}{%
+    Nine sites define 512 plans and jointly cover all 36 targets}
+
+% ================= radar_02_the_chromosome =================
+\section{The chromosome}
+
+\begin{frame}{The chromosome}
+The chromosome
+\end{frame}
+
+\begin{frame}[fragile]{(1) Candidate}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=49]{../src/radar_02_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) random\_candidate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=52,lastline=59]{../src/radar_02_the_chromosome.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=62,lastline=66]{../src/radar_02_the_chromosome.py}
+\end{frame}
+
+\resultframe{The chromosome}{../figures/radar_02_the_chromosome.png}{%
+    21 of 500 random plans cover every target}
+
+% ================= radar_03_the_penalty =================
+\section{A lexicographic penalty}
+
+\begin{frame}{A lexicographic penalty}
+A lexicographic penalty
+\end{frame}
+
+\begin{frame}[fragile]{(1) objective()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=61]{../src/radar_03_the_penalty.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the ranking audit}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=70]{../src/radar_03_the_penalty.py}
+\end{frame}
+
+\resultframe{A lexicographic penalty}{../figures/radar_03_the_penalty.png}{%
+    The audited penalty ranks every feasible plan ahead of every infeasible plan}
+
+% ================= radar_04_operators =================
+\section{Binary operators}
+
+\begin{frame}{Binary operators}
+Binary operators
+\end{frame}
+
+\begin{frame}[fragile]{(1) tournament()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=58,lastline=61]{../src/radar_04_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=68]{../src/radar_04_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=71,lastline=77]{../src/radar_04_operators.py}
+\end{frame}
+
+\resultframe{Binary operators}{../figures/radar_04_operators.png}{%
+    One generation lowers mean objective from 86.0 to 42.6}
+
+% ================= radar_05_the_full_search =================
+\section{The full search}
+
+\begin{frame}{The full search}
+The full search
+\end{frame}
+
+\begin{frame}[fragile]{(1) exact\_optimum()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=76,lastline=80]{../src/radar_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=83,lastline=98]{../src/radar_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the coverage map}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=110,lastline=126]{../src/radar_05_the_full_search.py}
+\end{frame}
+
+\resultframe{The full search}{../figures/radar_05_the_full_search.png}{%
+    GA and exhaustive enumeration both find five radars with full coverage}
+
+% ================= schedule_01_the_requirements =================
+\section{The requirements}
+
+\begin{frame}{The requirements}
+One bit assigns one employee to one shift. The instance needs 35 assignments
+across 21 shifts, while eight employees can cover at most five shifts each.
+\end{frame}
+
+\resultframe{The requirements}{../figures/schedule_01_the_requirements.png}{%
+    168 bits encode 35 required assignments under capacity 40}
+
+% ================= schedule_02_random_rosters =================
+\section{Random rosters}
+
+\begin{frame}{Random rosters}
+Random rosters
+\end{frame}
+
+\begin{frame}[fragile]{(1) random\_roster()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=34,lastline=39]{../src/schedule_02_random_rosters.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) violations()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=42,lastline=56]{../src/schedule_02_random_rosters.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=64]{../src/schedule_02_random_rosters.py}
+\end{frame}
+
+\resultframe{Random rosters}{../figures/schedule_02_random_rosters.png}{%
+    0 of 500 random rosters are feasible; the best still has 14 violations}
+
+% ================= schedule_03_repair =================
+\section{Repair the constraints}
+
+\begin{frame}{Repair the constraints}
+Repair the constraints
+\end{frame}
+
+\begin{frame}[fragile]{(1) preference\_cost()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=55,lastline=59]{../src/schedule_03_repair.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) repair()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=62,lastline=94]{../src/schedule_03_repair.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the comparison}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=97,lastline=103]{../src/schedule_03_repair.py}
+\end{frame}
+
+\resultframe{Repair the constraints}{../figures/schedule_03_repair.png}{%
+    Repair makes 500/500 rosters feasible; repaired costs range from 58 upward}
+
+% ================= schedule_04_operators =================
+\section{Operators under repair}
+
+\begin{frame}{Operators under repair}
+Operators under repair
+\end{frame}
+
+\begin{frame}[fragile]{(1) tournament()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=84]{../src/schedule_04_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=87,lastline=92]{../src/schedule_04_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) mutate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=95,lastline=106]{../src/schedule_04_operators.py}
+\end{frame}
+
+\resultframe{Operators under repair}{../figures/schedule_04_operators.png}{%
+    All 100 children are feasible; mean cost falls from 77.8 to 61.2}
+
+% ================= schedule_05_the_full_search =================
+\section{The full search}
+
+\begin{frame}{The full search}
+The full search
+\end{frame}
+
+\begin{frame}[fragile]{(1) one\_generation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=102,lastline=109]{../src/schedule_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=112,lastline=123]{../src/schedule_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the baseline report}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=126,lastline=131]{../src/schedule_05_the_full_search.py}
+\end{frame}
+
+\resultframe{The full search}{../figures/schedule_05_the_full_search.png}{%
+    GA cost 41 beats the best of 5,100 repaired-random rosters, cost 52, at equal evaluation count}
+
+\section{Next}
+
+\begin{frame}{Next}
+The knapsack GA hits the exact value 50 at weight 20. The roster starts at 0/500 feasible and still beats repaired-random at equal budget.
+
+\vspace{0.8em}
+\textbf{Lesson 10 --- Ordered Combinatorial Optimisation}
+
+Order and uniqueness are now part of correctness. The OX1 that was a silent no-op in Lesson 04 is the legal operator here.
+\end{frame}
+\end{document}

@@ -1,0 +1,267 @@
+\input{../../../templates/en/preamble.tex}
+
+% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\claimframe}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{10}{Ordered Combinatorial}
+
+\section{This lesson}
+
+\begin{frame}{This lesson}
+Lesson 09 was bits. A tour is not a bit mask: one-point crossover duplicates cities. Ordered crossover is the operator that stays legal.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item A legal ordered chromosome contains each required member exactly once.
+    \item Ordinary one-point crossover usually duplicates and loses members.
+    \item A valid GA result still needs a baseline (nearest neighbour; a budget).
+\end{itemize}
+\end{frame}
+
+% ================= team_01_the_roster =================
+\begin{frame}{Two constrained permutation models}
+For a tour \(\pi\), with \(\pi_{n+1}=\pi_1\),
+\[
+L(\pi)=\sum_{i=1}^{n}d(\pi_i,\pi_{i+1}).
+\]
+OX1 and inversion preserve membership and uniqueness. A legal roster likewise
+uses distinct identifiers in role-specific slots, obeys its budget, and
+maximizes total skill. These results certify legality and compare baselines;
+they do not prove global optimality.
+\end{frame}
+
+\section{Eleven ordered slots}
+
+\begin{frame}{Eleven ordered slots}
+The chromosome is an ordered list of eleven distinct player identifiers. Slot
+order encodes one goalkeeper, four defenders, three midfielders and three
+forwards, so membership and position must both survive every operator.
+\end{frame}
+
+\resultframe{Eleven ordered slots}{../figures/team_01_the_roster.png}{%
+    The source-backed pool contains 12 candidates for each role block and an explicit €600m budget}
+
+% ================= team_02_random_rosters =================
+\section{Random legal roles}
+
+\begin{frame}{Random legal roles}
+Random legal roles
+\end{frame}
+
+\begin{frame}[fragile]{(1) random\_team()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=54]{../src/team_02_random_rosters.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) team\_metrics()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=61]{../src/team_02_random_rosters.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=64,lastline=70]{../src/team_02_random_rosters.py}
+\end{frame}
+
+\resultframe{Random legal roles}{../figures/team_02_random_rosters.png}{%
+    All 1,000 rosters contain eleven distinct players; only 440 meet the budget}
+
+% ================= team_03_budget_repair =================
+\section{Budget repair}
+
+\begin{frame}{Budget repair}
+Budget repair
+\end{frame}
+
+\begin{frame}[fragile]{(1) repair\_budget()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=58,lastline=75]{../src/team_03_budget_repair.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the audit}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=78,lastline=85]{../src/team_03_budget_repair.py}
+\end{frame}
+
+\resultframe{Budget repair}{../figures/team_03_budget_repair.png}{%
+    Repair makes 1,000/1,000 teams affordable and preserves uniqueness}
+
+% ================= team_04_ordered_operators =================
+\section{Ordered operators}
+
+\begin{frame}{Ordered operators}
+Ordered operators
+\end{frame}
+
+\begin{frame}[fragile]{(1) role\_crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=70,lastline=78]{../src/team_04_ordered_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) mutate()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=81,lastline=86]{../src/team_04_ordered_operators.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) one generation}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=89,lastline=94]{../src/team_04_ordered_operators.py}
+\end{frame}
+
+\resultframe{Ordered operators}{../figures/team_04_ordered_operators.png}{%
+    All 100 children remain legal; mean skill rises from 979.6 to 985.3}
+
+% ================= team_05_the_full_search =================
+\section{The full roster search}
+
+\begin{frame}{The full roster search}
+The full roster search
+\end{frame}
+
+\begin{frame}[fragile]{(1) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=99,lastline=112]{../src/team_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) the baseline}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=115,lastline=118]{../src/team_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the roster}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=121,lastline=124]{../src/team_05_the_full_search.py}
+\end{frame}
+
+\resultframe{The full roster search}{../figures/team_05_the_full_search.png}{%
+    The GA reaches skill 991 at €597.5m and ties the best equal-evaluation repaired-random roster}
+
+% ================= tsp_01_the_route =================
+\section{A route is an ordering}
+
+\begin{frame}{A route is an ordering}
+A TSP chromosome contains every city exactly once. Its genes are not separate
+choices: changing one position changes the meaning of the whole route.
+\end{frame}
+
+\resultframe{A route is an ordering}{../figures/tsp_01_the_route.png}{%
+    The supplied instance contains 48 cities; the identity route is legal but long}
+
+% ================= tsp_02_random_population =================
+\section{Random legal routes}
+
+\begin{frame}{Random legal routes}
+Random legal routes
+\end{frame}
+
+\begin{frame}[fragile]{(1) random\_route()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=35,lastline=40]{../src/tsp_02_random_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) POPULATION\_SIZE}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=43,lastline=45]{../src/tsp_02_random_population.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the census}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=48,lastline=53]{../src/tsp_02_random_population.py}
+\end{frame}
+
+\resultframe{Random legal routes}{../figures/tsp_02_random_population.png}{%
+    All 500 shuffled routes are legal, with a wide length distribution}
+
+% ================= tsp_03_ordered_crossover =================
+\section{Crossover must preserve a permutation}
+
+\begin{frame}{Crossover must preserve a permutation}
+Crossover must preserve a permutation
+\end{frame}
+
+\begin{frame}[fragile]{(1) one\_point()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=39,lastline=43]{../src/tsp_03_ordered_crossover.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) ordered\_crossover()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=46,lastline=56]{../src/tsp_03_ordered_crossover.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the experiment}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=59,lastline=68]{../src/tsp_03_ordered_crossover.py}
+\end{frame}
+
+\resultframe{Crossover must preserve a permutation}{../figures/tsp_03_ordered_crossover.png}{%
+    One-point crossover produces 0/1,000 legal children; ordered crossover produces 1,000/1,000}
+
+% ================= tsp_04_mutation =================
+\section{Mutation changes order, not membership}
+
+\begin{frame}{Mutation changes order, not membership}
+Mutation changes order, not membership
+\end{frame}
+
+\begin{frame}[fragile]{(1) swap\_mutation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=48,lastline=54]{../src/tsp_04_mutation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) inversion\_mutation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=63]{../src/tsp_04_mutation.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) the distance audit}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=66,lastline=73]{../src/tsp_04_mutation.py}
+\end{frame}
+
+\resultframe{Mutation changes order, not membership}{../figures/tsp_04_mutation.png}{%
+    Swap and inversion preserve every city; their mean length changes are +451.0 and +238.9}
+
+% ================= tsp_05_the_full_search =================
+\section{The full ordered search}
+
+\begin{frame}{The full ordered search}
+The full ordered search
+\end{frame}
+
+\begin{frame}[fragile]{(1) nearest\_neighbour()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=57,lastline=65]{../src/tsp_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) tournament()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=68,lastline=71]{../src/tsp_05_the_full_search.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=74,lastline=91]{../src/tsp_05_the_full_search.py}
+\end{frame}
+
+\resultframe{The full ordered search}{../figures/tsp_05_the_full_search.png}{%
+    The GA route is legal but 57.2\% longer than nearest neighbour after 10,100 evaluations}
+
+\section{Next}
+
+\begin{frame}{Next}
+This TSP instance is the one Lesson 12 will reuse, restated locally. That is the book's only genuine cross-chapter import.
+
+\vspace{0.8em}
+\textbf{Lesson 11 --- Other Problems}
+
+Here both results can be checked for legality and against named baselines. Neither comparison proves a global optimum --- exactly the distinction Lesson 08 requires.
+\end{frame}
+\end{document}

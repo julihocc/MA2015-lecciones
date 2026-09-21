@@ -1,0 +1,91 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\DeclareUnicodeCharacter{2014}{---}
+\DeclareUnicodeCharacter{2013}{--}
+\DeclareUnicodeCharacter{2212}{-}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{00B1}{\ensuremath{\pm}}
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}
+\DeclareUnicodeCharacter{00B7}{\ensuremath{\cdot}}
+\DeclareUnicodeCharacter{20AC}{EUR}
+\DeclareUnicodeCharacter{2070}{\textsuperscript{0}}
+\DeclareUnicodeCharacter{00B9}{\textsuperscript{1}}
+\DeclareUnicodeCharacter{00B2}{\textsuperscript{2}}
+\DeclareUnicodeCharacter{00B3}{\textsuperscript{3}}
+\DeclareUnicodeCharacter{2074}{\textsuperscript{4}}
+\DeclareUnicodeCharacter{2075}{\textsuperscript{5}}
+\DeclareUnicodeCharacter{2076}{\textsuperscript{6}}
+\DeclareUnicodeCharacter{2077}{\textsuperscript{7}}
+\DeclareUnicodeCharacter{2078}{\textsuperscript{8}}
+\DeclareUnicodeCharacter{2079}{\textsuperscript{9}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\le}}
+
+% Colors for code
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codecomment}{RGB}{0,128,0}
+\definecolor{codekeyword}{RGB}{0,0,255}
+\definecolor{codestring}{RGB}{163,21,21}
+\definecolor{bandcolor}{RGB}{200,50,50}
+
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{codekeyword},
+    commentstyle=\color{codecomment},
+    stringstyle=\color{codestring},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{black},
+    escapeinside={(*@}{@*)},
+    moredelim=**[l][\color{bandcolor}\bfseries]{\#\ ---\ NEW},
+    moredelim=**[l][\color{bandcolor}\bfseries]{\#\ ---\ CHANGED},
+    literate=
+      {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+      {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+      {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
+      {¿}{{?`}}1 {¡}{{!`}}1
+      {—}{{---}}1 {–}{{--}}1 {−}{{-}}1
+      {±}{{\ensuremath{\pm}}}1 {×}{{\ensuremath{\times}}}1
+      {→}{{\ensuremath{\rightarrow}}}1
+      {°}{{\textdegree}}1
+      {·}{{\ensuremath{\cdot}}}1
+      {€}{{\texteuro}}1
+      {≈}{{\ensuremath{\approx}}}1
+      {≤}{{\ensuremath{\le}}}1
+      {⁰}{{\textsuperscript{0}}}1 {¹}{{\textsuperscript{1}}}1
+      {²}{{\textsuperscript{2}}}1 {³}{{\textsuperscript{3}}}1
+      {⁴}{{\textsuperscript{4}}}1 {⁵}{{\textsuperscript{5}}}1
+      {⁶}{{\textsuperscript{6}}}1 {⁷}{{\textsuperscript{7}}}1
+      {⁸}{{\textsuperscript{8}}}1 {⁹}{{\textsuperscript{9}}}1
+}
+
+\lstset{style=pythonstyle}
+
+% Title slide macro: \lessontitle{Lesson Number}{Title}
+\newcommand{\lessontitle}[2]{
+    \title{Lesson #1: #2}
+    \author{}
+    \institute{Tec de Monterrey}
+    \begin{frame}[plain]
+        \titlepage
+    \end{frame}
+}
+
+% Figure frame macro: \figureframe{Title}{Image path}
+\newcommand{\figureframe}[2]{
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.8\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+    \end{frame}
+}

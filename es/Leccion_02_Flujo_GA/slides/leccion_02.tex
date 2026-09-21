@@ -1,0 +1,210 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
+\lstset{
+    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.3em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\marcoresultado}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.25em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\marcoafirmacion}[2]{%
+    \begin{frame}{#1}
+        {\small #2\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{02}{El flujo del algoritmo genético}
+
+\section{Esta lección}
+
+\begin{frame}{Esta lección}
+El paso 6 de la Lección 01, con el ciclo todavía sin nombre, se reproduce aquí al dígito. Nombrar el flujo no debe cambiar la respuesta.
+
+\vspace{0.6em}
+\begin{itemize}
+    \item Cinco fases con nombre; una generación es una función.
+    \item El problema es un argumento, no va soldado al conductor.
+    \item Una regla de parada barata reporta que la ejecución dejó de mejorar --- no que terminó.
+\end{itemize}
+\end{frame}
+
+% ================= flujo_ag_01_las_cinco_fases =================
+\begin{frame}{Modelo matemático}
+\[
+P_{t+1}=R\!\left(M\!\left(C\!\left(S(P_t)\right)\right)\right)
+\]
+Una generación es una transición aleatoria de poblaciones. Una prueba de
+paciencia como \(b_t-b_{t-k}<\varepsilon\) detecta poca mejora reciente; no
+prueba convergencia ni dice nada del óptimo global desconocido.
+
+Para \(r\lfloor(T-s|x-x_0|)/h\rfloor\), las bandas unilaterales ordinarias
+miden \(h/s=0.5\); aquí la cima es \(|x-4|\le0.25\), ancho 0.5 y no un punto.
+\end{frame}
+
+\section{El flujo, nombrado}
+
+\begin{frame}{El flujo, nombrado}
+La Lección 01 terminó con un algoritmo genético que funcionaba. Su cuerpo de ciclo, sin embargo,
+era una serie de bloques de comentarios sin nombre, y no puedes discutir "el flujo" cuando el
+flujo no tiene nombre y no tiene límite. Este paso lo nombra.
+\end{frame}
+
+\begin{frame}[fragile]{(1) evolve\_one\_generation()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=94,lastline=127]{../src/flujo_ag_01_las_cinco_fases.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) run()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=130,lastline=148]{../src/flujo_ag_01_las_cinco_fases.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el rastro de fases}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=153,lastline=184]{../src/flujo_ag_01_las_cinco_fases.py}
+\end{frame}
+
+\marcoresultado{El flujo, nombrado}{../figures/flujo_ag_01_las_cinco_fases.png}{%
+    Misma semilla, misma respuesta que la Lección 01: \texttt{x=+1.372 f=+0.706}. La ejecución costó \textbf{107} evaluaciones de aptitud, no las 110 obvias — un individuo seleccionado pero no cruzado ni mutado es el mismo objeto y nunca se vuelve a evaluar}
+
+% ================= flujo_ag_02_aptitud_inyectada =================
+\section{El problema se convierte en un argumento}
+
+\begin{frame}{El problema se convierte en un argumento}
+En el paso 1, la palabra \texttt{objective} aparece dentro de Individuo. Esa única referencia
+suelda el flujo a un problema: para resolver un segundo problema copiarías el archivo.
+El libro separa \texttt{fitness.py} de \texttt{individual.py} exactamente por esta razón.
+\end{frame}
+
+\begin{frame}[fragile]{(1) los dos problemas}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=47,lastline=61]{../src/flujo_ag_02_aptitud_inyectada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) Individuo(genes, f)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=69,lastline=82]{../src/flujo_ag_02_aptitud_inyectada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) los operadores de construcción}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=99,lastline=115]{../src/flujo_ag_02_aptitud_inyectada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) run(fitness\_function)}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=147,lastline=165]{../src/flujo_ag_02_aptitud_inyectada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(5) las dos ejecuciones}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=168,lastline=190]{../src/flujo_ag_02_aptitud_inyectada.py}
+\end{frame}
+
+\marcoresultado{El problema se convierte en un argumento}{../figures/flujo_ag_02_aptitud_inyectada.png}{%
+    Un controlador, dos problemas: la ejecución del seno reproduce exactamente el paso 1, la ejecución del objetivo aterriza a \textbf{0.0038} de +4.200. La única diferencia entre las ejecuciones es qué función se pasó}
+
+% ================= flujo_ag_03_metricas_poblacion =================
+\section{Midiendo la población, no al líder}
+
+\begin{frame}{Midiendo la población, no al líder}
+Hasta ahora, cada rastro reporta el mejor individuo. Ese es el único número sobre
+el que un AG es menos honesto: el mejor puede quedarse quieto durante cinco
+generaciones mientras la población debajo de él cambia por completo, o puede ser un
+único caso atípico afortunado en una población que no ha aprendido nada.
+\end{frame}
+
+\begin{frame}[fragile]{(1) population\_metrics()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=67,lastline=83]{../src/flujo_ag_03_metricas_poblacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) la tabla de historial}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=188,lastline=230]{../src/flujo_ag_03_metricas_poblacion.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) la figura de métricas}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=232,lastline=257]{../src/flujo_ag_03_metricas_poblacion.py}
+\end{frame}
+
+\marcoresultado{Midiendo la población, no al líder}{../figures/flujo_ag_03_metricas_poblacion.png}{%
+    En el problema del seno, la aptitud promedio sube de −1.5588 a +0.6228 mientras que la dispersión genética cae de \textbf{6.665 a 0.064} para la generación 8. El campeón se queda quieto mientras la población colapsa debajo de él}
+
+% ================= flujo_ag_04_condicion_parada =================
+\section{Sabiendo cuándo detenerse}
+
+\begin{frame}{Sabiendo cuándo detenerse}
+Cada ejecución hasta ahora se detuvo después de exactamente diez generaciones, porque
+diez estaba escrito en la parte superior del archivo. El libro enumera tres formas de
+terminar una ejecución: se encuentra una solución aceptable, se alcanza un conteo de
+generaciones, o las mejoras se agotan. El paso 3 midió exactamente cuándo se agotan
+las mejoras, por lo que la tercera condición ahora está disponible gratis.
+\end{frame}
+
+\begin{frame}[fragile]{(1) MAX\_GENERATIONS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=40,lastline=40]{../src/flujo_ag_04_condicion_parada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) PATIENCE, MIN\_IMPROVEMENT}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=45,lastline=52]{../src/flujo_ag_04_condicion_parada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) detenerse por estancamiento}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=186,lastline=195]{../src/flujo_ag_04_condicion_parada.py}
+\end{frame}
+
+\begin{frame}[fragile]{(4) las ejecuciones de control}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=274,lastline=327]{../src/flujo_ag_04_condicion_parada.py}
+\end{frame}
+
+\marcoresultado{Sabiendo cuándo detenerse}{../figures/flujo_ag_04_condicion_parada.png}{%
+    La regla ahorra de \textbf{49 a 51} de las 60 generaciones permitidas y cuesta menos que \texttt{MIN\_IMPROVEMENT} en ambos problemas. También expone un defecto: en 1 de 2 problemas, la última generación ya no contiene al campeón — nada aquí lo protege}
+
+% ================= flujo_ag_05_paisajes_escalonados =================
+\section{Paisajes escalonados, y una suposición que resultó errónea}
+
+\begin{frame}{Paisajes escalonados, y una suposición que resultó errónea}
+El paso 4 evaluó el costo de la regla de parada en dos paisajes suaves y encontró que era gratis. La
+sospecha natural es que la suavidad estaba haciendo el trabajo: en un paisaje donde el
+progreso llega en saltos en lugar de pendientes, un tramo plano significaría que la
+población aún no ha encontrado el siguiente escalón, no que la búsqueda haya terminado - y una
+regla de paciencia no puede distinguirlos.
+\end{frame}
+
+\begin{frame}[fragile]{(1) escalera()}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=81,lastline=112]{../src/flujo_ag_05_paisajes_escalonados.py}
+\end{frame}
+
+\begin{frame}[fragile]{(2) PROBLEMAS}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=238,lastline=242]{../src/flujo_ag_05_paisajes_escalonados.py}
+\end{frame}
+
+\begin{frame}[fragile]{(3) el veredicto}
+\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=368,lastline=439]{../src/flujo_ag_05_paisajes_escalonados.py}
+\end{frame}
+
+\marcoresultado{Paisajes escalonados, y una suposición que resultó errónea}{../figures/flujo_ag_05_paisajes_escalonados.png}{%
+    La escalera \textbf{no} rompe la regla: la ejecución llega a \texttt{+2.0000}, la referencia de cuadrícula densa del paisaje, y la regla la detiene sin haber perdido nada. Cada uno de los tres problemas coincide con su referencia de cuadrícula, déficit \texttt{+0.0000}}
+
+\section{Siguiente}
+
+\begin{frame}{Siguiente}
+En la escalera la regla de paciencia nunca se rinde demasiado pronto: los peldaños suben, y cada borde es una comparación que la selección puede usar. La hipótesis queda refutada, y se conserva.
+
+\vspace{0.8em}
+\textbf{Lección 03 --- Selección}
+
+El primer operador que se abre, todavía sobre una generación de una población. La evidencia a nivel de corrida se aplaza a la Lección 06.
+\end{frame}
+\end{document}
