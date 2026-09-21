@@ -96,11 +96,12 @@ process from this lesson alone.
 
 ## Running it
 
-For a guided, self-contained walkthrough in Google Colab, open
-[the Lesson 01 notebook](notebooks/lesson_01_intro.ipynb). It combines the slide
-explanations with code built across cells, inline figures, prediction questions,
-and optional experiments. [Notebook instructions](notebooks/README.md) explain
-how to upload it and save a personal copy.
+For the classroom route, open the [compact Lesson 01 notebook](notebooks/lesson_01_intro_compact.ipynb).
+It combines the seven script-derived milestones with executable code, inline
+figures, prediction questions, and final checks. The [complete notebook](notebooks/lesson_01_intro.ipynb)
+keeps the detailed code-reading notes and optional experiments as reference.
+[Notebook instructions](notebooks/README.md) explain how to run either version
+locally, in VS Code, or in Colab.
 
 From the repository root, with `uv` handling the environment:
 
@@ -118,9 +119,9 @@ never shown, so the whole sequence runs unattended.
 Lesson_01_Intro/
 ├── README.md      this file — the lesson's contract
 ├── src/           the seven numbered scripts
-├── notebooks/     self-contained guided notebook, with saved outputs and instructions
+├── notebooks/     complete and compact guided notebooks, with saved outputs
 ├── figures/       generated plots (never edited by hand, never committed by hand)
-└── slides/        the Beamer deck (`lesson_01.tex` / `lesson_01.pdf`)
+└── slides/        complete and compact Beamer decks
 ```
 
 ## Status
@@ -128,6 +129,9 @@ Lesson_01_Intro/
 | Piece | State |
 |---|---|
 | Code | Done. Seven independently readable scripts; all run clean and preserve the original seeded numerical results. |
-| Notebook | Guided English walkthrough with 104 cells (34 executed code cells), per-cell reading notes, concrete traces, checks, and seven embedded figures. |
+| Complete notebook | Guided English walkthrough with 104 cells (34 executed code cells), detailed reading notes, optional experiments, checks, and seven embedded figures. |
+| Compact notebook | Classroom route with 29 cells (9 executed code cells), seven embedded figures, prediction prompts, checks, and the same baseline results. |
+| Complete slides | 48-page Beamer deck with the code-reading appendix. |
+| Compact slides | 17-page Beamer deck, compiled twice without overflows and reviewed visually; code listings follow the canonical script bands. |
 | Figures | Done. All seven scripts save a figure named after the script. Steps 3–5 added date omitted (selection multiplicities, blend children inside/outside, mutation reach). Step 5 no longer imports `scipy`. |
 

@@ -1,0 +1,179 @@
+\input{../../../templates/en/preamble.tex}
+
+% Compact classroom route. The seven scripts remain the authority.
+% Every listing below points to a real band in the canonical source code.
+\lstset{
+    basicstyle=\ttfamily\fontsize{5.4pt}{6.4pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.2em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultframe}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.63\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.2em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\lessontitle{01}{Your First Genetic Algorithm: compact route}
+
+\begin{frame}{The 50-minute route}
+    \begin{enumerate}
+        \item Formulate the landscape and inspect the best sampled point.
+        \item Build a population: candidates before a single answer.
+        \item Separate selection, crossover, and mutation.
+        \item Combine them for ten generations and change only the seed.
+    \end{enumerate}
+
+    \vspace{0.5em}
+    \textbf{Guiding question:} What does each operator add that the previous
+    operator could not do?
+\end{frame}
+
+\begin{frame}{Problem and reference}
+    \[
+        \max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|
+    \]
+    A 400-point grid provides a numerical reference. The genetic algorithm
+    sees candidates, evaluates them, and transforms a finite population.
+
+    \vspace{0.6em}
+    \textbf{Keep separate:} the best sampled point is not a proof of global
+    optimality.
+\end{frame}
+
+\resultframe{1. Landscape}{../figures/first_example_01_the_landscape.png}{%
+    The landscape has several peaks. A local search can stop on the peak where
+    it starts; the grid reports \texttt{x = +1.378} as this demonstration's
+    numerical reference.}
+
+\begin{frame}[fragile]{2. Population: preserve alternatives}
+    The recipe adds \texttt{Individual}, \texttt{create\_random()}, and the
+    initial population. The algorithm still does not select or modify
+    candidates: it stores ten evaluated alternatives.
+
+    \vspace{0.15em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.7pt}{5.6pt}\selectfont,
+        firstline=58,lastline=59]{../src/first_example_02_random_population.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.7pt}{5.6pt}\selectfont,
+        firstline=71,lastline=82]{../src/first_example_02_random_population.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.7pt}{5.6pt}\selectfont,
+        firstline=109,lastline=110]{../src/first_example_02_random_population.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.7pt}{5.6pt}\selectfont,
+        firstline=129,lastline=141]{../src/first_example_02_random_population.py}
+\end{frame}
+
+\resultframe{2. Initial population}{../figures/first_example_02_random_population.png}{%
+    With seed 52, the best initial candidate is \texttt{x = -0.323}. Ten blind
+    guesses cover more possibilities than one, but they are still guesses.}
+
+\begin{frame}[fragile]{3. Selection: change multiplicities}
+    Tournament selection keeps the best of three sampled candidates and repeats
+    until the population is full. It creates no new gene: selection only copies.
+
+    \vspace{0.25em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=121,lastline=122]{../src/first_example_03_selection.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=142,lastline=151]{../src/first_example_03_selection.py}
+\end{frame}
+
+\resultframe{3. Selection}{../figures/first_example_03_selection.png}{%
+    The run produces \texttt{4/10} individuals with zero copies. Selection
+    concentrates the population, but it cannot explore by itself.}
+
+\begin{frame}[fragile]{4. Crossover: create new values}
+    \texttt{clamp()} preserves the domain; \texttt{crossover\_blend()} combines
+    two genes; \texttt{crossover()} returns new individuals. The blend
+    parameter can leave the parental interval while staying in \([-10,10]\).
+
+    \vspace{0.1em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.5pt}{5.4pt}\selectfont,
+        firstline=61,lastline=61]{../src/first_example_04_crossover.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.5pt}{5.4pt}\selectfont,
+        firstline=80,lastline=82]{../src/first_example_04_crossover.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.5pt}{5.4pt}\selectfont,
+        firstline=131,lastline=145]{../src/first_example_04_crossover.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.5pt}{5.4pt}\selectfont,
+        firstline=167,lastline=168]{../src/first_example_04_crossover.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.5pt}{5.4pt}\selectfont,
+        firstline=181,lastline=184]{../src/first_example_04_crossover.py}
+\end{frame}
+
+\resultframe{4. Crossover}{../figures/first_example_04_crossover.png}{%
+    With parents \texttt{-2} and \texttt{+3}, \texttt{14/20} children fall
+    outside the parental interval. New values do not guarantee better fitness.}
+
+\begin{frame}[fragile]{5. Mutation: extend the reach}
+    Gaussian mutation adds noise and reapplies the bounds. The parameter
+    \texttt{sigma} controls the typical jump size.
+
+    \vspace{0.2em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=123,lastline=124]{../src/first_example_05_mutation.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=143,lastline=150]{../src/first_example_05_mutation.py}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=164,lastline=167]{../src/first_example_05_mutation.py}
+\end{frame}
+
+\resultframe{5. Mutation}{../figures/first_example_05_mutation.png}{%
+    From a local hill, \texttt{sigma=1.0} produces \texttt{0/2000} arrivals and
+    \texttt{sigma=3.0} produces \texttt{110/2000}. Zero observations in a finite
+    sample do not prove a probability of zero.}
+
+\begin{frame}[fragile]{6. Generational loop}
+    The complete run repeats
+    \[
+        \text{initialise}\to[\text{select}\to\text{crossover}\to\text{mutate}\to\text{replace}]\times10.
+    \]
+    The following band assembles the operators into the same reproducible run.
+
+    \vspace{0.2em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.8pt}{5.7pt}\selectfont,
+        firstline=200,lastline=218]{../src/first_example_06_the_full_loop.py}
+\end{frame}
+
+\resultframe{6. Complete loop}{../figures/first_example_06_the_full_loop.png}{%
+    With seed 52, ten generations finish at \texttt{x = +1.372, f = +0.706},
+    near the grid reference \texttt{x = +1.378}.}
+
+\begin{frame}[fragile]{7. Change only the seed}
+    Everything stays fixed except the random sequence. The change tests run
+    sensitivity, not implementation correctness.
+
+    \vspace{0.55em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{7.2pt}{8.4pt}\selectfont,
+        firstline=36,lastline=38]{../src/first_example_07_local_optimum.py}
+\end{frame}
+
+\resultframe{7. Local optimum}{../figures/first_example_07_local_optimum.png}{%
+    With seed 16, the same algorithm finishes at \texttt{x = -4.417, f = +0.073}.
+    A successful run does not prove global optimality.}
+
+\begin{frame}{Conceptual close}
+    \begin{itemize}
+        \item The population preserves alternatives.
+        \item Selection amplifies what already works.
+        \item Crossover recombines; mutation restores reach.
+        \item The loop produces a trajectory, not a guarantee.
+    \end{itemize}
+
+    \vspace{0.5em}
+    \textbf{Next:} Lesson 02 names and separates the algorithm's phases.
+\end{frame}
+
+\end{document}

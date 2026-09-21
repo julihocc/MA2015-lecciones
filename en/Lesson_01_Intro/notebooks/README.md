@@ -1,6 +1,19 @@
-# Lesson 01 — Guided notebook
+# Lesson 01 - Guided notebooks
 
-Open [lesson_01_intro.ipynb](lesson_01_intro.ipynb) for a complete, incremental
+The published classroom route is the [compact notebook](lesson_01_intro_compact.ipynb).
+The [complete notebook](lesson_01_intro.ipynb) remains the reference version with
+detailed code-reading notes and optional experiments.
+
+## Compact classroom route
+
+The compact version follows the seven canonical scripts in 29 cells, including 9
+executable cells. It keeps the mathematical model, prediction prompts, seven
+figures, expected results, final assertions, and local/VS Code/Colab path notes.
+It removes the extended code-reading traces and optional experiments from the
+main 50-minute route.
+
+Open [lesson_01_intro_compact.ipynb](lesson_01_intro_compact.ipynb) for the
+linear classroom route. Open [lesson_01_intro.ipynb](lesson_01_intro.ipynb) for a complete, incremental
 walkthrough of your first genetic algorithm. The notebook includes explanations,
 complete code, saved outputs, seven figures, prediction questions, self-check
 answers, and optional experiments. Every code cell has a nearby reading guide
@@ -11,7 +24,8 @@ continue afterward.
 ## Local Jupyter or VS Code
 
 1. From the repository root, run `uv sync --frozen` once.
-2. Open `lesson_01_intro.ipynb` in Jupyter or VS Code.
+2. Open `lesson_01_intro_compact.ipynb` for class, or `lesson_01_intro.ipynb`
+   for the complete reference, in Jupyter or VS Code.
 3. In VS Code, choose **Select Kernel** and select the project's `.venv` /
    `ma2015-genetic-algorithms` Python environment.
 4. Restart the kernel and choose **Run All**. The project requires Python 3.11+
@@ -55,8 +69,10 @@ notebook to retain its embedded figures.
 
 ## Relationship to the lesson
 
-The notebook follows the [slides](../slides/lesson_01.tex) and the
-[seven standalone scripts](../src/) in the same order:
+The compact notebook follows the [compact slides](../slides/lesson_01_compact.tex)
+and the [seven standalone scripts](../src/) in the same order. The complete
+notebook follows the [complete slides](../slides/lesson_01.tex) and the same
+seven standalone scripts:
 
 | Step | Main addition |
 |---|---|
@@ -68,7 +84,7 @@ The notebook follows the [slides](../slides/lesson_01.tex) and the
 | 6 | Generational loop and convergence history |
 | 7 | Seed 16 and the local-optimum comparison |
 
-Definitions accumulate across cells; the notebook is self-contained as a whole.
+Definitions accumulate across cells; both notebooks are self-contained as a whole.
 Each change recipe has matching `NEW` or `CHANGED` markers. Step 6 wraps the
 existing loop in `run_ga(seed)`, and step 7 reuses it. Settings, operator logic,
 and random draw order match the scripts. Short concrete traces expose one
@@ -105,7 +121,10 @@ Matplotlib 3.11.1 from the course lockfile. Notebook tooling (`ipykernel`,
   vocabulary table. Checked navigation and text overflow at desktop and
   narrower reading widths.
 
-This is local Jupyter execution and browser validation; the notebook has not
+This is local Jupyter execution and browser validation; the complete notebook has not
 been executed inside Google's hosted Colab service or through the VS Code Colab
 extension. Its remote-kernel path handling was validated separately with an
 unavailable host path and an isolated working directory.
+
+The compact notebook was verified on September 22, 2026 with 29 cells, 9 code
+cells, zero errors, seven embedded figures, and the documented baseline results.
