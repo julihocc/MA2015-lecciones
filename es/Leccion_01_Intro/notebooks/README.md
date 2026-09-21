@@ -1,18 +1,37 @@
-# Lección 01 — Libreta guiada
+# Lección 01 — Libretas guiadas
+
+La ruta estudiantil publicada para S01 es la
+[libreta compacta](leccion_01_intro_compacta.ipynb). La libreta completa
+([leccion_01_intro.ipynb](leccion_01_intro.ipynb)) se conserva como referencia
+de lectura detallada y experimentación.
+
+## Ruta compacta de S01
+
+La versión compacta conserva la misma secuencia y el mismo código que los siete
+scripts, pero reúne el recorrido en 35 celdas (9 ejecutables): preparación,
+modelo, siete pasos, figuras, resultados y comprobaciones finales. Omite la
+lectura extensa de código y los experimentos opcionales para que la ruta
+principal quepa en los 50 minutos de L01. Mantiene las siete figuras embebidas,
+la ejecución autónoma y la resolución de rutas para local/VS Code/Colab.
+
+La libreta compacta se deriva de los bloques de código de la libreta completa;
+no importa los scripts ni introduce una implementación paralela.
 
 Abre [leccion_01_intro.ipynb](leccion_01_intro.ipynb) para recorrer de forma
-lineal la construcción del primer algoritmo genético. La libreta intercala la
+detallada la construcción del primer algoritmo genético. La libreta intercala la
 explicación conceptual con incrementos pequeños de código, preguntas de
 predicción, comprobaciones y experimentos opcionales. Conserva sus salidas
 ejecutadas y siete figuras, de modo que también sirve como respaldo sin red.
 
-La ruta principal toma alrededor de 50 minutos. La lectura detallada y los
-experimentos opcionales pueden continuar después de la sesión.
+La ruta completa toma alrededor de 50 minutos para el recorrido base; la
+lectura detallada y los experimentos opcionales pueden continuar después de la
+sesión.
 
 ## Jupyter local o VS Code
 
 1. Desde la raíz del repositorio, ejecuta una vez `uv sync --frozen`.
-2. Abre `leccion_01_intro.ipynb` en Jupyter o VS Code.
+2. Abre `leccion_01_intro_compacta.ipynb` en Jupyter o VS Code para la ruta de
+   clase. Usa `leccion_01_intro.ipynb` si necesitas la lectura completa.
 3. En VS Code, elige **Select Kernel** y selecciona el entorno Python `.venv` /
    `ma2015-genetic-algorithms` del proyecto.
 4. Reinicia el kernel y elige **Run All**. El proyecto requiere Python 3.11+ y
@@ -71,12 +90,11 @@ La libreta sigue en el mismo orden las
 | 6 | Ciclo generacional e historial de convergencia |
 | 7 | Semilla 16 y comparación con un óptimo local |
 
-Las definiciones se acumulan entre celdas y la libreta completa es
-autocontenida. La lógica, los parámetros, las semillas y el orden de las
-extracciones aleatorias coinciden con los scripts. Los experimentos opcionales
-usan variables separadas y no alteran los resultados base. La celda de
-comprobaciones valida las cifras documentadas y la reproducibilidad de las
-corridas completas.
+Las definiciones se acumulan entre celdas y ambas libretas son autocontenidas.
+La lógica, los parámetros, las semillas y el orden de las extracciones
+aleatorias coinciden con los scripts. La celda de comprobaciones valida las
+cifras documentadas y la reproducibilidad de las corridas completas; sólo la
+versión extensa contiene los experimentos opcionales.
 
 ## Validación
 
@@ -104,4 +122,9 @@ La validación corresponde a Jupyter local. La libreta todavía no se ha
 ejecutado dentro del servicio alojado de Google Colab ni mediante su extensión
 de VS Code. El manejo de rutas para kernel remoto se validó por separado con
 una ruta local no disponible y un directorio de trabajo aislado.
+
+La versión compacta se verificó el 21 de septiembre de 2026: 35 celdas, 9
+celdas de código, cero errores, siete figuras embebidas y las mismas cifras de
+aceptación. Se ejecutó desde un kernel limpio con la carpeta de la libreta como
+directorio de trabajo.
 

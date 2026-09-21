@@ -95,10 +95,12 @@ lecciones, y no recibe argumentos de línea de comandos. Las figuras se
 sin supervisión.
 
 Para trabajar la misma secuencia como una sola experiencia estudiantil, abre
-[la libreta guiada](notebooks/leccion_01_intro.ipynb). Integra las explicaciones
-de las diapositivas con incrementos ejecutables del código, de modo que el
-estudiante avance de forma lineal sin alternar entre siete archivos. Los scripts
-siguen siendo la referencia autónoma de cada paso.
+[la libreta compacta](notebooks/leccion_01_intro_compacta.ipynb). Integra los
+slides compactos con incrementos ejecutables del código, de modo que el
+estudiante avance de forma lineal sin alternar entre siete archivos. La
+[libreta completa](notebooks/leccion_01_intro.ipynb) conserva la lectura
+detallada y los experimentos opcionales; los scripts siguen siendo la
+referencia autónoma de cada paso.
 
 ## Contenido de la carpeta
 
@@ -107,8 +109,8 @@ Leccion_01_Intro/
 ├── README.md         este archivo — el contrato de la lección
 ├── src/              los siete scripts numerados
 ├── figuras/          gráficas generadas (nunca se editan ni se agregan a mano)
-├── notebooks/        libreta guiada autocontenida y su guía de apertura
-└── slides/           deck en Beamer
+├── notebooks/        libretas completa y compacta, y guía de apertura
+└── slides/           decks Beamer completo y compacto
 ```
 
 ## Estado
@@ -117,6 +119,8 @@ Leccion_01_Intro/
 |---|---|
 | Código | Listo. Siete scripts, todos corren limpio, cifras idénticas a las de inglés. |
 | Figuras | Listas. Los siete pasos guardan una figura y fueron revisadas visualmente. |
-| Libreta guiada | Lista. 104 celdas, 34 de código ejecutadas sin errores y siete figuras embebidas; paridad exacta con los scripts. |
-| Diapositivas | Listas. Los rangos de código corresponden a las bandas numeradas; el PDF se recompila y revisa junto con esta lección. |
+| Libreta completa | Lista. 104 celdas, 34 de código ejecutadas sin errores y siete figuras embebidas; paridad exacta con los scripts. |
+| Libreta compacta | Lista. 35 celdas, 9 de código ejecutadas sin errores y siete figuras embebidas; misma paridad numérica. |
+| Diapositivas completas | Listas. Los rangos de código corresponden a las bandas numeradas. |
+| Diapositivas compactas | Listas. 17 páginas, compiladas dos veces sin desbordamientos y revisadas visualmente; los listados salen de los scripts canónicos. |
 

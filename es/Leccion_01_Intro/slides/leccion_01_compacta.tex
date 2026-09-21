@@ -1,0 +1,166 @@
+\input{../../../templates/es/preambulo.tex}
+
+% Ruta presencial compacta: el código canónico sigue siendo la autoridad.
+% Cada listado se extrae del script correspondiente y conserva sus rangos reales.
+\lstset{
+    basicstyle=\ttfamily\fontsize{5.4pt}{6.4pt}\selectfont,
+    breaklines=true,
+    breakatwhitespace=true,
+    columns=fullflexible,
+    keepspaces=true,
+    xleftmargin=0.2em,
+    framesep=2pt,
+    aboveskip=0pt,
+    belowskip=0pt
+}
+
+\newcommand{\resultadoCompacto}[3]{%
+    \begin{frame}{#1}
+        \begin{center}
+            \includegraphics[height=0.63\textheight,width=\textwidth,keepaspectratio]{#2}
+        \end{center}
+        \vspace{0.2em}
+        {\small #3\par}
+    \end{frame}%
+}
+
+\newcommand{\codigoCompacto}[4]{%
+    \begin{frame}[fragile]{#1}
+        {\small #2\par}\vspace{0.25em}
+        \lstinputlisting[
+            basicstyle=\ttfamily\fontsize{#4pt}{#4pt}\selectfont,
+            firstline=#3
+        ]{#1}
+    \end{frame}%
+}
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{01}{Tu primer algoritmo genético — ruta compacta}
+
+\begin{frame}{La ruta de 50 minutos}
+    \begin{enumerate}
+        \item Formular el paisaje y observar el mejor punto muestreado.
+        \item Construir una población: candidatos antes que una única respuesta.
+        \item Separar los tres operadores: selección, cruza y mutación.
+        \item Integrarlos en diez generaciones y cambiar sólo la semilla.
+    \end{enumerate}
+
+    \vspace{0.5em}
+    \textbf{Pregunta guía:} ¿qué aporta cada operador que el anterior todavía no podía hacer?
+\end{frame}
+
+\begin{frame}{Problema y referencia}
+    \[
+        \max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|
+    \]
+    La malla de 400 puntos es una referencia numérica. El algoritmo genético
+    sólo ve candidatos, los evalúa y transforma una población finita.
+
+    \vspace{0.6em}
+    \textbf{No confundas:} mejor punto observado \(\neq\) prueba de optimalidad global.
+\end{frame}
+
+\resultadoCompacto{1. Paisaje}{../figuras/primer_ejemplo_01_el_paisaje.png}{%
+    Hay varias cimas. La búsqueda local puede detenerse en la cima donde comenzó;
+    la malla reporta \texttt{x = +1.378} como referencia de esta demostración.}
+
+\begin{frame}[fragile]{2. Población: conservar alternativas}
+    La receta añade \texttt{Individuo}, \texttt{crear\_aleatorio()} y la población
+    inicial. El algoritmo aún no selecciona ni modifica: sólo mantiene diez
+    candidatos evaluados.
+
+    \vspace{0.2em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.1pt}{6.1pt}\selectfont,
+        firstline=74,lastline=100]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\end{frame}
+
+\resultadoCompacto{2. Población inicial}{../figuras/primer_ejemplo_02_poblacion_aleatoria.png}{%
+    Con semilla 52, el mejor candidato inicial es \texttt{x = -0.323}.
+    Diez conjeturas cubren más posibilidades que una, pero todavía son conjeturas.}
+
+\begin{frame}[fragile]{3. Selección: cambiar multiplicidades}
+    Un torneo de tres candidatos conserva al mejor y repite hasta llenar la
+    población. No aparece un gen nuevo: la selección sólo decide quién se copia.
+
+    \vspace{0.2em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.2pt}{6.2pt}\selectfont,
+        firstline=79,lastline=103]{../src/primer_ejemplo_03_seleccion.py}
+\end{frame}
+
+\resultadoCompacto{3. Selección}{../figuras/primer_ejemplo_03_seleccion.png}{%
+    La corrida produce \texttt{4/10} individuos con cero copias.
+    Seleccionar concentra la población, pero por sí sola no explora.}
+
+\begin{frame}[fragile]{4. Cruza: crear valores intermedios y extendidos}
+    \texttt{acotar()} respeta el dominio; \texttt{cruza\_mezcla()} combina dos
+    genes y \texttt{cruza()} devuelve nuevos individuos. El parámetro de mezcla
+    permite salir del intervalo parental sin salir de \([-10,10]\).
+
+    \vspace{0.15em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.8pt}{5.7pt}\selectfont,
+        firstline=88,lastline=116]{../src/primer_ejemplo_04_cruza.py}
+\end{frame}
+
+\resultadoCompacto{4. Cruza}{../figuras/primer_ejemplo_04_cruza.png}{%
+    Con progenitores \texttt{-2} y \texttt{+3}, \texttt{14/20} hijos caen fuera
+    del intervalo parental. Crear valores nuevos no garantiza mejorar la aptitud.}
+
+\begin{frame}[fragile]{5. Mutación: ampliar el alcance}
+    La mutación suma ruido gaussiano y vuelve a imponer los límites. La escala
+    \texttt{sigma} controla el tamaño típico del salto.
+
+    \vspace{0.15em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{5.0pt}{6.0pt}\selectfont,
+        firstline=82,lastline=101]{../src/primer_ejemplo_05_mutacion.py}
+\end{frame}
+
+\resultadoCompacto{5. Mutación}{../figuras/primer_ejemplo_05_mutacion.png}{%
+    Desde una colina local: \texttt{sigma=1.0} produce \texttt{0/2000} llegadas
+    y \texttt{sigma=3.0}, \texttt{110/2000}. Cero observaciones es un resultado
+    finito, no una probabilidad demostrada igual a cero.}
+
+\begin{frame}[fragile]{6. Ciclo generacional}
+    La corrida completa repite:
+    \[
+        \text{inicializar}\to[\text{seleccionar}\to\text{cruzar}\to\text{mutar}\to\text{reemplazar}]\times10.
+    \]
+    El siguiente fragmento ensambla exactamente los operadores anteriores.
+
+    \vspace{0.1em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{4.7pt}{5.6pt}\selectfont,
+        firstline=138,lastline=162]{../src/primer_ejemplo_06_el_ciclo_completo.py}
+\end{frame}
+
+\resultadoCompacto{6. Ciclo completo}{../figuras/primer_ejemplo_06_el_ciclo_completo.png}{%
+    Con semilla 52, diez generaciones terminan en \texttt{x = +1.372, f = +0.706},
+    cerca de la referencia de malla \texttt{x = +1.378}.}
+
+\begin{frame}[fragile]{7. Cambiar sólo la semilla}
+    Todo permanece igual salvo la secuencia aleatoria. Este cambio prueba
+    sensibilidad de la corrida, no un error de implementación.
+
+    \vspace{0.5em}
+    \lstinputlisting[basicstyle=\ttfamily\fontsize{7.2pt}{8.4pt}\selectfont,
+        firstline=32,lastline=32]{../src/primer_ejemplo_07_optimo_local.py}
+\end{frame}
+
+\resultadoCompacto{7. Óptimo local}{../figuras/primer_ejemplo_07_optimo_local.png}{%
+    Con semilla 16, el mismo algoritmo termina en \texttt{x = -4.417, f = +0.073}.
+    Una corrida exitosa no demuestra optimalidad global.}
+
+\begin{frame}{Cierre conceptual}
+    \begin{itemize}
+        \item La población conserva alternativas.
+        \item La selección amplifica lo que ya funciona.
+        \item La cruza recombina; la mutación reintroduce alcance.
+        \item El ciclo produce una trayectoria, no una garantía.
+    \end{itemize}
+
+    \vspace{0.5em}
+    \textbf{Siguiente:} la Lección 02 nombra y separa las fases del algoritmo.
+\end{frame}
+
+\end{document}
