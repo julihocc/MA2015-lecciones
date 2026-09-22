@@ -7,7 +7,7 @@ NUEVO EN ESTE PASO: nada. Es el paso 6 con UN carácter cambiado.
 
 Mismo algoritmo, mismos parámetros, mismo número de generaciones. Solo cambia
 la población inicial aleatoria, y el resultado es un fracaso: la corrida se
-asienta en un máximo local y nunca lo abandona.
+asienta cerca de un máximo local durante estas diez generaciones.
 
 Esto no es un error que haya que corregir. Es el comportamiento honesto del
 método, y es la razón de que existan las Lecciones 03, 04, 05 y 07: la presión
@@ -22,7 +22,7 @@ Ejecútalo:  python primer_ejemplo_07_optimo_local.py
 Compáralo:  python primer_ejemplo_06_el_ciclo_completo.py
 
 Misma receta, SEMILLA = 16 en lugar de 52. La corrida se asienta en
-x = -4.417, f = +0.073 y nunca sale de esa colina local.
+x = -4.417, f = +0.073, cerca de una colina local tras diez generaciones.
 """
 import random
 from pathlib import Path
@@ -40,7 +40,7 @@ MUTACION_MU, MUTACION_SIGMA = 0.0, 1.0
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Argumentos:
@@ -55,7 +55,7 @@ def objetivo(x):
     return np.sin(x) - 0.2 * abs(x)
 
 
-def acotar(g, minimo=GEN_MIN, maximo=GEN_MAX):
+def acotar(g: float, minimo: float = GEN_MIN, maximo: float = GEN_MAX) -> float:
     """Proyecta un gen al intervalo cerrado del paisaje.
 
     Argumentos:
@@ -75,20 +75,20 @@ class Individuo:
         lista_genes: cromosoma; aquí un solo real en [-10, 10].
     """
 
-    def __init__(self, lista_genes):
+    def __init__(self, lista_genes: list[float]) -> None:
         self.lista_genes = lista_genes
         self.aptitud = objetivo(lista_genes[0])
 
     @property
-    def gen(self):
+    def gen(self) -> float:
         """El único gen: este paisaje es unidimensional."""
         return self.lista_genes[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"x={self.gen:+.3f} f={self.aptitud:+.3f}"
 
 
-def crear_aleatorio():
+def crear_aleatorio() -> Individuo:
     """Extrae un individuo uniforme de [-10, 10].
 
     Devuelve:
@@ -97,7 +97,7 @@ def crear_aleatorio():
     return Individuo([random.uniform(GEN_MIN, GEN_MAX)])
 
 
-def seleccion_torneo(poblacion, tamano):
+def seleccion_torneo(poblacion: list[Individuo], tamano: int) -> list[Individuo]:
     """Un torneo por cada lugar de la nueva generación.
 
     Argumentos:
@@ -111,7 +111,7 @@ def seleccion_torneo(poblacion, tamano):
                 key=lambda i: i.aptitud) for _ in range(len(poblacion))]
 
 
-def cruza(p1, p2):
+def cruza(p1: Individuo, p2: Individuo) -> tuple[Individuo, Individuo]:
     """Variante complementaria de cruza por mezcla entre dos Individuo.
 
     Argumentos:
@@ -126,7 +126,7 @@ def cruza(p1, p2):
     return Individuo([g1]), Individuo([g2])
 
 
-def mutar(ind):
+def mutar(ind: Individuo) -> Individuo:
     """Suma ruido gaussiano a un gen y reconstruye el Individuo.
 
     Argumentos:

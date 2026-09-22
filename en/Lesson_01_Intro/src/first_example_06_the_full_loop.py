@@ -44,7 +44,7 @@ MUTATION_MU, MUTATION_SIGMA = 0.0, 1.0
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the sine landscape of step 1.
 
     Args:
@@ -61,7 +61,7 @@ def objective(x):
     return np.sin(x) - 0.2 * abs(x)
 
 
-def clamp(g, low=GENE_MIN, high=GENE_MAX):
+def clamp(g: float, low: float = GENE_MIN, high: float = GENE_MAX) -> float:
     """Keep a gene inside the landscape after blend or Gaussian noise.
 
     Args:
@@ -88,7 +88,7 @@ class Individual:
 
         """
 
-    def __init__(self, gene_list):
+    def __init__(self, gene_list: list[float]) -> None:
         """Build an individual and score it immediately.
 
         Args:
@@ -103,7 +103,7 @@ class Individual:
     # @property lets callers write ``individual.gene`` instead of calling
     # ``individual.gene()``. It hides the one-element list representation.
     @property
-    def gene(self):
+    def gene(self) -> float:
         """The single real gene as a float.
 
         Returns:
@@ -111,7 +111,7 @@ class Individual:
         """
         return self.gene_list[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Compact snapshot printed as the run's solution.
 
         Returns:
@@ -122,7 +122,7 @@ class Individual:
         return f"x={self.gene:+.3f} f={self.fitness:+.3f}"
 
 
-def create_random():
+def create_random() -> Individual:
     """Draw one individual uniformly from [-10, 10].
 
     Returns:
@@ -133,7 +133,7 @@ def create_random():
     return Individual([random.uniform(GENE_MIN, GENE_MAX)])
 
 
-def select_tournament(population, size):
+def select_tournament(population: list[Individual], size: int) -> list[Individual]:
     """Fill each next-generation slot with the winner of a size-tournament.
 
     Args:
@@ -155,7 +155,7 @@ def select_tournament(population, size):
     ]
 
 
-def crossover(p1, p2):
+def crossover(p1: Individual, p2: Individual) -> tuple[Individual, Individual]:
     """Use a complementary blend variant and return two clamped children.
 
     Args:
@@ -176,7 +176,7 @@ def crossover(p1, p2):
     return Individual([g1]), Individual([g2])
 
 
-def mutate(ind):
+def mutate(ind: Individual) -> Individual:
     """Add N(0, 1.0) noise to one gene and wrap it as a new Individual.
 
     Args:
@@ -257,7 +257,7 @@ plt.title("Best fitness per generation")
 plt.xlabel("generation"); plt.ylabel("best f(x)")
 # Here alpha is grid-line opacity, not the BLEND_ALPHA crossover parameter.
 plt.grid(True, linestyle=":", alpha=0.5)
-# Create the folder if needed, save the evidence, and release the .
+# Create the folder if needed, save the evidence, and release the figure.
 FIGURES.mkdir(exist_ok=True)
 plt.savefig(FIGURES / "first_example_06_the_full_loop.png", dpi=150, bbox_inches="tight")
 plt.close()

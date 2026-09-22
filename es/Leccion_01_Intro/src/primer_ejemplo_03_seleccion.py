@@ -29,7 +29,7 @@ TAMANO_TORNEO = 3
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Argumentos:
@@ -54,20 +54,20 @@ class Individuo:
         Con SEMILLA = 52, 4 de 10 individuos se extinguen tras el torneo.
     """
 
-    def __init__(self, lista_genes):
+    def __init__(self, lista_genes: list[float]) -> None:
         self.lista_genes = lista_genes
         self.aptitud = objetivo(lista_genes[0])
 
     @property
-    def gen(self):
+    def gen(self) -> float:
         """El único gen: este paisaje es unidimensional."""
         return self.lista_genes[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"x={self.gen:+.3f} f={self.aptitud:+.3f}"
 
 
-def crear_aleatorio():
+def crear_aleatorio() -> Individuo:
     """Extrae un individuo uniforme de [-10, 10].
 
     Devuelve:
@@ -77,7 +77,7 @@ def crear_aleatorio():
 
 
 # --- NUEVO (1) seleccion_torneo() ---------------------------------------------
-def seleccion_torneo(poblacion, tamano):
+def seleccion_torneo(poblacion: list[Individuo], tamano: int) -> list[Individuo]:
     """Corre un torneo por cada lugar de la nueva generación.
 
     Cada torneo toma `tamano` individuos al azar y se queda con el más apto.

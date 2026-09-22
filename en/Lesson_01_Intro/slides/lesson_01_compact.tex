@@ -1,0 +1,162 @@
+\input{../../../templates/en/preamble.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\lstset{basicstyle=\ttfamily\fontsize{7.3pt}{8.7pt}\selectfont,breaklines=true,columns=fullflexible,keepspaces=true,aboveskip=4pt,belowskip=0pt}
+\date{}
+\begin{document}
+\begin{frame}[fragile]{Your First Genetic Algorithm}
+\centering\Large Compact: 40-minute class
+\par\vspace{1em}\normalsize Prof. Juliho Castillo\par Tec de Monterrey\par
+\end{frame}
+
+\begin{frame}[fragile]{A shared route for explanation and execution}
+Setup and model: 4 min; landscape: 3; population: 4; selection: 5; crossover: 6; mutation: 6; complete loop: 7; seed comparison and checks: 5. Total: 40 minutes.\\[0.7em]
+Run prepared code in the compact notebook. Predict, execute and interpret each result. Timing includes computation and transitions; it is an estimate, not a rehearsed duration.
+\end{frame}
+
+\begin{frame}[fragile]{Model and assumptions}
+\[\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|.\]
+This is a synthetic, dimensionless teaching model, not Planta Física measurements. The sine argument is in radians. Evaluation is deterministic; larger scores are better. The interval is a hard feasibility constraint.\\[0.7em]
+Candidates and mutation draws are generated as part of learning the algorithm. No external data files are required.
+\end{frame}
+
+\begin{frame}[fragile]{Result 1}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_01_the_landscape.png}
+\par\vspace{0.3em}\raggedright\small Best grid point: x = +1.378, fitness = +0.706. Three interior peaks and a partial hill at the left boundary illustrate multiple basins. A local ascent may miss the highest peak.
+\end{frame}
+
+\begin{frame}[fragile]{2. Store a candidate and its score}
+Construction stores a one-gene chromosome and computes its fitness. The property reads the gene; the representation prints a signed value to three decimals.
+
+\begin{lstlisting}
+class Individual:
+
+    def __init__(self, gene_list: list[float]) -> None:
+        self.gene_list = gene_list
+        self.fitness = objective(gene_list[0])
+
+    @property
+    def gene(self) -> float:
+        return self.gene_list[0]
+
+    def __repr__(self) -> str:
+        return f'x={self.gene:+.3f} f={self.fitness:+.3f}'
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Result 2}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_02_random_population.png}
+\par\vspace{0.3em}\raggedright\small Seed 52 gives best initial x = -0.323, fitness = -0.382. Ten random candidates cover alternatives but do not guarantee proximity to the best peak.
+\end{frame}
+
+\begin{frame}[fragile]{3. Tournament selection}
+Sample three candidates with replacement and select the greatest fitness. Repeat for every output slot. The result contains references to existing objects; it does not create new genes.
+
+\begin{lstlisting}
+def select_tournament(population: list[Individual], size: int) -> list[Individual]:
+    offspring = []
+    for _ in range(len(population)):
+        candidates = [random.choice(population) for _ in range(size)]
+        offspring.append(max(candidates, key=lambda ind: ind.fitness))
+    return offspring
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Result 3}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_03_selection.png}
+\par\vspace{0.3em}\raggedright\small Four of ten original individuals have zero selected copies. The selected genes remain a subset of the original genes. Multiplicity changes, the gene values do not.
+\end{frame}
+
+\begin{frame}[fragile]{Project a proposal into the legal interval}
+A proposal above 10 becomes 10; one below -10 becomes -10. A legal value is unchanged. Projection is part of the algorithm, not a plotting adjustment.
+
+\begin{lstlisting}
+def clamp(gene: float, low: float=GENE_MIN, high: float=GENE_MAX) -> float:
+    return max(low, min(high, gene))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{4. Blend crossover}
+Draw $s=(1+2\alpha)u-\alpha$, $u\sim U[0,1)$. Propose $(1-s)a+sb$ and $sa+(1-s)b$; clamp both to the legal domain. One shared draw makes the proposals complementary, not independent.
+
+\begin{lstlisting}
+def crossover_blend(gene1: float, gene2: float, alpha: float) -> tuple[float, float]:
+    shift = (1 + 2 * alpha) * random.random() - alpha
+    child1 = (1 - shift) * gene1 + shift * gene2
+    child2 = shift * gene1 + (1 - shift) * gene2
+    return (clamp(child1), clamp(child2))
+
+def crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
+    g1, g2 = crossover_blend(parent1.gene, parent2.gene, BLEND_ALPHA)
+    return (Individual([g1]), Individual([g2]))
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Result 4}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_04_crossover.png}
+\par\vspace{0.3em}\raggedright\small With parents -2 and +3 and alpha = 1, 14 of 20 children lie outside the parental interval. All stay inside the legal domain. New values do not guarantee better fitness.
+\end{frame}
+
+\begin{frame}[fragile]{5. Gaussian mutation}
+Add $\varepsilon\sim N(0,\sigma^2)$ and clamp. Sigma controls typical jump size; it is not a maximum distance. In the full algorithm, mutation activates separately with probability 0.1.
+
+\begin{lstlisting}
+def mutate_gaussian(gene: float, mu: float, sigma: float) -> float:
+    return clamp(gene + random.gauss(mu, sigma))
+
+def mutate(individual: Individual) -> Individual:
+    return Individual([mutate_gaussian(individual.gene, MUTATION_MU, MUTATION_SIGMA)])
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Result 5}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_05_mutation.png}
+\par\vspace{0.3em}\raggedright\small From x = -4.6, count arrivals with |x - 1.38| < 1.5 in 2,000 attempts. Sigma 1 gives 0; sigma 3 gives 110 (5.5\%). Zero observed events do not mean zero probability.
+\end{frame}
+
+\begin{frame}[fragile]{6. The generational update}
+Initialize ten candidates; repeat select, cross adjacent pairs, mutate and replace ten times. Crossover probability is 0.8 per pair; mutation probability is 0.1 per individual. No elitism protects the previous best.
+
+\begin{lstlisting}
+random.seed(SEED)
+population = [create_random() for _ in range(POPULATION_SIZE)]
+history = [max(population, key=lambda i: i.fitness).fitness]
+for generation in range(1, MAX_GENERATIONS + 1):
+    offspring = select_tournament(population, TOURNAMENT_SIZE)
+    crossed = []
+    for p1, p2 in zip(offspring[::2], offspring[1::2]):
+        if random.random() < CROSSOVER_PROBABILITY:
+            crossed.extend(crossover(p1, p2))
+        else:
+            crossed.extend([p1, p2])
+    population = [mutate(i) if random.random() < MUTATION_PROBABILITY else i for i in crossed]
+    best = max(population, key=lambda i: i.fitness)
+    history.append(best.fitness)
+    print(f'Generation {generation:2d} | best {best.fitness:+.4f}')
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Result 6}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_06_the_full_loop.png}
+\par\vspace{0.3em}\raggedright\small Seed 52: final x = +1.372, fitness = +0.706. The grid reports x = +1.378. These are different approximations even when their displayed fitness rounds alike.
+\end{frame}
+
+\begin{frame}[fragile]{7. Change only the seed}
+Changing 52 to 16 changes initialization and every later random decision. Keep operators, population size, probabilities and ten generations fixed. This comparison does not isolate initialization as the only cause.
+\end{frame}
+
+\begin{frame}[fragile]{Result 7}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_07_local_optimum.png}
+\par\vspace{0.3em}\raggedright\small Seed 16: final x = -4.417, fitness = +0.073, near a lower local peak. This ten-generation run misses the highest peak; it does not prove the algorithm could never escape.
+\end{frame}
+
+\begin{frame}[fragile]{Checks and interpretation}
+Check population size, legal gene bounds and agreement between every gene and its cached score. Replaying a seed should reproduce the ordered population and complete history.\\[0.7em]
+Counts are exact. Compare unrounded floating-point values across environments with $\mathrm{rtol}=10^{-12}$ and $\mathrm{atol}=10^{-12}$. Investigate different trajectories. Two example seeds are not an estimated success rate.
+\end{frame}
+
+\begin{frame}[fragile]{Source and further study}
+Ivan Gridin, \emph{Learning Genetic Algorithms with Python}, Chapter 1, provides the foundation. The course develops seven autonomous increments.\\[0.7em]
+The extensive notebook includes the full runnable route, worked syntax examples, optional experiments and explained solutions. Lesson 02 names the phases of the same loop; this lesson does not modify its baseline.
+\end{frame}
+\end{document}

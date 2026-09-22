@@ -1,67 +1,32 @@
 # Lección 01 — Tu primer algoritmo genético
 
-Se construye un algoritmo genético frente al grupo, un operador a la vez, hasta
-que resuelve un problema de maximización de una variable — y después se corre
-el mismo código con otra semilla y fracasa, que es justamente a lo que responde
-el resto del curso.
+Construye un algoritmo genético en siete incrementos autónomos y compara dos corridas con semilla. Se supone Python básico: variables, condicionales, ciclos y funciones. Objetos, arreglos, comprensiones, emparejamiento y gráficas se explican cuando aparecen.
 
-- **Origen en el libro:** Gridin, *Learning Genetic Algorithms with Python*,
-  Capítulo 1 (*Introduction*) — 4 secciones, ~1,900 palabras, 8 figuras, un
-  script de 91 líneas (`03-referencias/…/Chapter01/your_first_genetic_algorithm.py`).
-- **Qué le hace la refactorización:** ese script único se parte en **siete pasos
-  numerados**, de modo que cada operador tiene su propio archivo ejecutable y su
-  propia diapositiva.
-- **Duración objetivo:** un bloque de 50 minutos (el promedio del curso). Los
-  pasos 1–2 son rápidos; los pasos 3–5 cargan la lección; los pasos 6–7 son la
-  recompensa y el gancho para la siguiente.
-- **Requisitos previos:** ninguno. Es la primera lección técnica del curso.
+## Materiales
 
-## Modelo matemático
+- [Presentación extensa — estudio](slides/leccion_01.pdf), 38 páginas; [fuente LaTeX](slides/leccion_01.tex).
+- [Notebook extenso — estudio](notebooks/leccion_01_intro.ipynb): fundamentos completos, código incremental, resultados, ejercicios y soluciones desplegables.
+- [Presentación compacta — clase de 40 minutos](slides/leccion_01_compacta.pdf), 19 páginas; [fuente LaTeX](slides/leccion_01_compacta.tex).
+- [Notebook compacto — clase de 40 minutos](notebooks/leccion_01_intro_compacta.ipynb): código completo preparado y comprobaciones breves.
+- [Siete scripts autónomos](src/) y [figuras generadas](figuras/).
+- [Paquete estudiantil](leccion_01_paquete_estudiantil.zip): PDF/notebook extensos, scripts, figuras, instrucciones y dependencias bloqueadas del curso. Los compactos docentes se conservan por separado.
+- [Instrucciones de ejecución](notebooks/README.md).
 
-El problema es \(\max_{x\in[-10,10]} f(x)\), con
-\(f(x)=\sin(x)-0.2|x|\). Un individuo guarda un candidato \(x\) y su aptitud
-\(f(x)\). Una población es una muestra finita: su mejor miembro es solo el
-**mejor observado**. Una cuadrícula densa da una referencia muestreada, no una
-prueba exacta del maximizador continuo. Dos corridas con semilla muestran
-comportamientos posibles, no una probabilidad de éxito.
+## Modelo y evidencia
 
-## Con qué se va el estudiante
+El modelo sintético y adimensional maximiza `sin(x) - 0.2*abs(x)` en `[-10,10]`, con radianes. Es un ejemplo didáctico, no mediciones de Planta Física. Generar poblaciones y aplicar variación aleatoria son objetivos de aprendizaje; no hay dataset externo ni preparación auxiliar de datos. Los extensos derivan el máximo global analítico `acos(0.2)` y lo distinguen de la malla y del mejor resultado observado del algoritmo.
 
-1. Un problema de optimización se puede atacar sin derivadas y sin saber nada de
-   la función más allá de cómo evaluarla.
-2. Un algoritmo genético trabaja sobre una **población**, no sobre un punto.
-3. Los tres operadores hacen trabajos distintos: la selección **repondera**
-   candidatos, la cruza **recombina** y la mutación **propone perturbaciones**.
-   Cambiar cualquiera modifica el balance entre explotación y exploración.
-4. Un algoritmo genético **no** garantiza encontrar el óptimo. El mismo código,
-   los mismos parámetros y otra población inicial se quedan atorados.
+| Paso | Idea que agrega | Resultado observado y comprobación |
+|---|---|---|
+| 1 | Objetivo y paisaje | Tres cimas interiores y una colina parcial en el extremo; mejor malla `x=+1.378`, `f=+0.706`. La malla aproxima. |
+| 2 | Individuo y población | Diez candidatos; mejor inicial `x=-0.323`, `f=-0.382` con semilla 52. Verificar aptitud guardada. |
+| 3 | Selección por torneo | Cuatro individuos originales quedan sin copias. Cambia multiplicidad, sin crear genes. |
+| 4 | Cruza por mezcla y acotación | 14 de 20 hijos salen del intervalo parental; todos respetan el dominio. Las dos propuestas comparten un sorteo. |
+| 5 | Mutación gaussiana | Desde -4.6, 0/2000 y 110/2000 llegadas cumplen `abs(x-1.38)<1.5` con sigma 1 y 3. Cero observaciones no implica probabilidad cero. |
+| 6 | Ciclo con reemplazo completo | Semilla 52: `x=+1.372`, `f=+0.706` tras diez generaciones. Verificar tamaño, límites y aptitud guardada. |
+| 7 | Cambiar a semilla 16 | Final `x=-4.417`, `f=+0.073`. La semilla cambia toda la secuencia aleatoria; dos corridas no estiman una tasa de éxito. |
 
-## El ejemplo que recorre la lección
-
-```
-f(x) = sen(x) - 0.2 * |x|,   x en [-10, 10]      (maximizar)
-```
-
-Elegida porque es unidimensional (todo se dibuja sobre un solo eje), multimodal
-(cuatro cimas, así que atorarse es un riesgo real y no un cuento) y su máximo
-global no es la cima más cercana al origen.
-
-## Los siete pasos
-
-| # | Script | Qué agrega | Qué demuestra su salida |
-|---|---|---|---|
-| 1 | `primer_ejemplo_01_el_paisaje.py` | `objetivo()`, la gráfica | Hay cuatro cimas; subir por la pendiente se detiene en aquella donde empezó |
-| 2 | `primer_ejemplo_02_poblacion_aleatoria.py` | `Individuo`, `crear_aleatorio()`, la población | Diez suposiciones a ciegas no caen cerca del óptimo |
-| 3 | `primer_ejemplo_03_seleccion.py` | `seleccion_torneo()` | No aparece ningún valor nuevo de `x` — la selección solo copia; 4 de 10 individuos se extinguen |
-| 4 | `primer_ejemplo_04_cruza.py` | `acotar()`, `cruza_mezcla()`, `cruza()` | 14 de 20 hijos caen fuera del intervalo de los progenitores — eso es lo que compra `alfa > 0` |
-| 5 | `primer_ejemplo_05_mutacion.py` | `mutacion_gaussiana()`, `mutar()` | En esta muestra, sigma = 1.0 alcanza la colina global 0 veces de 2000 y sigma = 3.0 la alcanza 110 veces; cero eventos observados no prueba probabilidad cero |
-| 6 | `primer_ejemplo_06_el_ciclo_completo.py` | el ciclo generacional, la gráfica de convergencia | Diez generaciones encuentran `x = +1.372, f = +0.706`, cerca de la cima más alta; una malla de 400 puntos reporta `x = +1.378, f = +0.706` |
-| 7 | `primer_ejemplo_07_optimo_local.py` | nada; `SEMILLA` pasa de 52 a 16 | El mismo algoritmo se asienta en `x = -4.417, f = +0.073` y nunca sale |
-
-**Estos números están verificados contra la salida real**, y son idénticos a los
-de la versión en inglés: mismas semillas, misma lógica, solo cambia el idioma.
-Cualquier diapositiva o material que cite una cifra debe citar una de estas. Si
-el código cambió, vuelve a correrlo en lugar de confiar en esta tabla.
+Las cifras mostradas proceden de los scripts. La comparación usa poblaciones finales ordenadas e historiales completos, sin redondear. Conteos y resultados en el mismo entorno deben coincidir exactamente. Entre entornos, comparar punto flotante con `rtol=atol=1e-12` e investigar trayectorias distintas.
 
 ## Cómo está marcado el código
 
@@ -81,42 +46,15 @@ aquí:
 Así, la diapositiva del paso *n* es mecánica de escribir: es la receta del
 script *n*, en orden, con el código de las bandas como listados.
 
-## Cómo ejecutarlo
+## Ejecución y procedencia
 
-Desde la raíz del repositorio, con `uv` administrando el entorno:
+Desde la raíz del repositorio MA2015:
 
-```bash
-uv run es/Leccion_01_Intro/src/primer_ejemplo_01_el_paisaje.py
+```sh
+uv sync --locked
+uv run python 02-lecciones/es/Leccion_01_Intro/src/primer_ejemplo_01_el_paisaje.py
 ```
 
-Cada script es autocontenido: no importa nada de otros pasos ni de otras
-lecciones, y no recibe argumentos de línea de comandos. Las figuras se
-**guardan** en `../figuras/`, nunca se muestran, para que toda la secuencia corra
-sin supervisión.
+Cada script corre sin argumentos ni importaciones de otros pasos, guarda su PNG relativo a su ubicación y cierra las figuras. Para ejecución sin interfaz, usar `MPLBACKEND=Agg`. El notebook guarda las figuras relativas al directorio del kernel y conserva las salidas embebidas.
 
-Para trabajar la misma secuencia como una sola experiencia estudiantil, abre
-[la libreta guiada](notebooks/leccion_01_intro.ipynb). Integra las explicaciones
-de las diapositivas con incrementos ejecutables del código, de modo que el
-estudiante avance de forma lineal sin alternar entre siete archivos. Los scripts
-siguen siendo la referencia autónoma de cada paso.
-
-## Contenido de la carpeta
-
-```
-Leccion_01_Intro/
-├── README.md         este archivo — el contrato de la lección
-├── src/              los siete scripts numerados
-├── figuras/          gráficas generadas (nunca se editan ni se agregan a mano)
-├── notebooks/        libreta guiada autocontenida y su guía de apertura
-└── slides/           deck en Beamer
-```
-
-## Estado
-
-| Pieza | Estado |
-|---|---|
-| Código | Listo. Siete scripts, todos corren limpio, cifras idénticas a las de inglés. |
-| Figuras | Listas. Los siete pasos guardan una figura y fueron revisadas visualmente. |
-| Libreta guiada | Lista. 104 celdas, 34 de código ejecutadas sin errores y siete figuras embebidas; paridad exacta con los scripts. |
-| Diapositivas | Listas. Los rangos de código corresponden a las bandas numeradas; el PDF se recompila y revisa junto con esta lección. |
-
+La fuente académica es Ivan Gridin, *Learning Genetic Algorithms with Python*, capítulo 1. El curso conserva la secuencia algorítmica y agrega incrementos autónomos y explicaciones. Los extensos desarrollan derivaciones, sintaxis y conexión con decisiones de ingeniería.

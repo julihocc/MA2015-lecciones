@@ -28,7 +28,7 @@ ALFA_MEZCLA = 1.0
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Argumentos:
@@ -44,7 +44,7 @@ def objetivo(x):
 
 
 # --- NUEVO (1) acotar() -------------------------------------------------------
-def acotar(gen, minimo=GEN_MIN, maximo=GEN_MAX):
+def acotar(gen: float, minimo: float = GEN_MIN, maximo: float = GEN_MAX) -> float:
     """Deja un gen dentro del paisaje después de una cruza de mezcla.
 
     Para progenitores y alfa fijos, la cruza propone valores en un intervalo
@@ -72,21 +72,21 @@ class Individuo:
         lista_genes: cromosoma; aquí un solo real en [-10, 10].
     """
 
-    def __init__(self, lista_genes):
+    def __init__(self, lista_genes: list[float]) -> None:
         self.lista_genes = lista_genes
         self.aptitud = objetivo(lista_genes[0])
 
     @property
-    def gen(self):
+    def gen(self) -> float:
         """El único gen: este paisaje es unidimensional."""
         return self.lista_genes[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"x={self.gen:+.3f} f={self.aptitud:+.3f}"
 
 
 # --- NUEVO (2) cruza_mezcla() -------------------------------------------------
-def cruza_mezcla(gen1, gen2, alfa):
+def cruza_mezcla(gen1: float, gen2: float, alfa: float) -> tuple[float, float]:
     """Variante complementaria de cruza por mezcla para genes reales.
 
     Se extrae un `desplazamiento` al azar de [-alfa, 1+alfa]:
@@ -118,7 +118,7 @@ def cruza_mezcla(gen1, gen2, alfa):
 
 
 # --- NUEVO (3) cruza() --------------------------------------------------------
-def cruza(progenitor1, progenitor2):
+def cruza(progenitor1: Individuo, progenitor2: Individuo) -> tuple[Individuo, Individuo]:
     """Envuelve cruza_mezcla() para objetos Individuo.
 
     Argumentos:

@@ -41,7 +41,7 @@ BLEND_ALPHA = 1.0
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the sine landscape of step 1.
 
     Args:
@@ -59,7 +59,7 @@ def objective(x):
 
 
 # --- NEW (1) clamp() ----------------------------------------------------------
-def clamp(gene, low=GENE_MIN, high=GENE_MAX):
+def clamp(gene: float, low: float = GENE_MIN, high: float = GENE_MAX) -> float:
     """Keep a gene inside the landscape after blend crossover.
 
     BLX-alpha can propose a value outside its parents' interval. This
@@ -93,7 +93,7 @@ class Individual:
 
         """
 
-    def __init__(self, gene_list):
+    def __init__(self, gene_list: list[float]) -> None:
         """Build an individual and score it immediately.
 
         Args:
@@ -108,7 +108,7 @@ class Individual:
     # @property lets callers write ``individual.gene`` instead of calling
     # ``individual.gene()``. It hides the one-element list representation.
     @property
-    def gene(self):
+    def gene(self) -> float:
         """The single real gene as a float.
 
         Returns:
@@ -116,7 +116,7 @@ class Individual:
         """
         return self.gene_list[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Compact snapshot used in the child table.
 
         Returns:
@@ -128,7 +128,7 @@ class Individual:
 
 
 # --- NEW (2) crossover_blend() ------------------------------------------------
-def crossover_blend(gene1, gene2, alpha):
+def crossover_blend(gene1: float, gene2: float, alpha: float) -> tuple[float, float]:
     """Complementary blend-crossover variant for real-valued genes.
 
     A random `shift` is drawn from [-alpha, 1+alpha]:
@@ -166,7 +166,7 @@ def crossover_blend(gene1, gene2, alpha):
 
 
 # --- NEW (3) crossover() ------------------------------------------------------
-def crossover(parent1, parent2):
+def crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
     """Blend two Individuals and return two scored children.
 
     Args:

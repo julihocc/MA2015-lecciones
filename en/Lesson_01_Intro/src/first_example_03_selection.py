@@ -41,7 +41,7 @@ TOURNAMENT_SIZE = 3
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the sine landscape of step 1.
 
     Args:
@@ -70,7 +70,7 @@ class Individual:
 
         """
 
-    def __init__(self, gene_list):
+    def __init__(self, gene_list: list[float]) -> None:
         """Build an individual and score it immediately.
 
         Args:
@@ -85,7 +85,7 @@ class Individual:
     # @property lets callers write ``individual.gene`` instead of calling
     # ``individual.gene()``. It hides the one-element list representation.
     @property
-    def gene(self):
+    def gene(self) -> float:
         """The single real gene as a float.
 
         Returns:
@@ -93,7 +93,7 @@ class Individual:
         """
         return self.gene_list[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Compact snapshot used in the before/after table.
 
         Returns:
@@ -104,7 +104,7 @@ class Individual:
         return f"x={self.gene:+.3f} f={self.fitness:+.3f}"
 
 
-def create_random():
+def create_random() -> Individual:
     """Draw one individual uniformly from [-10, 10].
 
     Returns:
@@ -119,7 +119,7 @@ def create_random():
 
 
 # --- NEW (1) select_tournament() ----------------------------------------------
-def select_tournament(population, size):
+def select_tournament(population: list[Individual], size: int) -> list[Individual]:
     """Run one tournament per slot in the new generation.
 
     Each tournament draws `size` individuals at random and keeps the fittest.

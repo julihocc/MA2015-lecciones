@@ -30,7 +30,7 @@ GENE_MIN, GENE_MAX = -10.0, 10.0
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the one-variable landscape this lesson maximises.
 
     The four peaks are why a climber that only walks uphill can miss the
@@ -67,7 +67,7 @@ plt.ylabel("f(x)")
 plt.grid(True, linestyle=":", alpha=0.5)
 # Create figures/ if needed. exist_ok=True avoids an error when it exists.
 # dpi controls image resolution; tight removes unused outside whitespace.
-# close() releases the  because this unattended script never shows it.
+# close() releases the figure because this unattended script never shows it.
 FIGURES.mkdir(exist_ok=True)
 plt.savefig(
     FIGURES / "first_example_01_the_landscape.png",

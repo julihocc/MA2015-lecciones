@@ -1,198 +1,311 @@
 \input{../../../templates/es/preambulo.tex}
-
-% Los listados se toman de src/ con \lstinputlisting; la diapositiva es el archivo.
-\lstset{
-    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
-    breaklines=true,
-    breakatwhitespace=true,
-    columns=fullflexible,
-    keepspaces=true,
-    xleftmargin=0.3em,
-    framesep=2pt,
-    aboveskip=0pt,
-    belowskip=0pt
-}
-
-\newcommand{\marcoresultado}[3]{%
-    \begin{frame}{#1}
-        \begin{center}
-            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
-        \end{center}
-        \vspace{0.25em}
-        {\small #3\par}
-    \end{frame}%
-}
-
-\newcommand{\marcoafirmacion}[2]{%
-    \begin{frame}{#1}
-        {\small #2\par}
-    \end{frame}%
-}
-
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\lstset{basicstyle=\ttfamily\fontsize{7.3pt}{8.7pt}\selectfont,breaklines=true,columns=fullflexible,keepspaces=true,aboveskip=4pt,belowskip=0pt}
 \date{}
-
 \begin{document}
-
-\tituloleccion{01}{Tu primer algoritmo genético}
-
-\section{Esta lección}
-
-\begin{frame}{Esta lección}
-El encuadre mostró cómo se lee una lección y cómo se corre el código. Hoy se construye el primer algoritmo, un operador a la vez.
-
-\vspace{0.6em}
-\begin{itemize}
-    \item Una población, no un punto; la selección descarta, la cruza recombina, la mutación inventa.
-    \item El ciclo de esos tres, unas cuantas generaciones.
-    \item El mismo código, otra semilla, una colina local: un AG no es una garantía.
-\end{itemize}
+\begin{frame}[fragile]{Tu primer algoritmo genético}
+\centering\Large Extenso: estudio
+\par\vspace{1em}\normalsize Prof. Juliho Castillo\par Tec de Monterrey\par
 \end{frame}
 
-% ================= primer_ejemplo_01_el_paisaje =================
-\begin{frame}{Modelo matemático}
-\[
-\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|
-\]
-Un individuo guarda un candidato \(x\) y su aptitud \(f(x)\). Una población es
-una muestra finita, así que su campeón es el \emph{mejor observado}. La
-cuadrícula densa es una referencia numérica, no una prueba del maximizador.
+\begin{frame}[fragile]{Objetivos de aprendizaje}
+Representar un candidato, su aptitud y una población. Explicar selección, cruza y mutación. Integrar una actualización generacional. Interpretar corridas con semilla sin atribuirles una garantía.\\[0.8em]
+Requisitos: variables, condicionales, ciclos y funciones de Python. Aquí se introducen objetos, comprensiones, arreglos y emparejamiento.
 \end{frame}
 
-\section{El problema}
-
-\begin{frame}{El problema}
-Antes de escribir cualquier algoritmo, veamos qué estamos buscando.
+\begin{frame}[fragile]{Modelo y supuestos}
+\[\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|.\]
+Es un modelo sintético y adimensional de enseñanza, no mediciones de Planta Física. El seno recibe radianes. La evaluación es determinista; mayor aptitud es preferible. El intervalo es una restricción obligatoria.\\[0.7em]
+Los candidatos y las perturbaciones se generan para aprender el algoritmo. No se requieren archivos de datos externos.
 \end{frame}
 
-\marcoresultado{El problema}{../figuras/primer_ejemplo_01_el_paisaje.png}{%
-    Hay cuatro cimas; subir por la pendiente se detiene en aquella donde empezó}
+\begin{frame}[fragile]{1. Definir la aptitud y su referencia}
+NumPy evalúa la función elemento a elemento. Una malla de 400 puntos da una referencia muestreada; el algoritmo no busca consultando esa malla.
 
-% ================= primer_ejemplo_02_poblacion_aleatoria =================
-\section{Una población}
-
-\begin{frame}{Una población}
-Un algoritmo genético no sigue la pista de una sola solución candidata, sigue
-muchas. Aquí simplemente esparcimos diez al azar y vemos dónde caen.
+\begin{lstlisting}
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
+    return np.sin(x) - 0.2 * abs(x)
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1a) Individuo: estado y aptitud}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=46,lastline=62]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\begin{frame}[fragile]{Resultado 1}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_01_el_paisaje.png}
+\par\vspace{0.3em}\raggedright\small Mejor punto de malla: x = +1.378, aptitud = +0.706. Tres cimas interiores y una colina parcial en el extremo izquierdo muestran varias cuencas. El ascenso local puede omitir la cima más alta.
 \end{frame}
 
-\begin{frame}[fragile]{(1b) Individuo: acceso y representación}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=64,lastline=71]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\begin{frame}[fragile]{Una referencia analítica para estudiar}
+El algoritmo no usa derivadas. Para auditar este ejemplo, si $x>0$,
+$f'(x)=\cos x-0.2$. En $(0,\pi)$ cambia de positiva a negativa en
+$x^*=\arccos(0.2)\approx1.3694384$.
+Para $x\in[-\pi,0]$, $f(x)\le0$; para $|x|\ge\pi$,
+$f(x)\le1-0.2\pi\approx0.3717<f(x^*)\approx0.7059082$.
+Por tanto, $x^*$ es el máximo global en el intervalo declarado. La malla y el
+algoritmo genético lo aproximan; ninguno calcula esta demostración.
+El candidato final de la semilla 16 está \textbf{cerca} de una cima local, no es su
+maximizador exacto.
+
+\textbf{Comprobación:} explica por qué redondear ambas aptitudes a \texttt{0.706} no vuelve
+idénticos el punto de la malla de 400 valores y el candidato de la semilla 52.
 \end{frame}
 
-\begin{frame}[fragile]{(2) crear\_aleatorio()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=74,lastline=88]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\begin{frame}[fragile]{2. Guardar un candidato y su aptitud}
+La construcción guarda un cromosoma de un gen y calcula su aptitud. La propiedad lee el gen; la representación imprime signo y tres decimales.
+
+\begin{lstlisting}
+class Individuo:
+
+    def __init__(self, lista_genes: list[float]) -> None:
+        self.lista_genes = lista_genes
+        self.aptitud = objetivo(lista_genes[0])
+
+    @property
+    def gen(self) -> float:
+        return self.lista_genes[0]
+
+    def __repr__(self) -> str:
+        return f'x={self.gen:+.3f} f={self.aptitud:+.3f}'
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(3) la población}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=91,lastline=114]{../src/primer_ejemplo_02_poblacion_aleatoria.py}
+\begin{frame}[fragile]{Crear la población inicial}
+El muestreo uniforme crea diez candidatos evaluados. Reinicia la semilla antes de la demostración. Una comprensión repite una expresión; max usa su función key para comparar aptitud.
+
+\begin{lstlisting}
+def crear_aleatorio() -> Individuo:
+    return Individuo([random.uniform(GEN_MIN, GEN_MAX)])
+
+random.seed(SEMILLA)
+poblacion = [crear_aleatorio() for _ in range(TAMANO_POBLACION)]
+\end{lstlisting}
 \end{frame}
 
-\marcoresultado{Una población}{../figuras/primer_ejemplo_02_poblacion_aleatoria.png}{%
-    Diez suposiciones a ciegas no caen cerca del óptimo}
-
-% ================= primer_ejemplo_03_seleccion =================
-\section{Selección}
-
-\begin{frame}{Selección}
-La población del paso 2 es aleatoria y en su mayoría mala. La selección es la
-primera fuerza de la evolución: decide quién llega a reproducirse. Aquí no se
-crea nada nuevo: solo elegimos, con repetición, entre lo que ya existe.
+\begin{frame}[fragile]{Resultado 2}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_02_poblacion_aleatoria.png}
+\par\vspace{0.3em}\raggedright\small La semilla 52 da como mejor inicial x = -0.323, aptitud = -0.382. Diez candidatos aleatorios ofrecen alternativas, sin garantizar cercanía a la mejor cima.
 \end{frame}
 
-\begin{frame}[fragile]{(1) seleccion\_torneo()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=79,lastline=103]{../src/primer_ejemplo_03_seleccion.py}
+\begin{frame}[fragile]{Por qué un torneo favorece a los mejores candidatos (1)}
+Con $n=10$ candidatos y $k=3$ sorteos independientes \textbf{con reemplazo}, ordena las
+aptitudes distintas por rango desde $r=1$ (peor) hasta $r=n$ (mejor).
+La probabilidad de que todos tengan rango a lo sumo $r$ es $(r/n)^k$.
+Resta el evento de que todos tengan rango a lo sumo $r-1$:
+\[P(\text{gana el rango }r)=(r/n)^k-((r-1)/n)^k.\]
+El mejor gana un lugar con probabilidad $1-0.9^3=0.271$; su conteo esperado en diez
+lugares es $2.71$, no una cantidad garantizada en esta semilla. Los empates requieren
+analizar su resolución; la fórmula supone rangos distintos.
 \end{frame}
 
-\marcoresultado{Selección}{../figuras/primer_ejemplo_03_seleccion.png}{%
-    No aparece ningún valor nuevo de \texttt{x} — la selección solo copia; 4 de 10 individuos se extinguen}
-
-% ================= primer_ejemplo_04_cruza =================
-\section{Cruza}
-
-\begin{frame}{Cruza}
-La selección por sí sola solo puede copiar. La cruza es el primer operador que
-crea valores que antes no estaban en la población, combinando dos progenitores.
+\begin{frame}[fragile]{Por qué un torneo favorece a los mejores candidatos (2)}
+Antes de leer la sintaxis compacta: \texttt{[v*v for v in [2,3]]} produce \texttt{[4,9]}.
+\texttt{max(["a", "larga"], key=len)} devuelve \texttt{"larga"} al comparar longitudes.
+La selección aplica estas ideas a objetos sorteados y sus aptitudes.
 \end{frame}
 
-\begin{frame}[fragile]{(1) acotar()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=46,lastline=65]{../src/primer_ejemplo_04_cruza.py}
+\begin{frame}[fragile]{3. Selección por torneo}
+Sortea tres candidatos con reemplazo y elige la mayor aptitud. Repite por cada lugar de salida. El resultado contiene referencias a objetos existentes; no crea genes nuevos.
+
+\begin{lstlisting}
+def seleccion_torneo(poblacion: list[Individuo], tamano: int) -> list[Individuo]:
+    descendencia = []
+    for _ in range(len(poblacion)):
+        candidatos = [random.choice(poblacion) for _ in range(tamano)]
+        descendencia.append(max(candidatos, key=lambda ind: ind.aptitud))
+    return descendencia
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(2) cruza\_mezcla()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont,firstline=88,lastline=118]{../src/primer_ejemplo_04_cruza.py}
+\begin{frame}[fragile]{Resultado 3}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_03_seleccion.png}
+\par\vspace{0.3em}\raggedright\small Cuatro de diez individuos originales quedan con cero copias. Los genes seleccionados son un subconjunto de los originales. Cambian las multiplicidades, no los valores de los genes.
 \end{frame}
 
-\begin{frame}[fragile]{(3) cruza()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=121,lastline=137]{../src/primer_ejemplo_04_cruza.py}
+\begin{frame}[fragile]{Cruza por mezcla y los dos intervalos}
+Sean $a,b$ los genes parentales, $d=|b-a|$ y $\alpha\ge0$.
+Sortea $u\sim U[0,1)$ y define $s=(1+2\alpha)u-\alpha$.
+Las propuestas son $c_1=(1-s)a+sb$ y $c_2=sa+(1-s)b$.
+Cada propuesta marginal recorre $[\min(a,b)-\alpha d,\max(a,b)+\alpha d]$.
+Comparten un sorteo: son \textbf{complementarias, no independientes} y cumplen
+$c_1+c_2=a+b$ antes de acotar. Para $a=-2,b=3,\alpha=1$, el intervalo es $[-7,8]$.
+
+La proyección $\min(10,\max(-10,c))$ impone el dominio legal y puede romper esa
+identidad de suma. Si los progenitores son iguales, $d=0$ y esta cruza no explora.
+\texttt{par = (2,3)} contiene dos valores; \texttt{izquierdo,derecho = par} los desempaqueta.
+\texttt{elementos=[]; elementos.extend(par)} forma \texttt{[2,3]}; \texttt{append(par)} guarda un solo par.
 \end{frame}
 
-\marcoresultado{Cruza}{../figuras/primer_ejemplo_04_cruza.png}{%
-    14 de 20 hijos caen fuera del intervalo de los progenitores — eso es lo que compra \texttt{alfa > 0}}
+\begin{frame}[fragile]{Proyectar una propuesta al intervalo legal}
+Una propuesta mayor a 10 queda en 10; una menor a -10 queda en -10. Un valor legal no cambia. La proyección forma parte del algoritmo, no es un ajuste visual.
 
-% ================= primer_ejemplo_05_mutacion =================
-\section{Mutación}
-
-\begin{frame}{Mutación}
-Cuando los genes de los progenitores quedan muy agrupados en una colina, esta
-cruza tiene poco alcance. La mutación agrega un desplazamiento independiente y
-todavía puede proponer valores lejanos.
+\begin{lstlisting}
+def acotar(gen: float, minimo: float=GEN_MIN, maximo: float=GEN_MAX) -> float:
+    return max(minimo, min(maximo, gen))
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1) mutacion\_gaussiana()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=82,lastline=103]{../src/primer_ejemplo_05_mutacion.py}
+\begin{frame}[fragile]{4. Cruza por mezcla}
+Sortea $s=(1+2\alpha)u-\alpha$, $u\sim U[0,1)$. Propone $(1-s)a+sb$ y $sa+(1-s)b$; acota al dominio legal. Un sorteo compartido hace propuestas complementarias, no independientes.
+
+\begin{lstlisting}
+def cruza_mezcla(gen1: float, gen2: float, alfa: float) -> tuple[float, float]:
+    desplazamiento = (1 + 2 * alfa) * random.random() - alfa
+    hijo1 = (1 - desplazamiento) * gen1 + desplazamiento * gen2
+    hijo2 = desplazamiento * gen1 + (1 - desplazamiento) * gen2
+    return (acotar(hijo1), acotar(hijo2))
+
+def cruza(progenitor1: Individuo, progenitor2: Individuo) -> tuple[Individuo, Individuo]:
+    g1, g2 = cruza_mezcla(progenitor1.gen, progenitor2.gen, ALFA_MEZCLA)
+    return (Individuo([g1]), Individuo([g2]))
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(2) mutar()}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=105,lastline=119]{../src/primer_ejemplo_05_mutacion.py}
+\begin{frame}[fragile]{Resultado 4}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_04_cruza.png}
+\par\vspace{0.3em}\raggedright\small Con progenitores -2 y +3 y alfa = 1, 14 de 20 hijos salen del intervalo parental. Todos permanecen en el dominio legal. Crear valores no garantiza mejorar la aptitud.
 \end{frame}
 
-\marcoresultado{Mutación}{../figuras/primer_ejemplo_05_mutacion.png}{%
-    En esta muestra, sigma = 1.0 alcanza la colina global 0 veces de 2000 y sigma = 3.0 la alcanza 110; cero eventos observados no prueba probabilidad cero}
-
-% ================= primer_ejemplo_06_el_ciclo_completo =================
-\section{El algoritmo genético completo}
-
-\begin{frame}{El algoritmo genético completo}
-inicializar -> [ SELECCIONAR -> CRUZAR -> MUTAR -> reemplazar ] x N
+\begin{frame}[fragile]{Mutación gaussiana, límites y conteo observado (1)}
+Sortea $\varepsilon\sim N(\mu,\sigma^2)$ y propone
+$x'=\min(10,\max(-10,x+\varepsilon))$.
+Aquí $\mu=0$ y $\sigma$ es una desviación estándar, no una distancia máxima.
+La propuesta sin acotar tiene densidad
+\[p(y)=\frac{1}{\sigma\sqrt{2\pi}}\exp\!\left[-\frac{(y-x-\mu)^2}{2\sigma^2}\right].\]
+Acotar manda las propuestas fuera del dominio a los extremos; la distribución
+resultante ya no es una gaussiana ordinaria. La curva del script describe la
+\textbf{propuesta sin acotar}; el histograma del notebook muestra valores muestreados
+y acotados. Ambos usan las mismas propuestas sorteadas y el mismo criterio de llegada.
 \end{frame}
 
-\begin{frame}[fragile]{(1) el ciclo generacional}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont,firstline=138,lastline=162]{../src/primer_ejemplo_06_el_ciclo_completo.py}
+\begin{frame}[fragile]{Mutación gaussiana, límites y conteo observado (2)}
+El experimento cuenta $|x'-h|<1.5$, con centro fijo $h=1.38$,
+partiendo de $x=-4.6$. \texttt{110/2000} es la fracción observada \texttt{0.055}, no una probabilidad
+establecida para cualquier corrida. Es un experimento de un salto; el algoritmo
+completo también decide si muta con probabilidad \texttt{0.1}.
 \end{frame}
 
-\begin{frame}[fragile]{(2) la gráfica de convergencia}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{7pt}{8.5pt}\selectfont,firstline=170,lastline=180]{../src/primer_ejemplo_06_el_ciclo_completo.py}
+\begin{frame}[fragile]{5. Mutación gaussiana}
+Suma $\varepsilon\sim N(0,\sigma^2)$ y acota. Sigma determina el salto típico; no es una distancia máxima. En el algoritmo completo, la mutación se activa por separado con probabilidad 0.1.
+
+\begin{lstlisting}
+def mutacion_gaussiana(gen: float, mu: float, sigma: float) -> float:
+    return acotar(gen + random.gauss(mu, sigma))
+
+def mutar(individuo: Individuo) -> Individuo:
+    return Individuo([mutacion_gaussiana(individuo.gen, MUTACION_MU, MUTACION_SIGMA)])
+\end{lstlisting}
 \end{frame}
 
-\marcoresultado{El algoritmo genético completo}{../figuras/primer_ejemplo_06_el_ciclo_completo.png}{%
-    Diez generaciones encuentran \texttt{x = +1.372, f = +0.706}, cerca de la cima más alta (referencia de 400 puntos: \texttt{x = +1.378, f = +0.706})}
+\begin{frame}[fragile]{Densidad de la propuesta sin acotar}
+La curva es la densidad antes de acotar; el recorte agrega masa en los extremos. El notebook muestra histogramas de propuestas muestreadas y acotadas. Ambos usan el mismo criterio de llegada.
 
-% ================= primer_ejemplo_07_optimo_local =================
-\section{Cuando falla}
-
-\begin{frame}{Cuando falla}
-SEMILLA = 52  ->  SEMILLA = 16
+\begin{lstlisting}
+def densidad_gaussiana(malla: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+    return np.exp(-0.5 * ((malla - mu) / sigma) ** 2) / (sigma * np.sqrt(2.0 * np.pi))
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1) SEMILLA}
-\lstinputlisting[basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,firstline=32,lastline=32]{../src/primer_ejemplo_07_optimo_local.py}
+\begin{frame}[fragile]{Resultado 5}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_05_mutacion.png}
+\par\vspace{0.3em}\raggedright\small Desde x = -4.6, cuenta llegadas con |x - 1.38| < 1.5 en 2000 intentos. Sigma 1 da 0; sigma 3 da 110 (5.5\%). Cero eventos observados no significa probabilidad cero.
 \end{frame}
 
-\marcoresultado{Cuando falla}{../figuras/primer_ejemplo_07_optimo_local.png}{%
-    El mismo algoritmo se asienta en \texttt{x = -4.417, f = +0.073} y nunca sale}
+\begin{frame}[fragile]{Actualización completa e invariantes (1)}
+La población tiene diez miembros. Cada generación ejecuta diez torneos de tamaño
+tres, luego cinco decisiones de cruza con probabilidad $0.8$ y diez decisiones de
+mutación con probabilidad $0.1$. Reemplaza toda la población. Diez generaciones son
+un presupuesto fijo, no una prueba de convergencia. Se esperan cuatro pares cruzados
+y un individuo mutado por generación; los conteos efectivos varían.
+\end{frame}
 
-\section{Siguiente}
+\begin{frame}[fragile]{Actualización completa e invariantes (2)}
+Si \texttt{lugares=[0,1,2,3]}, \texttt{lugares[::2]} da \texttt{[0,2]}, \texttt{lugares[1::2]} da \texttt{[1,3]} y
+\texttt{list(zip(lugares[::2],lugares[1::2]))} da \texttt{[(0,1),(2,3)]}.
+Este emparejamiento requiere un tamaño par. Se conservan tamaño de población,
+límites y aptitud almacenada. Si un operador no se aplica, puede reutilizarse un
+objeto: los operadores no deben mutar en sitio progenitores compartidos.
+No hay elitismo; la mejor aptitud de la generación puede disminuir.
+\end{frame}
 
-\begin{frame}{Siguiente}
-La semilla 52 encuentra la cima más alta observada; la 16 se queda en \(x = -4.417\), \(f = +0.073\) y no sale. Ninguna corrida prueba optimalidad global.
+\begin{frame}[fragile]{6. Actualización generacional}
+Inicializa diez candidatos; repite selección, cruza de pares, mutación y reemplazo diez veces. La cruza tiene probabilidad 0.8 por par y la mutación 0.1 por individuo. No hay elitismo que proteja al mejor previo.
 
-\vspace{0.8em}
-\textbf{Lección 02 --- El flujo del algoritmo genético}
+\begin{lstlisting}
+random.seed(SEMILLA)
+poblacion = [crear_aleatorio() for _ in range(TAMANO_POBLACION)]
+historia = [max(poblacion, key=lambda i: i.aptitud).aptitud]
+for generacion in range(1, MAX_GENERACIONES + 1):
+    descendencia = seleccion_torneo(poblacion, TAMANO_TORNEO)
+    cruzados = []
+    for p1, p2 in zip(descendencia[::2], descendencia[1::2]):
+        if random.random() < PROB_CRUZA:
+            cruzados.extend(cruza(p1, p2))
+        else:
+            cruzados.extend([p1, p2])
+    poblacion = [mutar(i) if random.random() < PROB_MUTACION else i for i in cruzados]
+    mejor = max(poblacion, key=lambda i: i.aptitud)
+    historia.append(mejor.aptitud)
+    print(f'Generación {generacion:2d} | mejor {mejor.aptitud:+.4f}')
+\end{lstlisting}
+\end{frame}
 
-El ciclo que acabamos de escribir sigue siendo una ristra de comentarios sin nombre. La 02 nombra las cinco fases. Misma semilla, mismas cifras que el paso 6.
+\begin{frame}[fragile]{Resultado 6}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_06_el_ciclo_completo.png}
+\par\vspace{0.3em}\raggedright\small Semilla 52: x final = +1.372, aptitud = +0.706. La malla reporta x = +1.378. Son aproximaciones diferentes aunque sus aptitudes mostradas se redondeen igual.
+\end{frame}
+
+\begin{frame}[fragile]{7. Cambiar sólo la semilla}
+Cambiar 52 por 16 cambia la inicialización y cada decisión aleatoria posterior. Conserva operadores, tamaño, probabilidades y diez generaciones. No se aísla la inicialización como causa única.
+\end{frame}
+
+\begin{frame}[fragile]{Resultado 7}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_07_optimo_local.png}
+\par\vspace{0.3em}\raggedright\small Semilla 16: x final = -4.417, aptitud = +0.073, cerca de una cima local menor. Esta corrida de diez generaciones omite la cima más alta; no demuestra que nunca pueda escapar.
+\end{frame}
+
+\begin{frame}[fragile]{Comprobaciones e interpretación}
+Comprueba tamaño de población, límites de genes y concordancia de cada gen con su aptitud almacenada. Repetir una semilla debe reproducir la población ordenada y el historial completo.\\[0.7em]
+Los conteos son exactos. Entre entornos, compara valores sin redondear con $\mathrm{rtol}=10^{-12}$ y $\mathrm{atol}=10^{-12}$. Investiga trayectorias distintas. Dos semillas no estiman una tasa de éxito.
+\end{frame}
+
+\begin{frame}[fragile]{Práctica: predecir, modificar, explicar}
+1. Conserva los progenitores y compara $\alpha=0,0.5,1$. ¿Qué cambia el intervalo de propuestas?\\[0.6em]
+2. Prueba $\sigma=2$ desde el mismo origen. ¿El conteo determina la mejor configuración de una corrida completa?\\[0.6em]
+3. Ejecuta las semillas 0, 1, 2 y 3. Define éxito antes de diseñar un estudio mayor. Usa nombres separados y conserva la línea base.
+\end{frame}
+
+\begin{frame}[fragile]{Respuestas razonadas}
+1. Aumentar alfa amplía el intervalo. No asegura mejor aptitud: un hijo puede caer en un valle.\\[0.6em]
+2. Sigma cambia el alcance de un salto. El desempeño completo también depende de selección, cruza, activación de mutación y presupuesto generacional.\\[0.6em]
+3. Cuatro corridas ilustran variación. Estimar una tasa requiere un evento explícito, suficientes corridas independientes e incertidumbre reportada.
+\end{frame}
+
+\begin{frame}[fragile]{Conexión con Planta Física}
+Un candidato codificará decisiones de diseño físico; la factibilidad reflejará restricciones de ingeniería; la aptitud medirá un criterio de desempeño justificado.\\[0.7em]
+La función de un gen es un modelo didáctico. Su óptimo numérico no es una recomendación para una instalación real. Distingue el mejor diseño observado de un óptimo global verificado.
+\end{frame}
+
+\begin{frame}[fragile]{Arreglos y gráficas}
+\texttt{linspace} crea valores alineados; \texttt{argmax} devuelve un índice. Figure es el lienzo completo; Axes es un área de dibujo. Guarda, muestra cuando corresponda y cierra la figura. Los rótulos indican qué mide cada eje.
+\end{frame}
+
+\begin{frame}[fragile]{Referencias y conteos}
+La selección devuelve referencias compartidas. La identidad difiere de la igualdad de genes. Counter cuenta identificadores; get(key, 0) contempla individuos ausentes. La variación crea objetos nuevos para conservar la aptitud correcta.
+\end{frame}
+
+\begin{frame}[fragile]{Pares y reemplazo}
+\texttt{[::2]} selecciona lugares 0,2,...; \texttt{[1::2]} selecciona 1,3,... . zip empareja posiciones. extend agrega elementos; append agrega un objeto. Una comprensión condicional muta o conserva el objeto; la asignación reemplaza la lista de población.
+\end{frame}
+
+\begin{frame}[fragile]{APIs de gráficas y escala}
+Alfa de dibujo controla opacidad, no alcance de cruza. twinx comparte x con otra escala y para densidad; combina leyendas explícitamente. Los histogramas cuentan observaciones por intervalo. Una altura de densidad no es probabilidad. Acompaña colores con estilos y rótulos.
+\end{frame}
+
+\begin{frame}[fragile]{Tipos, estado y reproducibilidad}
+Un tipo anotado documenta entradas y salidas, sin imponerlas durante la ejecución. self accede al estado del objeto; una propiedad expone un atributo calculado. La semilla fija los sorteos posteriores: cambiar su orden cambia la corrida. Reinicia kernels antes de validar.
+\end{frame}
+
+\begin{frame}[fragile]{Fuente y profundización}
+Ivan Gridin, \emph{Learning Genetic Algorithms with Python}, capítulo 1, aporta la base. El curso desarrolla siete incrementos autónomos.\\[0.7em]
+El notebook extenso contiene el recorrido ejecutable completo, ejemplos de sintaxis, experimentos y soluciones. La Lección 02 nombra las fases del mismo ciclo; esta lección conserva su línea base.
 \end{frame}
 \end{document}

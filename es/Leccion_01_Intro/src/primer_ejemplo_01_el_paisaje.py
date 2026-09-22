@@ -18,7 +18,7 @@ GEN_MIN, GEN_MAX = -10.0, 10.0
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Cuatro cimas en [-10, 10]. El AG no necesita derivadas: solo este

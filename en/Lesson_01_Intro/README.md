@@ -1,71 +1,32 @@
 # Lesson 01 — Your First Genetic Algorithm
 
-A genetic algorithm is built in front of the students, one operator at a time,
-until it solves a one-variable maximisation problem — and then the same code is
-run again with a different seed and fails, which is what the rest of the course
-exists to address.
+Build a genetic algorithm in seven autonomous increments, then compare two seeded runs. The prerequisites are basic Python variables, conditionals, loops and functions. Objects, arrays, comprehensions, pairing and plotting are explained where they appear.
 
-- **Source in the book:** Gridin, *Learning Genetic Algorithms with Python*,
-  Chapter 1 (*Introduction*) — 4 sections, ~1,900 words, 8 figures, one 91-line
-  script (`03-referencias/…/Chapter01/your_first_genetic_algorithm.py`).
-- **What the refactor does to it:** that single script is split into **seven
-  numbered steps**, so each operator gets its own runnable file and its own
-  slide.
-- **Target duration:** the seven-step classroom route fills about 50 minutes.
-  Steps 1–2 are fast; steps 3–5 carry the lesson; steps 6–7 are a payoff and a
-  cliffhanger. The code-reading appendix and notebook experiments are optional
-  self-study material outside that route.
-- **Prerequisites:** none. This is the first technical lesson of the course.
+## Materials
 
-## Mathematical model
+- [Extensive deck — study](slides/lesson_01.pdf), 38 pages; [LaTeX source](slides/lesson_01.tex).
+- [Extensive notebook — study](notebooks/lesson_01_intro.ipynb): full foundations, incremental code, saved results, exercises and expandable solutions.
+- [Compact deck — 40-minute class](slides/lesson_01_compact.pdf), 19 pages; [LaTeX source](slides/lesson_01_compact.tex).
+- [Compact notebook — 40-minute class](notebooks/lesson_01_intro_compact.ipynb): complete prepared code and brief checks.
+- [Seven independent scripts](src/) and [generated figures](figures/).
+- [Student package](lesson_01_student_package.zip): extensive PDF/notebook, scripts, figures, instructions and the course dependency lock. Compact teaching materials are separate.
+- [Execution instructions](notebooks/README.md).
 
-The search problem is
-\[
-\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin(x)-0.2|x|.
-\]
-An individual stores one candidate gene \(x\); its fitness is the evaluated
-value \(f(x)\). A population is a finite sample, so its best member is only the
-**best observed** value. A dense grid gives a sampled reference, not an exact
-proof of the continuous maximizer. The two seeded runs establish possible GA
-behaviours; neither seed estimates a success probability.
+## Model and evidence
 
-## What the student leaves with
+The synthetic, dimensionless model maximizes `sin(x) - 0.2*abs(x)` on `[-10,10]`, with radians. It is a teaching example, not measured Planta Física data. Random populations and variation are part of the learning objective; there is no external dataset or auxiliary data-preparation step. The extensive materials derive the analytic global maximizer `acos(0.2)` and distinguish it from both the sampled grid and the algorithm's best observation.
 
-1. An optimisation problem can be attacked without derivatives, and without
-   knowing anything about the function beyond how to evaluate it.
-2. A GA works on a **population**, not a point.
-3. The three operators do three different jobs: selection **discards**,
-   crossover **recombines**, mutation **invents**. Removing any one of them
-   breaks the search in a specific, predictable way.
-4. A GA is **not** guaranteed to find the optimum. The same code and parameters,
-   driven by a different random sequence, can get stuck.
+| Step | Added idea | Observed result and check |
+|---|---|---|
+| 1 | Objective and landscape | Three interior peaks and a partial boundary hill; grid best `x=+1.378`, `f=+0.706`. A grid is an approximation. |
+| 2 | Individual and population | Ten candidates; best initial `x=-0.323`, `f=-0.382` for seed 52. Check the cached score. |
+| 3 | Tournament selection | Four original individuals have zero copies. Selection changes multiplicity and creates no genes. |
+| 4 | Blend crossover and clamp | 14 of 20 children lie outside the parental interval; all satisfy the domain. The two proposals share a draw. |
+| 5 | Gaussian mutation | From -4.6, 0/2000 and 110/2000 arrivals satisfy `abs(x-1.38)<1.5` for sigma 1 and 3. Zero observations do not imply zero probability. |
+| 6 | Complete replacement loop | Seed 52 gives `x=+1.372`, `f=+0.706` after ten generations. Check population size, bounds and cached fitness. |
+| 7 | Change seed to 16 | Final `x=-4.417`, `f=+0.073`. The seed changes the entire random sequence; two runs do not estimate a success rate. |
 
-## The running example
-
-```
-f(x) = sin(x) - 0.2 * |x|,   x in [-10, 10]      (maximise)
-```
-
-Chosen because it is one-dimensional (everything can be drawn on one axis),
-multimodal (four peaks, so getting stuck is a real risk rather than a story),
-and has a global maximum that is not the peak nearest the origin.
-
-## The seven steps
-
-| # | Script | What it adds | What its output proves |
-|---|---|---|---|
-| 1 | `first_example_01_the_landscape.py` | `objective()`, the plot | There are four peaks; hill-climbing stops at whichever one it starts on |
-| 2 | `first_example_02_random_population.py` | `Individual`, `create_random()`, the population | Ten blind guesses land nowhere near the optimum |
-| 3 | `first_example_03_selection.py` | `select_tournament()` | No new `x` value appears — selection only copies; 4 of 10 individuals go extinct |
-| 4 | `first_example_04_crossover.py` | `clamp()`, `crossover_blend()`, `crossover()` | 14 of 20 children fall outside the parents' interval — that is what `alpha > 0` buys |
-| 5 | `first_example_05_mutation.py` | `mutate_gaussian()`, `mutate()` | From `x = -4.6`, the seeded sample observes 0/2000 arrivals with sigma = 1.0 and 110/2000 with sigma = 3.0 |
-| 6 | `first_example_06_the_full_loop.py` | the generational loop, the convergence plot | Ten generations find `x = +1.372, f = +0.706`, near the highest peak; a 400-point grid reports `x = +1.378, f = +0.706` |
-| 7 | `first_example_07_local_optimum.py` | nothing; `SEED` changes from 52 to 16 | In this ten-generation run, the same algorithm settles on `x = -4.417, f = +0.073` |
-
-**These numbers are verified against actual output.** Any slide, handout or
-translation that states a figure must state one of these, not a plausible
-substitute. Re-run the script rather than trusting this table if the code has
-changed since.
+These displayed values come from the scripts. Reproducibility comparisons use complete ordered populations and histories, not rounded summaries. Counts and within-environment results are exact. Across runtimes, compare floating-point values at `rtol=atol=1e-12`; investigate changed trajectories.
 
 ## How the code is marked up
 
@@ -90,44 +51,15 @@ arrays, object references, comprehensions, formatting, validation, and plotting.
 The slides keep the seven-step classroom route concise and collect these
 language notes in a clearly marked code-reading appendix.
 
-Maintainers preparing another student notebook should follow the shared
-[guided notebook workflow](../_NOTEBOOK-WORKFLOW.md) rather than inferring the
-process from this lesson alone.
+## Execution and provenance
 
-## Running it
+From the MA2015 repository root:
 
-For a guided, self-contained walkthrough in Google Colab, open
-[the Lesson 01 notebook](notebooks/lesson_01_intro.ipynb). It combines the slide
-explanations with code built across cells, inline figures, prediction questions,
-and optional experiments. [Notebook instructions](notebooks/README.md) explain
-how to upload it and save a personal copy.
-
-From the repository root, with `uv` handling the environment:
-
-```bash
-uv run en/Lesson_01_Intro/src/first_example_01_the_landscape.py
+```sh
+uv sync --locked
+uv run python 02-lecciones/en/Lesson_01_Intro/src/first_example_01_the_landscape.py
 ```
 
-Every script is self-contained: no imports across steps, no imports across
-lessons, no command-line arguments. Figures are **saved** to `../figures/`,
-never shown, so the whole sequence runs unattended.
+Each script runs without arguments or imports from other steps, saves its PNG relative to its own location and closes figures. With a headless backend, use `MPLBACKEND=Agg`. The notebook saves figures relative to the kernel working directory and embeds them in its outputs.
 
-## Folder contents
-
-```
-Lesson_01_Intro/
-├── README.md      this file — the lesson's contract
-├── src/           the seven numbered scripts
-├── notebooks/     self-contained guided notebook, with saved outputs and instructions
-├── figures/       generated plots (never edited by hand, never committed by hand)
-└── slides/        the Beamer deck (`lesson_01.tex` / `lesson_01.pdf`)
-```
-
-## Status
-
-| Piece | State |
-|---|---|
-| Code | Done. Seven independently readable scripts; all run clean and preserve the original seeded numerical results. |
-| Notebook | Guided English walkthrough with 104 cells (34 executed code cells), per-cell reading notes, concrete traces, checks, and seven embedded figures. |
-| Figures | Done. All seven scripts save a figure named after the script. Steps 3–5 added date omitted (selection multiplicities, blend children inside/outside, mutation reach). Step 5 no longer imports `scipy`. |
-
+The academic source is Ivan Gridin, *Learning Genetic Algorithms with Python*, Chapter 1. The course preserves its algorithmic sequence while adding independent increments and explanatory material. See the extensive materials for derivations, syntax examples and the connection to engineering design decisions.

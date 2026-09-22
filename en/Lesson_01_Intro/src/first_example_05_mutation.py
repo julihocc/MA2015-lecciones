@@ -39,7 +39,7 @@ MUTATION_MU, MUTATION_SIGMA = 0.0, 1.0
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the sine landscape of step 1.
 
     Args:
@@ -57,7 +57,7 @@ def objective(x):
     return np.sin(x) - 0.2 * abs(x)
 
 
-def clamp(gene, low=GENE_MIN, high=GENE_MAX):
+def clamp(gene: float, low: float = GENE_MIN, high: float = GENE_MAX) -> float:
     """Keep a mutated gene inside the landscape.
 
     Gaussian noise has unbounded support, so a jump can leave [-10, 10].
@@ -86,7 +86,7 @@ class Individual:
 
         """
 
-    def __init__(self, gene_list):
+    def __init__(self, gene_list: list[float]) -> None:
         """Build an individual and score it immediately.
 
         Args:
@@ -101,7 +101,7 @@ class Individual:
     # @property lets callers write ``individual.gene`` instead of calling
     # ``individual.gene()``. It hides the one-element list representation.
     @property
-    def gene(self):
+    def gene(self) -> float:
         """The single real gene as a float.
 
         Returns:
@@ -109,7 +109,7 @@ class Individual:
         """
         return self.gene_list[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Compact snapshot used in the trapped-population listing.
 
         Returns:
@@ -121,7 +121,7 @@ class Individual:
 
 
 # --- NEW (1) mutate_gaussian() ------------------------------------------------
-def mutate_gaussian(gene, mu, sigma):
+def mutate_gaussian(gene: float, mu: float, sigma: float) -> float:
     """Add noise drawn from N(mu, sigma) to a gene.
 
     sigma controls the distribution's typical step size. A small sigma makes
@@ -147,7 +147,7 @@ def mutate_gaussian(gene, mu, sigma):
 
 
 # --- NEW (2) mutate() ---------------------------------------------------------
-def mutate(individual):
+def mutate(individual: Individual) -> Individual:
     """Apply Gaussian mutation to an Individual and return a new one.
 
     Args:
@@ -222,7 +222,7 @@ print("\nOne attempt does not determine the whole run. A GA creates thousands")
 print("of mutation attempts across many generations, increasing its chances")
 print("of observing a rare jump. Step 6 supplies that repeated process.")
 
-def gaussian_pdf(grid, mu, sigma):
+def gaussian_pdf(grid: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     """Density of N(mu, sigma), used only to shade the reach in the figure.
 
     Args:

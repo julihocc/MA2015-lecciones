@@ -38,7 +38,7 @@ GENE_MIN, GENE_MAX = -10.0, 10.0
 FIGURES = Path(__file__).resolve().parent.parent / "figures"
 
 
-def objective(x):
+def objective(x: float | np.ndarray) -> float | np.ndarray:
     """Score a candidate on the sine landscape of step 1.
 
     Args:
@@ -68,7 +68,7 @@ class Individual:
 
         """
 
-    def __init__(self, gene_list):
+    def __init__(self, gene_list: list[float]) -> None:
         """Build an individual and score it immediately.
 
         Args:
@@ -86,7 +86,7 @@ class Individual:
     # @property lets callers write ``individual.gene`` instead of calling
     # ``individual.gene()``. It hides the one-element list representation.
     @property
-    def gene(self):
+    def gene(self) -> float:
         """The single real gene, as a float rather than a one-element list.
 
         Returns:
@@ -94,7 +94,7 @@ class Individual:
         """
         return self.gene_list[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Compact snapshot used in every printed table of this lesson.
 
         Returns:
@@ -107,7 +107,7 @@ class Individual:
 
 
 # --- NEW (2) create_random() --------------------------------------------------
-def create_random():
+def create_random() -> Individual:
     """Draw one individual uniformly from the closed search interval.
 
     Uniform is the honest prior: before any fitness is seen, every x in
@@ -156,7 +156,7 @@ plt.xlabel("x"); plt.ylabel("f(x)")
 # Semicolons put two ordinary statements on one line. legend() displays
 # the labels above; visual alpha=0.5 makes the dotted grid lighter.
 plt.legend(); plt.grid(True, linestyle=":", alpha=0.5)
-# Save reproducible evidence and release the .
+# Save reproducible evidence and release the figure.
 FIGURES.mkdir(exist_ok=True)
 plt.savefig(FIGURES / "first_example_02_random_population.png",
             dpi=150, bbox_inches="tight")

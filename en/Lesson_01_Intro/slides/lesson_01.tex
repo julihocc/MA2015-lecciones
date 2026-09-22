@@ -1,374 +1,309 @@
 \input{../../../templates/en/preamble.tex}
-
-% Listings pulled from src/ with \lstinputlisting, so the slide is the file.
-\lstset{
-    basicstyle=\ttfamily\fontsize{8pt}{9.6pt}\selectfont,
-    breaklines=true,
-    breakatwhitespace=true,
-    columns=fullflexible,
-    keepspaces=true,
-    xleftmargin=0.3em,
-    framesep=2pt,
-    aboveskip=0pt,
-    belowskip=0pt
-}
-
-\newcommand{\resultframe}[3]{%
-    \begin{frame}{#1}
-        \begin{center}
-            \includegraphics[height=0.62\textheight,width=\textwidth,keepaspectratio]{#2}
-        \end{center}
-        \vspace{0.25em}
-        {\small #3\par}
-    \end{frame}%
-}
-
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\lstset{basicstyle=\ttfamily\fontsize{7.3pt}{8.7pt}\selectfont,breaklines=true,columns=fullflexible,keepspaces=true,aboveskip=4pt,belowskip=0pt}
 \date{}
-
 \begin{document}
-
-\lessontitle{01}{Your First Genetic Algorithm}
-
-\section{This lesson}
-
-\begin{frame}{This lesson}
-The course introduction showed how a lesson is read and how to run the code. Today the first algorithm is built, one operator at a time.
-
-\vspace{0.6em}
-\begin{itemize}
-    \item A population, not a point; selection discards, crossover recombines, mutation invents.
-    \item The loop of those three, for a handful of generations.
-    \item The same code, a different seed, a local hill: a GA is not a guarantee.
-\end{itemize}
-
-\vspace{0.4em}
-{\small The main route develops the algorithm. A code-reading appendix explains
-the Python, plotting, paths, random state, and validation idioms used around it.}
+\begin{frame}[fragile]{Your First Genetic Algorithm}
+\centering\Large Extensive study
+\par\vspace{1em}\normalsize Prof. Juliho Castillo\par Tec de Monterrey\par
 \end{frame}
 
-% ================= first_example_01_the_landscape =================
-\begin{frame}{Mathematical model}
-\[
-\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|
-\]
-An individual stores a candidate \(x\); its fitness is \(f(x)\). A population
-is a finite sample, so its champion is the \emph{best observed} value. The dense
-grid used below is a numerical reference, not a proof of the exact maximizer.
+\begin{frame}[fragile]{Learning objectives}
+Represent a candidate, its fitness and a population. Explain selection, crossover and mutation. Assemble a complete generational update. Interpret seeded outcomes without claiming a guarantee.\\[0.8em]
+Prerequisites: Python variables, conditionals, loops and functions. Objects, comprehensions, arrays and pairing syntax are introduced here.
 \end{frame}
 
-\section{The problem}
-
-\begin{frame}{The problem}
-Before writing any algorithm, look at what we are searching.
-
-\[
-    f(x) = \sin(x) - 0.2\,|x|, \qquad x \in [-10,\,10]
-\]
-
-Maximise. No derivatives. Nothing about the function except how to evaluate it.
+\begin{frame}[fragile]{Model and assumptions}
+\[\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|.\]
+This is a synthetic, dimensionless teaching model, not Planta Física measurements. The sine argument is in radians. Evaluation is deterministic; larger scores are better. The interval is a hard feasibility constraint.\\[0.7em]
+Candidates and mutation draws are generated as part of learning the algorithm. No external data files are required.
 \end{frame}
 
-\begin{frame}[fragile]{objective()}
-\lstinputlisting[firstline=33,lastline=33]{../src/first_example_01_the_landscape.py}
-\lstinputlisting[firstline=49,lastline=51]{../src/first_example_01_the_landscape.py}
+\begin{frame}[fragile]{1. Define the score and its reference}
+NumPy evaluates the score element by element. A 400-point grid gives a sampled reference; the algorithm does not search by reading that grid.
+
+\begin{lstlisting}
+def objective(x: float | np.ndarray) -> float | np.ndarray:
+    return np.sin(x) - 0.2 * abs(x)
+\end{lstlisting}
 \end{frame}
 
-\resultframe{The search space}{../figures/first_example_01_the_landscape.png}{%
-    Largest value on the 400-point grid: \(x = +1.378\), \(f = +0.706\).
-    Multiple peaks: a method that only climbs uphill stops at whichever one it starts on.}
-
-% ================= first_example_02_random_population =================
-\section{A population}
-
-\begin{frame}{A population}
-A genetic algorithm does not track one candidate solution, it tracks many.
-Here we simply scatter ten of them at random and look at where they land.
+\begin{frame}[fragile]{Result 1}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_01_the_landscape.png}
+\par\vspace{0.3em}\raggedright\small Best grid point: x = +1.378, fitness = +0.706. Three interior peaks and a partial hill at the left boundary illustrate multiple basins. A local ascent may miss the highest peak.
 \end{frame}
 
-\begin{frame}[fragile]{(1a) Individual: state and fitness}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=58,lastline=59]{../src/first_example_02_random_population.py}
-\lstinputlisting[firstline=71,lastline=82]{../src/first_example_02_random_population.py}
+\begin{frame}[fragile]{An analytical reference for study}
+The algorithm itself uses no derivative. To audit this simple example, for $x>0$,
+$f'(x)=\cos x-0.2$. On $(0,\pi)$ it changes from positive to negative at
+$x^*=\arccos(0.2)\approx1.3694384$.
+For $x\in[-\pi,0]$, $f(x)\le0$; for $|x|\ge\pi$,
+$f(x)\le1-0.2\pi\approx0.3717<f(x^*)\approx0.7059082$.
+Therefore $x^*$ is the global maximizer over the stated interval. The grid and
+the genetic algorithm approximate it; neither computes this proof.
+The final seed-16 point is \textbf{near} a local peak, not its exact maximizer.
+
+\textbf{Check:} explain why rounding both fitness values to \texttt{0.706} does not make the
+400-point grid and the seed-52 candidate identical.
 \end{frame}
 
-\begin{frame}[fragile]{(1b) Individual: access and representation}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=83,lastline=105]{../src/first_example_02_random_population.py}
+\begin{frame}[fragile]{2. Store a candidate and its score}
+Construction stores a one-gene chromosome and computes its fitness. The property reads the gene; the representation prints a signed value to three decimals.
+
+\begin{lstlisting}
+class Individual:
+
+    def __init__(self, gene_list: list[float]) -> None:
+        self.gene_list = gene_list
+        self.fitness = objective(gene_list[0])
+
+    @property
+    def gene(self) -> float:
+        return self.gene_list[0]
+
+    def __repr__(self) -> str:
+        return f'x={self.gene:+.3f} f={self.fitness:+.3f}'
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(2) create\_random()}
-\lstinputlisting[firstline=109,lastline=110]{../src/first_example_02_random_population.py}
-\lstinputlisting[firstline=123,lastline=125]{../src/first_example_02_random_population.py}
+\begin{frame}[fragile]{Create the initial population}
+Uniform sampling creates ten scored candidates. Reset the seed before the demonstration. A list comprehension repeats an expression; max uses its key function to compare fitness.
+
+\begin{lstlisting}
+def create_random() -> Individual:
+    return Individual([random.uniform(GENE_MIN, GENE_MAX)])
+
+random.seed(SEED)
+population = [create_random() for _ in range(POPULATION_SIZE)]
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(3) the population}
-\lstinputlisting[firstline=129,lastline=141]{../src/first_example_02_random_population.py}
+\begin{frame}[fragile]{Result 2}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_02_random_population.png}
+\par\vspace{0.3em}\raggedright\small Seed 52 gives best initial x = -0.323, fitness = -0.382. Ten random candidates cover alternatives but do not guarantee proximity to the best peak.
 \end{frame}
 
-\resultframe{Ten blind guesses}{../figures/first_example_02_random_population.png}{%
-    Best of the initial population: \(x = -0.323\), \(f = -0.382\).
-    Nowhere near the optimum.}
-
-% ================= first_example_03_selection =================
-\section{Selection}
-
-\begin{frame}{Selection}
-The population from step 2 is random and mostly bad. Selection is the first
-force of evolution: it decides who gets to reproduce. Nothing new is created
-here --- we only choose, with repetition, from what already exists.
+\begin{frame}[fragile]{Why a tournament favors good candidates (1)}
+With $n=10$ candidates and $k=3$ independent draws \textbf{with replacement}, rank the
+candidates by distinct fitness from $r=1$ (worst) to $r=n$ (best).
+All draws have rank at most $r$ with probability $(r/n)^k$. Subtract the event
+that all ranks are at most $r-1$:
+\[P(\text{winner has rank }r)=(r/n)^k-((r-1)/n)^k.\]
+Thus the best candidate wins one slot with probability $1-0.9^3=0.271$;
+its expected count over ten slots is $2.71$, not a promised count in this seed.
+Tied fitness values need a tie-handling analysis; the formula assumes distinct ranks.
 \end{frame}
 
-\begin{frame}[fragile]{(1) select\_tournament()}
-\lstinputlisting[firstline=121,lastline=122]{../src/first_example_03_selection.py}
-\lstinputlisting[firstline=142,lastline=151]{../src/first_example_03_selection.py}
+\begin{frame}[fragile]{Why a tournament favors good candidates (2)}
+Before reading the compact syntax: \texttt{[v*v for v in [2,3]]} gives \texttt{[4,9]}.
+\texttt{max(["a", "long"], key=len)} returns \texttt{"long"} by comparing lengths.
+The selection code applies those ideas to sampled objects and their fitness.
 \end{frame}
 
-\resultframe{Selection only copies}{../figures/first_example_03_selection.png}{%
-    No new \(x\) value appears. 4 of 10 individuals were selected zero times.
-    Those exact objects no longer have a selected copy from which to reproduce.}
+\begin{frame}[fragile]{3. Tournament selection}
+Sample three candidates with replacement and select the greatest fitness. Repeat for every output slot. The result contains references to existing objects; it does not create new genes.
 
-% ================= first_example_04_crossover =================
-\section{Crossover}
-
-\begin{frame}{Crossover}
-Selection alone can only copy. Crossover is the first operator that creates
-values that were not in the population before, by combining two parents.
+\begin{lstlisting}
+def select_tournament(population: list[Individual], size: int) -> list[Individual]:
+    offspring = []
+    for _ in range(len(population)):
+        candidates = [random.choice(population) for _ in range(size)]
+        offspring.append(max(candidates, key=lambda ind: ind.fitness))
+    return offspring
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1) clamp()}
-\lstinputlisting[firstline=60,lastline=61]{../src/first_example_04_crossover.py}
-\lstinputlisting[firstline=80,lastline=82]{../src/first_example_04_crossover.py}
+\begin{frame}[fragile]{Result 3}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_03_selection.png}
+\par\vspace{0.3em}\raggedright\small Four of ten original individuals have zero selected copies. The selected genes remain a subset of the original genes. Multiplicity changes, the gene values do not.
 \end{frame}
 
-\begin{frame}[fragile]{(2) crossover\_blend()}
-\lstinputlisting[firstline=129,lastline=130]{../src/first_example_04_crossover.py}
-\lstinputlisting[firstline=155,lastline=163]{../src/first_example_04_crossover.py}
+\begin{frame}[fragile]{Blend crossover and the two intervals}
+Let parents have genes $a,b$, distance $d=|b-a|$, and $\alpha\ge0$.
+Draw $u\sim U[0,1)$ and set $s=(1+2\alpha)u-\alpha$.
+The two proposals are $c_1=(1-s)a+sb$ and $c_2=sa+(1-s)b$.
+Each marginal proposal spans $[\min(a,b)-\alpha d,\max(a,b)+\alpha d]$.
+They share one draw, so they are \textbf{complementary, not independent}:
+$c_1+c_2=a+b$ before clamping. For $a=-2,b=3,\alpha=1$ the interval is $[-7,8]$.
+
+Projection $\min(10,\max(-10,c))$ enforces the legal domain and may break the
+sum identity. With identical parents, $d=0$ and this crossover cannot explore.
+\texttt{pair = (2,3)} returns two values; \texttt{left,right = pair} unpacks them.
+\texttt{items=[]; items.extend(pair)} makes a flat \texttt{[2,3]}, whereas \texttt{append(pair)} stores one pair.
 \end{frame}
 
-\begin{frame}[fragile]{(3) crossover()}
-\lstinputlisting[firstline=167,lastline=168]{../src/first_example_04_crossover.py}
-\lstinputlisting[firstline=181,lastline=184]{../src/first_example_04_crossover.py}
+\begin{frame}[fragile]{Project a proposal into the legal interval}
+A proposal above 10 becomes 10; one below -10 becomes -10. A legal value is unchanged. Projection is part of the algorithm, not a plotting adjustment.
+
+\begin{lstlisting}
+def clamp(gene: float, low: float=GENE_MIN, high: float=GENE_MAX) -> float:
+    return max(low, min(high, gene))
+\end{lstlisting}
 \end{frame}
 
-\resultframe{What \(\alpha > 0\) buys}{../figures/first_example_04_crossover.png}{%
-    14 of 20 children fell outside the parents' interval \([-2, +3]\).
-    With \(\alpha = 0\), crossover would interpolate only: no child could leave that interval.}
+\begin{frame}[fragile]{4. Blend crossover}
+Draw $s=(1+2\alpha)u-\alpha$, $u\sim U[0,1)$. Propose $(1-s)a+sb$ and $sa+(1-s)b$; clamp both to the legal domain. One shared draw makes the proposals complementary, not independent.
 
-% ================= first_example_05_mutation =================
-\section{Mutation}
+\begin{lstlisting}
+def crossover_blend(gene1: float, gene2: float, alpha: float) -> tuple[float, float]:
+    shift = (1 + 2 * alpha) * random.random() - alpha
+    child1 = (1 - shift) * gene1 + shift * gene2
+    child2 = shift * gene1 + (1 - shift) * gene2
+    return (clamp(child1), clamp(child2))
 
-\begin{frame}{Mutation}
-Crossover has little reach after parent genes cluster closely on one hill.
-Mutation adds an independent displacement, so it can still propose a distant
-gene even when both parents are identical.
+def crossover(parent1: Individual, parent2: Individual) -> tuple[Individual, Individual]:
+    g1, g2 = crossover_blend(parent1.gene, parent2.gene, BLEND_ALPHA)
+    return (Individual([g1]), Individual([g2]))
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1) mutate\_gaussian()}
-\lstinputlisting[firstline=123,lastline=124]{../src/first_example_05_mutation.py}
-\lstinputlisting[firstline=143,lastline=145]{../src/first_example_05_mutation.py}
+\begin{frame}[fragile]{Result 4}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_04_crossover.png}
+\par\vspace{0.3em}\raggedright\small With parents -2 and +3 and alpha = 1, 14 of 20 children lie outside the parental interval. All stay inside the legal domain. New values do not guarantee better fitness.
 \end{frame}
 
-\begin{frame}[fragile]{(2) mutate()}
-\lstinputlisting[firstline=149,lastline=150]{../src/first_example_05_mutation.py}
-\lstinputlisting[firstline=164,lastline=167]{../src/first_example_05_mutation.py}
+\begin{frame}[fragile]{Gaussian mutation, clipping, and the observed count (1)}
+Draw $\varepsilon\sim N(\mu,\sigma^2)$ and propose $x'=\min(10,\max(-10,x+\varepsilon))$.
+Here $\mu=0$ and $\sigma$ is a standard deviation, not a maximum jump length.
+The unbounded proposal has density
+\[p(y)=\frac{1}{\sigma\sqrt{2\pi}}\exp\!\left[-\frac{(y-x-\mu)^2}{2\sigma^2}\right].\]
+Clipping sends out-of-domain proposals to the endpoints; the clipped distribution
+is no longer an ordinary Gaussian. The script's density curve describes the
+\textbf{unclipped proposal}, while the notebook histogram displays sampled, clipped values.
+Both use the same sampled proposals and arrival criterion.
 \end{frame}
 
-\resultframe{Reach of a single mutation}{../figures/first_example_05_mutation.png}{%
-    From a population trapped at \(x \approx -4.6\), 6 units from the global hill:\\
-    \(\sigma = 1.0\): 0 of 2000 sampled mutations land on the global hill.\\
-    \(\sigma = 3.0\): 110 of 2000 mutations (5.5\%) land on the global hill.}
-
-% ================= first_example_06_the_full_loop =================
-\section{The complete genetic algorithm}
-
-\begin{frame}{The complete genetic algorithm}
-\[
-    \text{initialise} \;\to\;
-    [\;\text{SELECT} \to \text{CROSSOVER} \to \text{MUTATE} \to \text{replace}\;] \times N
-\]
-Nothing below is new except the loop itself.
+\begin{frame}[fragile]{Gaussian mutation, clipping, and the observed count (2)}
+The experiment counts $|x'-h|<1.5$ with the fixed target center $h=1.38$,
+from the fixed start $x=-4.6$. The count \texttt{110/2000} is the observed fraction
+\texttt{0.055}, not a probability established for every run. This is a single-jump
+experiment; the full algorithm also decides whether to mutate with probability \texttt{0.1}.
 \end{frame}
 
-\begin{frame}[fragile]{(1a) initialise and select}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=200,lastline=218]{../src/first_example_06_the_full_loop.py}
+\begin{frame}[fragile]{5. Gaussian mutation}
+Add $\varepsilon\sim N(0,\sigma^2)$ and clamp. Sigma controls typical jump size; it is not a maximum distance. In the full algorithm, mutation activates separately with probability 0.1.
+
+\begin{lstlisting}
+def mutate_gaussian(gene: float, mu: float, sigma: float) -> float:
+    return clamp(gene + random.gauss(mu, sigma))
+
+def mutate(individual: Individual) -> Individual:
+    return Individual([mutate_gaussian(individual.gene, MUTATION_MU, MUTATION_SIGMA)])
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(1b) vary, replace and record}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=219,lastline=240]{../src/first_example_06_the_full_loop.py}
+\begin{frame}[fragile]{The unbounded proposal density}
+The curve is the density before clipping. Clipping adds endpoint mass. The notebook instead plots histograms of the sampled, clipped proposals; both use the same arrival criterion.
+
+\begin{lstlisting}
+def gaussian_pdf(grid: np.ndarray, mu: float, sigma: float) -> np.ndarray:
+    return np.exp(-0.5 * ((grid - mu) / sigma) ** 2) / (sigma * np.sqrt(2.0 * np.pi))
+\end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{(2) the convergence plot}
-\lstinputlisting[firstline=250,lastline=264]{../src/first_example_06_the_full_loop.py}
+\begin{frame}[fragile]{Result 5}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_05_mutation.png}
+\par\vspace{0.3em}\raggedright\small From x = -4.6, count arrivals with |x - 1.38| < 1.5 in 2,000 attempts. Sigma 1 gives 0; sigma 3 gives 110 (5.5\%). Zero observed events do not mean zero probability.
 \end{frame}
 
-\resultframe{Ten generations}{../figures/first_example_06_the_full_loop.png}{%
-    Approximate solution: \(x = +1.372\), \(f = +0.706\), near the highest peak
-    (400-point grid reference near \(x = +1.378\), \(f = +0.706\)).}
-
-% ================= first_example_07_local_optimum =================
-\section{When it fails}
-
-\begin{frame}{When it fails}
-\[
-    \texttt{SEED = 52} \quad\longrightarrow\quad \texttt{SEED = 16}
-\]
-Same algorithm, same parameters, same number of generations. The seed changes
-the complete random sequence: initialization, tournaments, crossover and
-mutation. This run settles on a local maximum and never leaves it.
-
-This is not a bug to be fixed. It is the honest behaviour of the method, and
-it is the reason Lessons 03, 04, 05 and 07 exist.
+\begin{frame}[fragile]{The complete update and its invariants (1)}
+The population has ten members. Each generation runs ten tournaments of size three,
+then five pair decisions with crossover probability $0.8$, then ten mutation decisions
+with probability $0.1$. It replaces the population as a whole. Ten generations are a
+fixed computational budget, not a convergence test. The expected operation counts
+are four crossed pairs and one mutated individual per generation; actual counts vary.
 \end{frame}
 
-\begin{frame}[fragile]{SEED}
-\lstinputlisting[firstline=36,lastline=38]{../src/first_example_07_local_optimum.py}
+\begin{frame}[fragile]{The complete update and its invariants (2)}
+For \texttt{slots=[0,1,2,3]}, \texttt{slots[::2]} is \texttt{[0,2]}, \texttt{slots[1::2]} is \texttt{[1,3]}, and
+\texttt{list(zip(slots[::2],slots[1::2]))} is \texttt{[(0,1),(2,3)]}.
+An even population size is required by this pairing. Preserve population size,
+gene bounds and cached fitness; a false operator decision can reuse an object,
+so the operators must avoid mutating shared parent objects in place.
+There is no elitism: generation-best fitness may decrease.
 \end{frame}
 
-\resultframe{Stuck on the local hill}{../figures/first_example_07_local_optimum.png}{%
-    Solution: \(x = -4.417\), \(f = +0.073\).
-    Grid reference \(x = +1.378\), \(f = +0.706\) --- never found.}
+\begin{frame}[fragile]{6. The generational update}
+Initialize ten candidates; repeat select, cross adjacent pairs, mutate and replace ten times. Crossover probability is 0.8 per pair; mutation probability is 0.1 per individual. No elitism protects the previous best.
 
-\section{Next}
-
-\begin{frame}{Next}
-Seed 52 reaches the highest hill; seed 16 settles at \(x = -4.417\), \(f = +0.073\) for this ten-generation run. That failure is the method.
-
-\vspace{0.8em}
-\textbf{Lesson 02 --- The Genetic Algorithm Flow}
-
-The loop we just wrote is still a run of unnamed comments. Lesson 02 names the five phases. Same seed, same digits as step 6.
+\begin{lstlisting}
+random.seed(SEED)
+population = [create_random() for _ in range(POPULATION_SIZE)]
+history = [max(population, key=lambda i: i.fitness).fitness]
+for generation in range(1, MAX_GENERATIONS + 1):
+    offspring = select_tournament(population, TOURNAMENT_SIZE)
+    crossed = []
+    for p1, p2 in zip(offspring[::2], offspring[1::2]):
+        if random.random() < CROSSOVER_PROBABILITY:
+            crossed.extend(crossover(p1, p2))
+        else:
+            crossed.extend([p1, p2])
+    population = [mutate(i) if random.random() < MUTATION_PROBABILITY else i for i in crossed]
+    best = max(population, key=lambda i: i.fitness)
+    history.append(best.fitness)
+    print(f'Generation {generation:2d} | best {best.fitness:+.4f}')
+\end{lstlisting}
 \end{frame}
 
-\appendix
-\section{Code-reading appendix}
-
-\begin{frame}{How to use this appendix}
-The lesson assumes basic variables, functions and loops. These frames decode the
-Python and plotting constructs that support the genetic algorithm.
-
-\begin{itemize}
-    \item Read each source excerpt from top to bottom; comments state its purpose.
-    \item Follow the data: inputs enter on the right of an assignment, results receive the name on the left.
-    \item Plotting and file-output statements present evidence; they do not change the GA state.
-    \item The guided notebook gives the same explanations beside every executable cell.
-\end{itemize}
+\begin{frame}[fragile]{Result 6}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_06_the_full_loop.png}
+\par\vspace{0.3em}\raggedright\small Seed 52: final x = +1.372, fitness = +0.706. The grid reports x = +1.378. These are different approximations even when their displayed fitness rounds alike.
 \end{frame}
 
-\begin{frame}[fragile]{Step 1: imports, settings and a portable path}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=14,lastline=30]{../src/first_example_01_the_landscape.py}
-\vspace{0.4em}
-{\small Imports load reusable definitions. Uppercase names are run settings.
-\texttt{Path / name} joins paths portably; \texttt{\_\_file\_\_} locates this script.}
+\begin{frame}[fragile]{7. Change only the seed}
+Changing 52 to 16 changes initialization and every later random decision. Keep operators, population size, probabilities and ten generations fixed. This comparison does not isolate initialization as the only cause.
 \end{frame}
 
-\begin{frame}[fragile]{Step 1: arrays, indexing and the plot lifecycle}
-\lstset{basicstyle=\ttfamily\fontsize{5.2pt}{6.2pt}\selectfont}
-\lstinputlisting[firstline=54,lastline=82]{../src/first_example_01_the_landscape.py}
-\vspace{0.2em}
-{\small \texttt{linspace} makes aligned inputs; \texttt{argmax} returns an index.
-Create the , add layers and labels, save it, then close it.}
+\begin{frame}[fragile]{Result 7}
+\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figures/first_example_07_local_optimum.png}
+\par\vspace{0.3em}\raggedright\small Seed 16: final x = -4.417, fitness = +0.073, near a lower local peak. This ten-generation run misses the highest peak; it does not prove the algorithm could never escape.
 \end{frame}
 
-\begin{frame}[fragile]{Step 2: object state, a property and formatted output}
-\lstset{basicstyle=\ttfamily\fontsize{4.7pt}{5.4pt}\selectfont}
-\lstinputlisting[firstline=71,lastline=105]{../src/first_example_02_random_population.py}
-\vspace{0.2em}
-{\small \texttt{self} is the new object. Fitness is cached when it is built.
-\texttt{@property} hides the one-item list; \texttt{:+.3f} prints a sign and three decimals.}
+\begin{frame}[fragile]{Checks and interpretation}
+Check population size, legal gene bounds and agreement between every gene and its cached score. Replaying a seed should reproduce the ordered population and complete history.\\[0.7em]
+Counts are exact. Compare unrounded floating-point values across environments with $\mathrm{rtol}=10^{-12}$ and $\mathrm{atol}=10^{-12}$. Investigate different trajectories. Two example seeds are not an estimated success rate.
 \end{frame}
 
-\begin{frame}[fragile]{Step 2: comprehensions, loops and a key function}
-\lstset{basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont}
-\lstinputlisting[firstline=129,lastline=142]{../src/first_example_02_random_population.py}
-\vspace{0.4em}
-{\small A comprehension builds the population; the loop prints one object at a time.
-\texttt{key=lambda ...} tells \texttt{max} which attribute to compare.}
+\begin{frame}[fragile]{Practice: predict, modify, explain}
+1. Keep parents fixed and compare $\alpha=0,0.5,1$. Which changes the proposal interval?\\[0.6em]
+2. Try $\sigma=2$ from the same start. Does the arrival count establish the best setting for a whole run?\\[0.6em]
+3. Run seeds 0, 1, 2 and 3. Define a success criterion before designing a larger study. Use separate experiment names; preserve the baseline.
 \end{frame}
 
-\begin{frame}[fragile]{Step 3: references, identity and counts}
-\lstset{basicstyle=\ttfamily\fontsize{4.4pt}{5.1pt}\selectfont}
-\lstinputlisting[firstline=142,lastline=178]{../src/first_example_03_selection.py}
-\vspace{0.2em}
-{\small Selection appends references to existing objects. \texttt{id} distinguishes
-objects; \texttt{Counter.get(key, 0)} also represents candidates with no copies.}
+\begin{frame}[fragile]{Reasoned answers}
+1. Increasing alpha expands the interval. It does not ensure better fitness; a child can move into a valley.\\[0.6em]
+2. Sigma changes single-jump reach. Full-run performance also depends on selection, crossover, mutation activation and the generation budget.\\[0.6em]
+3. Four runs illustrate variation. A success-rate estimate needs an explicit event, enough independent runs and uncertainty reporting.
 \end{frame}
 
-\begin{frame}[fragile]{Step 4: tuples, extend, filtering and Boolean counts}
-\lstset{basicstyle=\ttfamily\fontsize{4.8pt}{5.6pt}\selectfont}
-\lstinputlisting[firstline=189,lastline=221]{../src/first_example_04_crossover.py}
-\vspace{0.2em}
-{\small A comma returns a pair and unpacking names it. \texttt{extend} keeps one flat
-list. Chained comparisons classify children; a Boolean contributes 1 or 0 to a count.}
+\begin{frame}[fragile]{Connection to Planta Física}
+A candidate will encode physical design decisions; feasibility will reflect engineering constraints; fitness will measure a justified performance criterion.\\[0.7em]
+The present one-gene score is a teaching model. Its numerical optimum is not a recommendation for a real facility. Preserve the distinction between a best observed design and a verified global optimum.
 \end{frame}
 
-\begin{frame}{Two meanings of alpha}
-\begin{description}
-    \item[\texttt{BLEND\_ALPHA}] A GA parameter. It expands the interval from which blend crossover can produce children.
-    \item[\texttt{alpha=0.2}] A Matplotlib argument. It makes a plotted layer 20\% opaque.
-\end{description}
-
-The shared name comes from two different APIs. Changing one has no effect on the other.
+\begin{frame}[fragile]{Arrays and plots}
+\texttt{linspace} creates aligned grid values; \texttt{argmax} returns an index. Matplotlib Figure is the complete canvas; Axes is one plotting area. Save, display where appropriate, then close each figure. Labels state what each axis measures.
 \end{frame}
 
-\begin{frame}[fragile]{Step 5: a finite experiment and its criterion}
-\lstset{basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont}
-\lstinputlisting[firstline=203,lastline=218]{../src/first_example_05_mutation.py}
-\vspace{0.4em}
-{\small Each sigma starts from corresponding random draws. The test counts a
-neighbourhood of a hill. Zero observed arrivals do not establish zero probability.}
+\begin{frame}[fragile]{References and counts}
+Selection returns shared object references. Identity differs from equality of genes. Counter counts object identifiers; get(key, 0) handles absent individuals. Variation constructs new objects so cached fitness matches the gene.
 \end{frame}
 
-\begin{frame}[fragile]{Step 5: the Gaussian density}
-\lstset{basicstyle=\ttfamily\fontsize{5pt}{5.9pt}\selectfont}
-\lstinputlisting[firstline=225,lastline=254]{../src/first_example_05_mutation.py}
-\vspace{0.2em}
-{\small The function evaluates the normal-density formula element by element.
-The three aligned arrays support the figure; they do not alter mutation.}
+\begin{frame}[fragile]{Pairing and replacement}
+\texttt{[::2]} selects positions 0,2,...; \texttt{[1::2]} selects 1,3,... . zip pairs matching positions. extend adds individual elements; append adds one object. A conditional comprehension applies mutation or keeps the object; assignment replaces the population list.
 \end{frame}
 
-\begin{frame}[fragile]{Step 5: two y-axes and a merged legend}
-\lstset{basicstyle=\ttfamily\fontsize{4.6pt}{5.4pt}\selectfont}
-\lstinputlisting[firstline=256,lastline=291]{../src/first_example_05_mutation.py}
-\vspace{0.2em}
-{\small \texttt{twinx} shares x but gives density a different y scale. Each axis
-owns its legend entries, so the two handle and label lists are joined explicitly.}
+\begin{frame}[fragile]{Plotting APIs and scale}
+The plotting alpha controls opacity, not crossover reach. twinx shares x but has a second y scale for density; combine legends explicitly. Histograms count observations in bins. A density height is not a probability. Use styles and labels alongside color.
 \end{frame}
 
-\begin{frame}[fragile]{Step 6: slicing, zip and a flat offspring list}
-\lstset{basicstyle=\ttfamily\fontsize{5.8pt}{7pt}\selectfont}
-\lstinputlisting[firstline=213,lastline=226]{../src/first_example_06_the_full_loop.py}
-\vspace{0.4em}
-{\small \texttt{[::2]} and \texttt{[1::2]} take alternating slots. \texttt{zip}
-aligns adjacent parents. \texttt{extend} adds both returned children separately.}
+\begin{frame}[fragile]{Types, state and reproducibility}
+A type hint documents expected inputs and outputs; it does not enforce them at runtime. Methods share object state through self. A property exposes a computed attribute. A seed fixes subsequent pseudorandom draws; changing their order changes the run. Restart kernels before validation.
 \end{frame}
 
-\begin{frame}[fragile]{Step 6: conditional comprehension and replacement}
-\lstset{basicstyle=\ttfamily\fontsize{6pt}{7.2pt}\selectfont}
-\lstinputlisting[firstline=227,lastline=240]{../src/first_example_06_the_full_loop.py}
-\vspace{0.4em}
-{\small One random decision is made per candidate. Assignment replaces the list;
-\texttt{append} then adds one scalar to history. No elitism protects the old best.}
-\end{frame}
-
-\begin{frame}[fragile]{Step 7: what the seed changes}
-\lstset{basicstyle=\ttfamily\fontsize{6.5pt}{7.8pt}\selectfont}
-\lstinputlisting[firstline=207,lastline=217]{../src/first_example_07_local_optimum.py}
-\vspace{0.4em}
-{\small \texttt{seed} fixes every subsequent pseudorandom draw. It changes more
-than the initial population, so the two seeds compare complete random sequences.}
-\end{frame}
-
-\begin{frame}{Code-reading checklist}
-For any unfamiliar chunk, ask:
-\begin{enumerate}
-    \item Which names already exist, and what type of value does each hold?
-    \item Which expressions produce new values, objects, lists or figures?
-    \item Does the chunk modify GA state, or only report and visualize it?
-    \item Which random draw occurs here, and has the seed been reset?
-    \item What invariant should be true afterward: size, bounds, cached fitness or reproducibility?
-\end{enumerate}
+\begin{frame}[fragile]{Source and further study}
+Ivan Gridin, \emph{Learning Genetic Algorithms with Python}, Chapter 1, provides the foundation. The course develops seven autonomous increments.\\[0.7em]
+The extensive notebook includes the full runnable route, worked syntax examples, optional experiments and explained solutions. Lesson 02 names the phases of the same loop; this lesson does not modify its baseline.
 \end{frame}
 \end{document}

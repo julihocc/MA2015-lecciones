@@ -28,7 +28,7 @@ GEN_MIN, GEN_MAX = -10.0, 10.0
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Argumentos:
@@ -57,22 +57,22 @@ class Individuo:
         Con SEMILLA = 52, diez individuos aleatorios no rozan x = +1.372.
     """
 
-    def __init__(self, lista_genes):
+    def __init__(self, lista_genes: list[float]) -> None:
         self.lista_genes = lista_genes
         self.aptitud = objetivo(lista_genes[0])
 
     @property
-    def gen(self):
+    def gen(self) -> float:
         """El único gen: este paisaje es unidimensional."""
         return self.lista_genes[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"x={self.gen:+.3f} f={self.aptitud:+.3f}"
 # ------------------------------------------------------------------------------
 
 
 # --- NUEVO (2) crear_aleatorio() ----------------------------------------------
-def crear_aleatorio():
+def crear_aleatorio() -> Individuo:
     """Extrae un individuo uniforme del intervalo cerrado [-10, 10].
 
     Uniforme a ciegas: todavía no hay presión ni memoria. Diez de estas

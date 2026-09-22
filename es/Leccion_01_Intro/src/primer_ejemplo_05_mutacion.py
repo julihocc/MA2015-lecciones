@@ -28,7 +28,7 @@ MUTACION_MU, MUTACION_SIGMA = 0.0, 1.0
 FIGURAS = Path(__file__).resolve().parent.parent / "figuras"
 
 
-def objetivo(x):
+def objetivo(x: float | np.ndarray) -> float | np.ndarray:
     """La función que queremos MAXIMIZAR.
 
     Argumentos:
@@ -43,7 +43,7 @@ def objetivo(x):
     return np.sin(x) - 0.2 * abs(x)
 
 
-def acotar(gen, minimo=GEN_MIN, maximo=GEN_MAX):
+def acotar(gen: float, minimo: float = GEN_MIN, maximo: float = GEN_MAX) -> float:
     """Proyecta un gen al intervalo cerrado del paisaje.
 
     Argumentos:
@@ -66,21 +66,21 @@ class Individuo:
         lista_genes: cromosoma; aquí un solo real en [-10, 10].
     """
 
-    def __init__(self, lista_genes):
+    def __init__(self, lista_genes: list[float]) -> None:
         self.lista_genes = lista_genes
         self.aptitud = objetivo(lista_genes[0])
 
     @property
-    def gen(self):
+    def gen(self) -> float:
         """El único gen: este paisaje es unidimensional."""
         return self.lista_genes[0]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"x={self.gen:+.3f} f={self.aptitud:+.3f}"
 
 
 # --- NUEVO (1) mutacion_gaussiana() -------------------------------------------
-def mutacion_gaussiana(gen, mu, sigma):
+def mutacion_gaussiana(gen: float, mu: float, sigma: float) -> float:
     """Suma al gen un ruido extraído de N(mu, sigma).
 
     sigma es el tamaño típico de paso. Un valor pequeño hace menos frecuentes
@@ -103,7 +103,7 @@ def mutacion_gaussiana(gen, mu, sigma):
 
 
 # --- NUEVO (2) mutar() --------------------------------------------------------
-def mutar(individuo):
+def mutar(individuo: Individuo) -> Individuo:
     """Envuelve mutacion_gaussiana() para objetos Individuo.
 
     Argumentos:
@@ -161,7 +161,7 @@ print("la variación durante varias generaciones y crea más oportunidades de")
 print("observar saltos poco frecuentes.")
 
 
-def densidad_gaussiana(malla, mu, sigma):
+def densidad_gaussiana(malla: np.ndarray, mu: float, sigma: float) -> np.ndarray:
     """Densidad N(mu, sigma) para dibujar el alcance, no para muestrear.
 
     Argumentos:
