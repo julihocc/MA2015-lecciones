@@ -4,27 +4,37 @@
 \lstset{basicstyle=\ttfamily\fontsize{7.3pt}{8.7pt}\selectfont,breaklines=true,columns=fullflexible,keepspaces=true,aboveskip=4pt,belowskip=0pt}
 \date{}
 \begin{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \begin{frame}[fragile]{Tu primer algoritmo genético}
 \centering\Large Compacto: clase de 40 minutos
 \par\vspace{1em}\normalsize Prof. Juliho Castillo\par Tec de Monterrey\par
 \end{frame}
-
-\begin{frame}[fragile]{Ruta compartida de explicación y ejecución}
-Preparación y modelo: 4 min; paisaje: 3; población: 4; selección: 5; cruza: 6; mutación: 6; ciclo completo: 7; semillas y comprobaciones: 5. Total: 40 minutos.\\[0.7em]
-Ejecuta código preparado del notebook compacto. Predice, ejecuta e interpreta cada resultado. El tiempo incluye cómputo y transiciones; es una estimación, no un ensayo cronometrado.
-\end{frame}
-
 \begin{frame}[fragile]{Modelo y supuestos}
 \[\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|.\]
 Es un modelo sintético y adimensional de enseñanza, no mediciones de Planta Física. El seno recibe radianes. La evaluación es determinista; mayor aptitud es preferible. El intervalo es una restricción obligatoria.\\[0.7em]
 Los candidatos y las perturbaciones se generan para aprender el algoritmo. No se requieren archivos de datos externos.
 \end{frame}
-
 \begin{frame}[fragile]{Resultado 1}
 \centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_01_el_paisaje.png}
 \par\vspace{0.3em}\raggedright\small Mejor punto de malla: x = +1.378, aptitud = +0.706. Tres cimas interiores y una colina parcial en el extremo izquierdo muestran varias cuencas. El ascenso local puede omitir la cima más alta.
 \end{frame}
-
 \begin{frame}[fragile]{2. Guardar un candidato y su aptitud}
 La construcción guarda un cromosoma de un gen y calcula su aptitud. La propiedad lee el gen; la representación imprime signo y tres decimales.
 
@@ -43,12 +53,6 @@ class Individuo:
         return f'x={self.gen:+.3f} f={self.aptitud:+.3f}'
 \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]{Resultado 2}
-\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_02_poblacion_aleatoria.png}
-\par\vspace{0.3em}\raggedright\small La semilla 52 da como mejor inicial x = -0.323, aptitud = -0.382. Diez candidatos aleatorios ofrecen alternativas, sin garantizar cercanía a la mejor cima.
-\end{frame}
-
 \begin{frame}[fragile]{3. Selección por torneo}
 Sortea tres candidatos con reemplazo y elige la mayor aptitud. Repite por cada lugar de salida. El resultado contiene referencias a objetos existentes; no crea genes nuevos.
 
@@ -61,12 +65,6 @@ def seleccion_torneo(poblacion: list[Individuo], tamano: int) -> list[Individuo]
     return descendencia
 \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]{Resultado 3}
-\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_03_seleccion.png}
-\par\vspace{0.3em}\raggedright\small Cuatro de diez individuos originales quedan con cero copias. Los genes seleccionados son un subconjunto de los originales. Cambian las multiplicidades, no los valores de los genes.
-\end{frame}
-
 \begin{frame}[fragile]{Proyectar una propuesta al intervalo legal}
 Una propuesta mayor a 10 queda en 10; una menor a -10 queda en -10. Un valor legal no cambia. La proyección forma parte del algoritmo, no es un ajuste visual.
 
@@ -75,7 +73,6 @@ def acotar(gen: float, minimo: float=GEN_MIN, maximo: float=GEN_MAX) -> float:
     return max(minimo, min(maximo, gen))
 \end{lstlisting}
 \end{frame}
-
 \begin{frame}[fragile]{4. Cruza por mezcla}
 Sortea $s=(1+2\alpha)u-\alpha$, $u\sim U[0,1)$. Propone $(1-s)a+sb$ y $sa+(1-s)b$; acota al dominio legal. Un sorteo compartido hace propuestas complementarias, no independientes.
 
@@ -91,12 +88,6 @@ def cruza(progenitor1: Individuo, progenitor2: Individuo) -> tuple[Individuo, In
     return (Individuo([g1]), Individuo([g2]))
 \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]{Resultado 4}
-\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_04_cruza.png}
-\par\vspace{0.3em}\raggedright\small Con progenitores -2 y +3 y alfa = 1, 14 de 20 hijos salen del intervalo parental. Todos permanecen en el dominio legal. Crear valores no garantiza mejorar la aptitud.
-\end{frame}
-
 \begin{frame}[fragile]{5. Mutación gaussiana}
 Suma $\varepsilon\sim N(0,\sigma^2)$ y acota. Sigma determina el salto típico; no es una distancia máxima. En el algoritmo completo, la mutación se activa por separado con probabilidad 0.1.
 
@@ -108,12 +99,6 @@ def mutar(individuo: Individuo) -> Individuo:
     return Individuo([mutacion_gaussiana(individuo.gen, MUTACION_MU, MUTACION_SIGMA)])
 \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]{Resultado 5}
-\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_05_mutacion.png}
-\par\vspace{0.3em}\raggedright\small Desde x = -4.6, cuenta llegadas con |x - 1.38| < 1.5 en 2000 intentos. Sigma 1 da 0; sigma 3 da 110 (5.5\%). Cero eventos observados no significa probabilidad cero.
-\end{frame}
-
 \begin{frame}[fragile]{6. Actualización generacional}
 Inicializa diez candidatos; repite selección, cruza de pares, mutación y reemplazo diez veces. La cruza tiene probabilidad 0.8 por par y la mutación 0.1 por individuo. No hay elitismo que proteja al mejor previo.
 
@@ -135,28 +120,16 @@ for generacion in range(1, MAX_GENERACIONES + 1):
     print(f'Generación {generacion:2d} | mejor {mejor.aptitud:+.4f}')
 \end{lstlisting}
 \end{frame}
-
-\begin{frame}[fragile]{Resultado 6}
-\centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_06_el_ciclo_completo.png}
-\par\vspace{0.3em}\raggedright\small Semilla 52: x final = +1.372, aptitud = +0.706. La malla reporta x = +1.378. Son aproximaciones diferentes aunque sus aptitudes mostradas se redondeen igual.
-\end{frame}
-
 \begin{frame}[fragile]{7. Cambiar sólo la semilla}
 Cambiar 52 por 16 cambia la inicialización y cada decisión aleatoria posterior. Conserva operadores, tamaño, probabilidades y diez generaciones. No se aísla la inicialización como causa única.
 \end{frame}
-
 \begin{frame}[fragile]{Resultado 7}
 \centering\includegraphics[height=0.58\textheight,width=\textwidth,keepaspectratio]{../figuras/primer_ejemplo_07_optimo_local.png}
 \par\vspace{0.3em}\raggedright\small Semilla 16: x final = -4.417, aptitud = +0.073, cerca de una cima local menor. Esta corrida de diez generaciones omite la cima más alta; no demuestra que nunca pueda escapar.
 \end{frame}
-
 \begin{frame}[fragile]{Comprobaciones e interpretación}
 Comprueba tamaño de población, límites de genes y concordancia de cada gen con su aptitud almacenada. Repetir una semilla debe reproducir la población ordenada y el historial completo.\\[0.7em]
 Los conteos son exactos. Entre entornos, compara valores sin redondear con $\mathrm{rtol}=10^{-12}$ y $\mathrm{atol}=10^{-12}$. Investiga trayectorias distintas. Dos semillas no estiman una tasa de éxito.
-\end{frame}
-
-\begin{frame}[fragile]{Fuente y profundización}
-Ivan Gridin, \emph{Learning Genetic Algorithms with Python}, capítulo 1, aporta la base. El curso desarrolla siete incrementos autónomos.\\[0.7em]
-El notebook extenso contiene el recorrido ejecutable completo, ejemplos de sintaxis, experimentos y soluciones. La Lección 02 nombra las fases del mismo ciclo; esta lección conserva su línea base.
+\par\vspace{0.3em}\scriptsize Referencia: Ivan Gridin, \emph{Learning Genetic Algorithms with Python}, cap. 1. Gráficos y experimentos: notebook extenso.
 \end{frame}
 \end{document}
