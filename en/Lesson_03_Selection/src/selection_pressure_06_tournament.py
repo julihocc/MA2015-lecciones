@@ -598,19 +598,35 @@ ax_dial.plot(TOURNAMENT_SIZES, [row["extinct"] for row in dial], "s--",
              color="tab:red", label="individuals that go extinct")
 ax_dial.set_xlabel("tournament size k")
 ax_dial.set_ylabel(f"out of {POPULATION_SIZE}")
-ax_dial.set_title("the dial: one integer from no pressure to almost total")
+ax_dial.set_title("the dial: one integer\nsets selection pressure", fontsize=10)
 ax_dial.grid(True, linestyle=":", alpha=0.5)
 ax_dial.legend()
 
 ax_scatter.scatter(pressure, diversity, color="tab:purple", zorder=3)
+chart_labels = {
+    "no selection": ("no selection", (8, 5)),
+    "tournament k=5": ("tournament 5", (8, 8)),
+    "tournament k=10": ("tournament 10", (8, 8)),
+}
+
+# Label three representative settings; the table above lists every method.
 for row in rows:
-    ax_scatter.annotate(row["label"], (row["copies"], row["spread"]),
-                        textcoords="offset points", xytext=(5, 4), fontsize=7)
+    if row["label"] not in chart_labels:
+        continue
+    short_label, offset = chart_labels[row["label"]]
+    ax_scatter.annotate(
+        short_label,
+        (row["copies"], row["spread"]),
+        textcoords="offset points",
+        xytext=offset,
+        ha="left",
+        fontsize=6,
+    )
 ax_scatter.axhline(gene_spread(population), color="grey", linestyle="--",
                    label=f"no selection ({gene_spread(population):.2f})")
 ax_scatter.set_xlabel("pressure: expected copies of the best individual")
 ax_scatter.set_ylabel("diversity: standard deviation of the genes")
-ax_scatter.set_title("every method pays for pressure in diversity")
+ax_scatter.set_title("pressure and diversity\nmove together", fontsize=10)
 ax_scatter.grid(True, linestyle=":", alpha=0.5)
 ax_scatter.legend()
 

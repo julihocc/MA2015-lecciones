@@ -342,6 +342,7 @@ for ax, (name, generations, best) in zip(axes, results):
     ax.grid(True, linestyle=":", alpha=0.5)
     ax.legend(loc="lower center")
 fig.suptitle("One driver, two problems, no change to the loop")
+fig.tight_layout(rect=(0, 0, 1, 0.90))
 FIGURES.mkdir(exist_ok=True)
 fig.savefig(FIGURES / "ga_flow_02_injected_fitness.png", dpi=150, bbox_inches="tight")
 plt.close(fig)

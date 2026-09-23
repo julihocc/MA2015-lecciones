@@ -415,6 +415,7 @@ for ax, (name, fitness_function, generations) in zip(axes, results):
     lines = ax.get_lines() + twin.get_lines()
     ax.legend(lines, [l.get_label() for l in lines], loc="center right", fontsize=8)
 fig.suptitle("Average catches up with best, while the spread collapses - and partly recovers")
+fig.tight_layout(rect=(0, 0, 1, 0.90))
 FIGURES.mkdir(exist_ok=True)
 fig.savefig(FIGURES / "ga_flow_04_stopping_condition.png", dpi=150, bbox_inches="tight")
 plt.close(fig)

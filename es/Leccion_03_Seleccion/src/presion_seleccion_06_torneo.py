@@ -469,19 +469,35 @@ ax_dial.plot(TAMANOS_TORNEO, [fila["extinct"] for fila in dial], "s--",
              color="tab:red", label="individuos que se extinguen")
 ax_dial.set_xlabel("tamaño de torneo k")
 ax_dial.set_ylabel(f"de un total de {TAMANO_POBLACION}")
-ax_dial.set_title("el dial: un entero de ninguna presión a casi total")
+ax_dial.set_title("el dial: un entero\nregula la presión", fontsize=10)
 ax_dial.grid(True, linestyle=":", alpha=0.5)
 ax_dial.legend()
 
 ax_scatter.scatter(presion, diversidad, color="tab:purple", zorder=3)
+etiquetas_grafica = {
+    "sin seleccion": ("sin selección", (8, 5)),
+    "torneo k=5": ("torneo 5", (8, 8)),
+    "torneo k=10": ("torneo 10", (8, 8)),
+}
+
+# Etiqueto tres configuraciones representativas; la tabla contiene todos los métodos.
 for fila in filas:
-    ax_scatter.annotate(fila["label"], (fila["copies"], fila["spread"]),
-                        textcoords="offset points", xytext=(5, 4), fontsize=7)
+    if fila["label"] not in etiquetas_grafica:
+        continue
+    etiqueta, desplazamiento = etiquetas_grafica[fila["label"]]
+    ax_scatter.annotate(
+        etiqueta,
+        (fila["copies"], fila["spread"]),
+        textcoords="offset points",
+        xytext=desplazamiento,
+        ha="left",
+        fontsize=6,
+    )
 ax_scatter.axhline(dispersion_genetica(poblacion), color="grey", linestyle="--",
                    label=f"sin seleccion ({dispersion_genetica(poblacion):.2f})")
 ax_scatter.set_xlabel("presión: copias esperadas del mejor individuo")
 ax_scatter.set_ylabel("diversidad: desviación estándar de los genes")
-ax_scatter.set_title("cada método paga la presión con diversidad")
+ax_scatter.set_title("presión y diversidad\nse mueven juntas", fontsize=10)
 ax_scatter.grid(True, linestyle=":", alpha=0.5)
 ax_scatter.legend()
 

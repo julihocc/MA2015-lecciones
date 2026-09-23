@@ -275,6 +275,7 @@ for ax, (label, pop) in zip(axes, [("generación 0", generations[0]),
 axes[0].set_ylabel("f(x)")
 axes[0].legend()
 fig.suptitle("El flujo lleva a la población de dispersa a establecida")
+fig.tight_layout(rect=(0, 0, 1, 0.90))
 FIGURES.mkdir(exist_ok=True)
 fig.savefig(FIGURES / "flujo_ag_01_las_cinco_fases.png", dpi=150, bbox_inches="tight")
 plt.close(fig)

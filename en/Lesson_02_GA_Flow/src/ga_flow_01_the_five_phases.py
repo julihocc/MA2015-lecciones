@@ -319,6 +319,7 @@ for ax, (label, pop) in zip(axes, [("generation 0", generations[0]),
 axes[0].set_ylabel("f(x)")
 axes[0].legend()
 fig.suptitle("The flow takes the population from scattered to settled")
+fig.tight_layout(rect=(0, 0, 1, 0.90))
 FIGURES.mkdir(exist_ok=True)
 fig.savefig(FIGURES / "ga_flow_01_the_five_phases.png", dpi=150, bbox_inches="tight")
 plt.close(fig)
