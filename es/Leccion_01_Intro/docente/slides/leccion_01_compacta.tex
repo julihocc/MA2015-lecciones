@@ -18,9 +18,9 @@ g(x)=-(x-2)^2.
 La mejor solución es $x=2$, con aptitud $g(2)=0$; valores más negativos son peores.
 \medskip
 
-Este ejemplo matemático es sintético y adimensional. Lo usaré para mostrar
-cómo una población de candidatos cambia entre generaciones. La aptitud
-traduce una decisión de diseño a un número comparable.
+Cada número del intervalo es una posible respuesta. Cuanto más cerca esté de
+$2$, mejor será su aptitud. Partiré de cuatro propuestas y seguiré cómo el
+algoritmo elige, combina y modifica algunas para acercarse a esa meta.
 \end{frame}
 
 \begin{frame}{Población, gen y aptitud}
@@ -125,15 +125,14 @@ posibilidad, no prometen mejoría en cada cruce o mutación.
 \end{frame}
 
 \begin{frame}{Del ejemplo al caso ejecutable}
-La libreta compacta usa otra función de prueba, inventada para enseñar:
-$f(x)=\sin x-0.2|x|$ en $[-10,10]$. Allí construiré siete incrementos
-ejecutables con selección por torneo, cruza por mezcla, mutación gaussiana
-y reemplazo completo.
+En la libreta compacta, la gráfica tendrá varias cimas:
+$f(x)=\sin x-0.2|x|$ en $[-10,10]$. Allí construiré el algoritmo paso a paso
+con selección por torneo, cruza por mezcla, mutación gaussiana y reemplazo
+completo.
 \medskip
 
-Las definiciones de gen, aptitud, población, restricción y semilla son las
-mismas; los números del ejemplo cuadrático no se trasladan a esa libreta.
-Cada recurso incluye los supuestos y resultados de su propio caso.
+Las reglas son las mismas, pero ahora acercarse a una cima no garantiza haber
+encontrado la mejor. La gráfica y las corridas nos ayudarán a seguir la búsqueda.
 \end{frame}
 
 \begin{frame}{Síntesis}

@@ -16,8 +16,11 @@ Requisitos: variables, condicionales, ciclos y funciones de Python. Aquí se int
 
 \begin{frame}[fragile]{Modelo y supuestos}
 \[\max_{x\in[-10,10]} f(x),\qquad f(x)=\sin x-0.2|x|.\]
-Es un modelo sintético y adimensional de enseñanza, no mediciones de Planta Física. El seno recibe radianes. La evaluación es determinista; mayor aptitud es preferible. El intervalo es una restricción obligatoria.\\[0.7em]
-Los candidatos y las perturbaciones se generan para aprender el algoritmo. No se requieren archivos de datos externos.
+Cada $x$ del intervalo es una propuesta. La función le asigna una puntuación:
+la curva tiene varias cimas, y buscamos la más alta. El seno recibe radianes;
+una aptitud mayor es preferible.\\[0.7em]
+En esta primera búsqueda, $x$ es un número sin unidades. Más adelante, en
+Planta Física, representará decisiones de ingeniería sujetas a restricciones reales.
 \end{frame}
 
 \begin{frame}[fragile]{1. Definir la aptitud y su referencia}

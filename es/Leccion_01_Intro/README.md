@@ -14,7 +14,7 @@ Construye un algoritmo genético en siete incrementos autónomos y compara dos c
 
 ## Modelo y evidencia
 
-El modelo sintético y adimensional maximiza `sin(x) - 0.2*abs(x)` en `[-10,10]`, con radianes. Es un ejemplo didáctico, no mediciones de Planta Física. Generar poblaciones y aplicar variación aleatoria son objetivos de aprendizaje; no hay dataset externo ni preparación auxiliar de datos. Los extensos derivan el máximo global analítico `acos(0.2)` y lo distinguen de la malla y del mejor resultado observado del algoritmo.
+Buscamos el mejor valor de `x` entre `-10` y `10` según `sin(x) - 0.2*abs(x)`, con radianes. La gráfica tiene varias cimas: el algoritmo debe explorar sin saber de antemano cuál alcanzará. `x` no tiene unidades ni representa todavía una decisión de Planta Física. No hay dataset externo ni preparación auxiliar de datos. Los extensos derivan el máximo global analítico `acos(0.2)` y lo distinguen de la malla y del mejor resultado observado del algoritmo.
 
 | Paso | Idea que agrega | Resultado observado y comprobación |
 |---|---|---|
@@ -45,7 +45,7 @@ aquí:
 
 Las recetas y bandas guían la construcción de los scripts. La presentación
 compacta explica los conceptos sin requerir código ni la libreta; la libreta
-compacta muestra después cómo se ejecutan con otra función de prueba inventada.
+compacta muestra después cómo se ejecutan cuando la gráfica tiene varias cimas.
 
 ## Ejecución y procedencia
 
