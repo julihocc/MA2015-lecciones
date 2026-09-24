@@ -4,13 +4,13 @@ Construye un algoritmo genético en siete incrementos autónomos y compara dos c
 
 ## Materiales
 
-- [Presentación extensa — estudio](slides/leccion_01.pdf), 38 páginas; [fuente LaTeX](slides/leccion_01.tex).
-- [Notebook extenso — estudio](notebooks/leccion_01_intro.ipynb): fundamentos completos, código incremental, resultados, ejercicios y soluciones desplegables.
-- [Presentación compacta — clase de 40 minutos](slides/leccion_01_compacta.pdf), 19 páginas; [fuente LaTeX](slides/leccion_01_compacta.tex).
-- [Notebook compacto — clase de 40 minutos](notebooks/leccion_01_intro_compacta.ipynb): código completo preparado y comprobaciones breves.
+- [Presentación extensa — estudio](estudiante/slides/leccion_01.pdf), 38 páginas; [fuente LaTeX](estudiante/slides/leccion_01.tex).
+- [Notebook extenso — estudio](estudiante/notebooks/leccion_01_intro.ipynb): fundamentos completos, código incremental, resultados, ejercicios y soluciones desplegables.
+- [Presentación compacta — exposición docente](docente/slides/leccion_01_compacta.pdf), 12 láminas; [fuente LaTeX](docente/slides/leccion_01_compacta.tex). Explica la teoría con un ejemplo cuadrático independiente.
+- [Notebook compacto — exposición docente](docente/notebooks/leccion_01_intro_compacta.ipynb): introduce por sí mismo el caso de seno penalizado, sus siete pasos, resultados y comprobaciones.
 - [Siete scripts autónomos](src/) y [figuras generadas](figuras/).
 - [Paquete estudiantil](leccion_01_paquete_estudiantil.zip): PDF/notebook extensos, scripts, figuras, instrucciones y dependencias bloqueadas del curso. Los compactos docentes se conservan por separado.
-- [Instrucciones de ejecución](notebooks/README.md).
+- [Instrucciones de ejecución del notebook estudiantil](estudiante/notebooks/README.md).
 
 ## Modelo y evidencia
 
@@ -43,8 +43,9 @@ aquí:
   es código que los estudiantes ya tienen. El paso 7 cambia un valor en lugar de
   agregar código, así que marca la línea: `SEMILLA = 16   # --- CAMBIADO ---`.
 
-Así, la diapositiva del paso *n* es mecánica de escribir: es la receta del
-script *n*, en orden, con el código de las bandas como listados.
+Las recetas y bandas guían la construcción de los scripts. La presentación
+compacta explica los conceptos sin requerir código ni la libreta; la libreta
+compacta muestra después cómo se ejecutan en otro paisaje sintético.
 
 ## Ejecución y procedencia
 

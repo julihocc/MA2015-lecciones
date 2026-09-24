@@ -1,7 +1,10 @@
-# Lección 01 — Notebooks
+# Lección 01 — Notebook de estudio
 
 - [Extenso — estudio](leccion_01_intro.ipynb): fundamentos, código incremental completo, experimentos y soluciones razonadas.
-- [Compacto — clase de 40 minutos](leccion_01_intro_compacta.ipynb): código preparado, resultados y comprobaciones breves; su tabla inicial coincide con la presentación compacta.
+
+La [libreta compacta](../../docente/notebooks/leccion_01_intro_compacta.ipynb)
+es la ruta de exposición del profesor. Esta libreta extensa se puede estudiar
+y ejecutar sin haber visto la ruta docente.
 
 ## Ejecución local
 
@@ -16,8 +19,8 @@ Subir el notebook a [Google Colab](https://colab.research.google.com/), elegir u
 
 ## Interpretación y reproducibilidad
 
-Conservar parámetros y semillas base para la primera corrida. El extenso explica cada celda y usa nombres separados para experimentos opcionales. Ambas versiones conservan siete figuras embebidas. Las comprobaciones cubren tamaño, límites, aptitud guardada, conteos e historiales repetidos. La semilla controla todos los sorteos posteriores.
+Conservar parámetros y semillas base para la primera corrida. Esta libreta explica cada celda y usa nombres separados para experimentos opcionales. Conserva siete figuras embebidas. Las comprobaciones cubren tamaño, límites, aptitud guardada, conteos e historiales repetidos. La semilla controla todos los sorteos posteriores.
 
 La figura del script de mutación presenta una densidad sin acotar; el notebook muestra un histograma de propuestas muestreadas y acotadas. Ambos usan las mismas muestras y criterio de llegada. Una altura de densidad o una fracción observada no garantiza una probabilidad para otra corrida.
 
-La revisión actual pasó dos ejecuciones locales aisladas por notebook. Ambos notebooks también completaron Ejecutar todo en entornos CPU alojados nuevos de Google Colab el 22 de septiembre de 2026 (Python 3.13.15, NumPy 2.1.3, Matplotlib 3.10.0), incluidas las comprobaciones finales de resultados y reproducibilidad.
+La revisión del 22 de septiembre de 2026 documentó dos ejecuciones locales aisladas por notebook y ejecución CPU alojada en Google Colab (Python 3.13.15, NumPy 2.1.3, Matplotlib 3.10.0), incluidas las comprobaciones finales de resultados y reproducibilidad. Una edición posterior exige una nueva comprobación de la versión correspondiente.

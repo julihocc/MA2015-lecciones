@@ -1,0 +1,149 @@
+\input{../../../../templates/es/preambulo.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+
+\begin{frame}{Tu primer algoritmo genético}
+\centering\Large Ideas y decisiones de un algoritmo genético
+\par\vspace{1em}\normalsize Un ejemplo numérico que se puede seguir sin ejecutar código
+\par\vspace{1em}Prof. Juliho Castillo\par Tec de Monterrey
+\end{frame}
+
+\begin{frame}{¿Qué problema resuelve?}
+Busco un valor real $x\in[-4,4]$ que maximice
+\[
+g(x)=-(x-2)^2.
+\]
+La mejor solución es $x=2$, con aptitud $g(2)=0$; valores más negativos son peores.
+\medskip
+
+Este ejemplo matemático es sintético y adimensional. Lo usaré para mostrar
+cómo una población de candidatos cambia entre generaciones. La aptitud
+traduce una decisión de diseño a un número comparable.
+\end{frame}
+
+\begin{frame}{Población, gen y aptitud}
+Cada individuo guarda un cromosoma de un gen real $x$ y su aptitud $g(x)$.
+\[
+\begin{array}{c|rrrr}
+x & -2 & 0 & 1 & 3\\ \hline
+g(x) & -16 & -4 & -1 & -1
+\end{array}
+\]
+Esta población tiene cuatro alternativas. Los valores $1$ y $3$ empatan
+como mejores \emph{de la población}; ninguno alcanza el máximo conocido $x=2$.
+La aptitud debe recalcularse cuando cambia el gen.
+\end{frame}
+
+\begin{frame}{Selección: quién puede reproducirse}
+En un torneo de tamaño dos sorteo dos individuos y elijo el de mayor aptitud.
+Si salen $x=-2$ y $x=1$, gana $x=1$ porque $-1>-16$.
+\medskip
+
+Repito el torneo para llenar los lugares de progenitores. Puedo elegir varias
+veces al mismo individuo; otro puede quedar sin copias. La selección cambia
+frecuencias, pero todavía no crea un valor nuevo de $x$.
+\end{frame}
+
+\begin{frame}{Cruza por mezcla: crear propuestas}
+Con progenitores $a=1$ y $b=3$, elijo un peso $s=0.25$:
+\[
+h_1=(1-s)a+sb=1.5,\qquad
+h_2=sa+(1-s)b=2.5.
+\]
+Ambos hijos tienen aptitud $-0.25$, mejor que la aptitud $-1$ de sus padres.
+En la variante de la lección el peso puede salir de $[-\alpha,1+\alpha)$;
+entonces un hijo también puede quedar fuera del intervalo parental.
+\medskip
+
+Proyecto cualquier propuesta fuera de $[-4,4]$ al extremo legal más cercano.
+Así se conserva la restricción del problema.
+\end{frame}
+
+\begin{frame}{Mutación: una perturbación controlada}
+La mutación suma un desplazamiento aleatorio al gen y vuelve a aplicar la
+restricción. Si a $h_1=1.5$ se suma $+0.7$, el nuevo gen es $2.2$:
+\[
+g(2.2)=-(0.2)^2=-0.04.
+\]
+Una perturbación gaussiana tiene media $\mu$ y desviación típica $\sigma$.
+$\sigma$ regula la escala habitual del salto; no garantiza que la aptitud
+mejore. La probabilidad de \emph{activar} la mutación es otra decisión.
+\end{frame}
+
+\begin{frame}{Reemplazo y una generación completa}
+\[
+\text{población}\longrightarrow\text{selección}
+\longrightarrow\text{cruza}\longrightarrow\text{mutación}
+\longrightarrow\text{nueva población}.
+\]
+Una generación conserva el tamaño elegido de población y el dominio legal.
+Si se reemplazan todos los individuos, un buen candidato puede perderse:
+sin elitismo no hay garantía de que la mejor aptitud de cada generación
+sea creciente.
+\medskip
+
+Compruebo después de cada paso el número de individuos, los límites de los
+genes y la concordancia entre gen y aptitud guardada.
+\end{frame}
+
+\begin{frame}{Qué debe quedar bajo control}
+\begin{itemize}
+\item \textbf{Representación:} qué decisión codifica cada gen y cuáles son sus límites.
+\item \textbf{Aptitud:} qué se maximiza y cómo se evalúa cada candidato.
+\item \textbf{Selección:} cuánto favorece a los candidatos con mayor aptitud.
+\item \textbf{Variación:} escala de mezcla, frecuencia de cruza y de mutación.
+\item \textbf{Parada:} número de generaciones o criterio comprobable.
+\end{itemize}
+Un parámetro distinto puede cambiar la exploración y el resultado. Para
+comparar configuraciones, mantengo explícitas las condiciones de cada corrida.
+\end{frame}
+
+\begin{frame}{Semilla y resultados observados}
+Fijar una semilla permite repetir la misma secuencia seudoaleatoria
+\emph{si también se conserva el orden de los sorteos y el entorno pertinente}.
+Cambiar la semilla altera la inicialización y las decisiones posteriores.
+\medskip
+
+El máximo matemático $g(2)=0$ es una referencia conocida. El mejor valor
+obtenido por una corrida es un resultado observado: puede ser inferior.
+Dos corridas no bastan para estimar una tasa de éxito.
+\end{frame}
+
+\begin{frame}{Comprobación del ejemplo}
+\begin{enumerate}
+\item ¿Por qué $x=1$ gana el torneo frente a $x=-2$?
+\item ¿Qué aptitud tienen los hijos $1.5$ y $2.5$?
+\item Si una mutación lleva $1.5$ a $2.2$, ¿mejora la aptitud?
+\item ¿Qué debe verificarse antes de aceptar la nueva población?
+\end{enumerate}
+\medskip
+Respuestas: $-1>-16$; ambos hijos dan $-0.25$; $-0.04>-0.25$;
+tamaño, dominio y aptitudes consistentes. Estos cálculos ilustran una
+posibilidad, no prometen mejoría en cada cruce o mutación.
+\end{frame}
+
+\begin{frame}{Del ejemplo al caso ejecutable}
+La libreta compacta usa otro paisaje sintético:
+$f(x)=\sin x-0.2|x|$ en $[-10,10]$. Allí construiré siete incrementos
+ejecutables con selección por torneo, cruza por mezcla, mutación gaussiana
+y reemplazo completo.
+\medskip
+
+Las definiciones de gen, aptitud, población, restricción y semilla son las
+mismas; los números del ejemplo cuadrático no se trasladan a esa libreta.
+Cada recurso incluye los supuestos y resultados de su propio caso.
+\end{frame}
+
+\begin{frame}{Síntesis}
+Un algoritmo genético mantiene candidatos, favorece algunos por su aptitud,
+crea variantes y decide cuándo terminar. La búsqueda es estocástica:
+puedo reproducir una corrida, pero no inferir garantía de óptimo a partir de ella.
+\medskip
+
+\scriptsize Base académica: Ivan Gridin, \emph{Learning Genetic Algorithms with Python},
+capítulo 1. El ejemplo cuadrático, sus cálculos y la explicación son material
+didáctico de esta lección.
+\end{frame}
+\end{document}
