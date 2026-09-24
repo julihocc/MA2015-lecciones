@@ -18,7 +18,7 @@ El modelo sintético y adimensional maximiza `sin(x) - 0.2*abs(x)` en `[-10,10]`
 
 | Paso | Idea que agrega | Resultado observado y comprobación |
 |---|---|---|
-| 1 | Objetivo y paisaje | Tres cimas interiores y una colina parcial en el extremo; mejor malla `x=+1.378`, `f=+0.706`. La malla aproxima. |
+| 1 | Objetivo y gráfica de aptitud | La altura de cada punto es `f(x)`; tres cimas interiores y una colina parcial muestran valores mejores que los vecinos. Mejor malla: `x=+1.378`, `f=+0.706`. La malla aproxima. |
 | 2 | Individuo y población | Diez candidatos; mejor inicial `x=-0.323`, `f=-0.382` con semilla 52. Verificar aptitud guardada. |
 | 3 | Selección por torneo | Cuatro individuos originales quedan sin copias. Cambia multiplicidad, sin crear genes. |
 | 4 | Cruza por mezcla y acotación | 14 de 20 hijos salen del intervalo parental; todos respetan el dominio. Las dos propuestas comparten un sorteo. |
@@ -45,7 +45,7 @@ aquí:
 
 Las recetas y bandas guían la construcción de los scripts. La presentación
 compacta explica los conceptos sin requerir código ni la libreta; la libreta
-compacta muestra después cómo se ejecutan en otro paisaje sintético.
+compacta muestra después cómo se ejecutan con otra función de prueba inventada.
 
 ## Ejecución y procedencia
 
