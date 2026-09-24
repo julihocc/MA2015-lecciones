@@ -227,14 +227,14 @@ y = objective(x)
 # Draw the objective first, shade the parent interval, and then add parents and
 # both child groups with different marker shapes.
 plt.figure(figsize=(8, 4))
-plt.plot(x, y, color="tab:blue", alpha=0.35)
+plt.plot(x, y, color="tab:blue")
 # axvspan shades an x interval. Here alpha means 20% visual opacity; it is
 # unrelated to the numeric BLEND_ALPHA used by crossover.
 plt.axvspan(lo, hi, color="gray", alpha=0.2, label="parents' interval [-2, +3]")
 plt.plot([mother.gene, father.gene], [mother.fitness, father.fitness],
          "D", color="black", label="parents", markersize=8, zorder=4)
 plt.plot([c.gene for c in inside], [c.fitness for c in inside],
-         "o", color="tab:orange", label="children inside", zorder=3)
+         "o", color="#A65300", label="children inside", zorder=3)
 plt.plot([c.gene for c in outside_children], [c.fitness for c in outside_children],
          "o", color="tab:red", label="children outside", zorder=3)
 plt.title(f"Blend crossover (alpha = {BLEND_ALPHA})")

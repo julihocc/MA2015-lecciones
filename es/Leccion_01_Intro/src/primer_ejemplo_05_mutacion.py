@@ -183,7 +183,7 @@ pdf1 = densidad_gaussiana(x, ATRAPADOS_EN, 1.0)
 pdf3 = densidad_gaussiana(x, ATRAPADOS_EN, 3.0)
 
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.plot(x, y, color="tab:blue", alpha=0.75, label="objetivo f(x)")
+ax.plot(x, y, color="tab:blue", label="objetivo f(x)")
 ax.plot([ATRAPADOS_EN], [objetivo(ATRAPADOS_EN)], "D", color="black",
         markersize=8, zorder=4, label="atrapados aquí")
 ax.axvline(ATRAPADOS_EN, color="gray", linestyle="--", alpha=0.5)
@@ -192,8 +192,8 @@ ax.plot([COLINA_GLOBAL], [objetivo(COLINA_GLOBAL)], "*", color="tab:green",
         markersize=14, zorder=4, label="colina global")
 
 ax2 = ax.twinx()
-ax2.fill_between(x, pdf1, color="tab:orange", alpha=0.35, label="sigma = 1.0")
-ax2.plot(x, pdf1, color="tab:orange", linewidth=1.5)
+ax2.fill_between(x, pdf1, color="#A65300", alpha=0.35, label="sigma = 1.0")
+ax2.plot(x, pdf1, color="#A65300", linewidth=1.5)
 ax2.fill_between(x, pdf3, color="tab:red", alpha=0.18, label="sigma = 3.0")
 ax2.plot(x, pdf3, color="tab:red", linewidth=1.5)
 ax2.set_ylim(0, pdf1.max() * 2.2)

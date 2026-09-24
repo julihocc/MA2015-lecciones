@@ -145,11 +145,11 @@ print(f"\nBest of the initial population: {best}")
 grid = np.linspace(GENE_MIN, GENE_MAX, 400)
 # Create the . The next calls add one layer at a time.
 plt.figure(figsize=(8, 4))
-plt.plot(grid, objective(grid), "--", color="tab:blue", alpha=0.6)
+plt.plot(grid, objective(grid), "--", color="tab:blue")
 # The two comprehensions extract matching x and y coordinates. "o" asks
 # for unconnected circle markers, and label supplies the legend text.
 plt.plot([i.gene for i in population], [i.fitness for i in population],
-         "o", color="tab:orange", label="population")
+         "o", color="#A65300", label="population")
 plt.plot([best.gene], [best.fitness], "s", color="tab:green", markersize=9, label="best")
 plt.title("Generation 0: random population")
 plt.xlabel("x"); plt.ylabel("f(x)")

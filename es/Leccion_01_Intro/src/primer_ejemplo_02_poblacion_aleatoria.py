@@ -101,9 +101,9 @@ print(f"\nMejor de la población inicial: {mejor}")
 
 malla = np.linspace(GEN_MIN, GEN_MAX, 400)
 plt.figure(figsize=(8, 4))
-plt.plot(malla, objetivo(malla), "--", color="tab:blue", alpha=0.6)
+plt.plot(malla, objetivo(malla), "--", color="tab:blue")
 plt.plot([i.gen for i in poblacion], [i.aptitud for i in poblacion],
-         "o", color="tab:orange", label="población")
+         "o", color="#A65300", label="población")
 plt.plot([mejor.gen], [mejor.aptitud], "s", color="tab:green", markersize=9, label="mejor")
 plt.title("Generación 0: población aleatoria")
 plt.xlabel("x"); plt.ylabel("f(x)")

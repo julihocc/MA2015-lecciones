@@ -255,7 +255,7 @@ pdf3 = gaussian_pdf(x, TRAPPED_AT, 3.0)
 
 # subplots returns two objects: fig owns the  and ax owns the axes.
 fig, ax = plt.subplots(figsize=(8, 4))
-ax.plot(x, y, color="tab:blue", alpha=0.75, label="objective f(x)")
+ax.plot(x, y, color="tab:blue", label="objective f(x)")
 ax.plot([TRAPPED_AT], [objective(TRAPPED_AT)], "D", color="black",
         markersize=8, zorder=4, label="trapped here")
 ax.axvline(TRAPPED_AT, color="gray", linestyle="--", alpha=0.5)
@@ -266,8 +266,8 @@ ax.plot([GLOBAL_HILL], [objective(GLOBAL_HILL)], "*", color="tab:green",
 # twinx adds a second y-axis sharing the same x-axis. Fitness uses ax; the
 # probability densities use ax2 because their vertical units differ.
 ax2 = ax.twinx()
-ax2.fill_between(x, pdf1, color="tab:orange", alpha=0.35, label="sigma = 1.0")
-ax2.plot(x, pdf1, color="tab:orange", linewidth=1.5)
+ax2.fill_between(x, pdf1, color="#A65300", alpha=0.35, label="sigma = 1.0")
+ax2.plot(x, pdf1, color="#A65300", linewidth=1.5)
 ax2.fill_between(x, pdf3, color="tab:red", alpha=0.18, label="sigma = 3.0")
 ax2.plot(x, pdf3, color="tab:red", linewidth=1.5)
 # Leave headroom above the taller density and hide its numeric ticks because

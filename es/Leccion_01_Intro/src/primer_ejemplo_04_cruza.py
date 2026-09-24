@@ -162,17 +162,17 @@ fuera_hijos = [h for h in hijos if not (lo <= h.gen <= hi)]
 x = np.linspace(GEN_MIN, GEN_MAX, 400)
 y = objetivo(x)
 plt.figure(figsize=(8, 4))
-plt.plot(x, y, color="tab:blue", alpha=0.35)
+plt.plot(x, y, color="tab:blue")
 plt.axvspan(lo, hi, color="gray", alpha=0.2, label="intervalo de los progenitores [-2, +3]")
 plt.plot([madre.gen, padre.gen], [madre.aptitud, padre.aptitud],
          "D", color="black", label="progenitores", markersize=8, zorder=4)
 plt.plot([h.gen for h in dentro], [h.aptitud for h in dentro],
-         "o", color="tab:orange", label="hijos dentro", zorder=3)
+         "o", color="#A65300", label="hijos dentro", zorder=3)
 plt.plot([h.gen for h in fuera_hijos], [h.aptitud for h in fuera_hijos],
          "o", color="tab:red", label="hijos fuera", zorder=3)
 plt.title(f"Cruza de mezcla (alfa = {ALFA_MEZCLA})")
 plt.xlabel("x"); plt.ylabel("f(x)")
-plt.legend(); plt.grid(True, linestyle=":", alpha=0.5)
+plt.legend(loc="upper left"); plt.grid(True, linestyle=":", alpha=0.5)
 FIGURAS.mkdir(exist_ok=True)
 plt.savefig(FIGURAS / "primer_ejemplo_04_cruza.png", dpi=150, bbox_inches="tight")
 plt.close()
