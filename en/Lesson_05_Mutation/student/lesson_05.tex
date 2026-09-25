@@ -1,0 +1,63 @@
+\input{../../../templates/en/preamble.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+\lessontitle{05}{Mutation}
+\begin{frame}{Design question}
+\normalsize
+How far does one mutation move a chromosome? Rate and step size are separate choices.
+\end{frame}
+\begin{frame}{Real-valued model}
+\normalsize
+For each gene, \(B_i\sim\mathrm{Bernoulli}(p)\), \(\Delta_i\sim\mathcal N(0,\sigma^2)\), \(x_i'=\Pi_{[l,u]}(x_i+B_i\Delta_i)\). Expected activated genes: \(Lp\).
+\end{frame}
+\begin{frame}{Instrument}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/mutation_reach_01_the_instrument.png}\end{center}
+{\small Measure displacement, improvement, arrival at a target, and clipped proposals over many draws.}
+\end{frame}
+\begin{frame}{Rate and step}
+\normalsize
+With \(L=48\) and \(p=.10\), 4.8 genes activate on average. Holding \(p\sigma\) fixed does not fix the longest jump or the chance to cross a low-fitness region.
+\end{frame}
+\begin{frame}{Three regimes}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/mutation_reach_02_rate_and_step.png}\end{center}
+{\small Compare touched genes, total distance, and longest jump, not one output alone.}
+\end{frame}
+\begin{frame}{Cost of fitness guidance}
+\normalsize
+Retrying until improvement can raise gain per accepted proposal while multiplying evaluator calls. Compare results per evaluation.
+\end{frame}
+\begin{frame}{Zero-width top}
+\normalsize
+If a staircase top exists only at \(x=4\), a grid can see it; an ideal continuous proposal hits it with probability zero. Check geometry before tuning \(p\) or \(\sigma\).
+\end{frame}
+\begin{frame}{Repairing the target}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/mutation_reach_04_the_dead_staircase.png}\end{center}
+{\small Widening the top band to 0.5 lets the same search rule reach it.}
+\end{frame}
+\begin{frame}{Another representation}
+\normalsize
+A permutation retains each symbol once. Adding noise or altering labels is not a legal mutation; exchange, inversion, and shift can be.
+\end{frame}
+\begin{frame}{Compare moves}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/permutation_mutation_02_rearrangements.png}\end{center}
+{\small Changed positions and index travel rank these operators differently.}
+\end{frame}
+\begin{frame}{Transfer to Planta Física}
+\normalsize
+For 48 proportions, choose \(p\) and \(\sigma\) on the decision scale. Gene clipping does not prove annual quota, potable minimum, or monthly continuity; use the shared evaluator.
+\end{frame}
+\begin{frame}{Team design record}
+\normalsize
+Record rate, step, expected touched genes, repair, and internal evaluator calls. Compare with eight common seeds and 10\,000 evaluations; report feasibility before fitness.
+\end{frame}
+\begin{frame}{Limit}
+\normalsize
+Script numbers are synthetic examples. One run does not establish convergence or set Planta Física operating parameters.
+\end{frame}
+\end{document}

@@ -7,7 +7,7 @@ which cannot be swapped. A crossover chosen for the wrong representation does
 not produce a worse solution — it produces something that is not a solution.
 
 - **Source in the book:** Gridin, *Learning Genetic Algorithms with Python*,
-  Chapter 4 (*Crossover*) — 7 sections, ~2,748 words, 14 figures, 157 lines
+  Chapter 4 (*Crossover*) — 7 sections, `2,748 words, 14 figures, 157 lines
   across 7 files.
 - **Budget:** 51 min (Chapter 4 is 7.8% of the book).
 - **Prerequisites:** Lesson 01 (BLX-alpha and `clamp()` were introduced there,
@@ -156,16 +156,12 @@ Lesson_04_Crossover/
 ├── figures/       one figure per script, plus `offspring_02_one_point_schematic.png`
 ```
 
-## Status
+## Active full package — W08, 25 September 2026
 
-| Piece | State |
-|---|---|
-| Code | Done. Seven scripts, all run clean, one figure each. |
-| Figures | Done — seven named after their scripts, plus the step-2 schematic `offspring_02_one_point_schematic.png`. |
-| Slides | Done. |
-| Spanish mirror | Scripts exist under `es/Leccion_04_Cruza/`. Remaining work is polish (the lesson workflow), not a rewrite. |
+Five components: 7 scripts in src/, extensive deck and notebook in student/, compact deck and notebook in instructor/. 8 figures in figures/. Both PDFs compiled twice; notebooks and scripts ran without errors. The compact deck has nine slides and comments in every code cell.
+
+Forty-minute route per lesson. In S04: 51 minutes for L04, 35 for L05, and 14 for transitions and closure. Synthetic examples remain distinct from the Planta Física model. External data and ZIP: not applicable. Hosted Colab, full accessibility, and student distribution were not checked.
 
 ## Guided notebooks
 
-Student entry point: [`notebooks/README.md`](notebooks/README.md). This lesson has 1 independently runnable sequence: [`lesson_04_crossover.ipynb`](notebooks/lesson_04_crossover.ipynb). The retained outputs were validated on date omitted against the frozen scripts in three fresh-kernel path modes; see the notebook README for environment details and the explicit hosted-Colab gap.
-
+The current complete student notebook is in [`student/`](student/). The earlier milestone notebooks remain in [`notebooks/`](notebooks/) as supplementary material.

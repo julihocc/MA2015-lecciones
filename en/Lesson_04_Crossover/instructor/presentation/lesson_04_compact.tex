@@ -1,0 +1,43 @@
+\input{../../../../templates/en/preamble.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+\lessontitle{04}{Crossover}
+\begin{frame}{Design question}
+\normalsize
+Given two fixed parents, which children can an operator reach? The Planta Física case has 48 real-valued decisions: four buildings by twelve months.
+\end{frame}
+\begin{frame}{What to measure}
+\normalsize
+Reach is the support of the child distribution. Measure distinct children, new gene values, clones, and validity. Sampling illustrates; enumeration establishes support size.
+\end{frame}
+\begin{frame}{More cuts and uniform}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/offspring_03_more_cuts.png}\end{center}
+{\small In this implementation: one cut 10 children, two cuts 12, three cuts 8, uniform 64.}
+\end{frame}
+\begin{frame}{BLX-\(\alpha\)}
+\normalsize
+If \(m=\min(a,b)\), \(M=\max(a,b)\), and \(d=M-m\), then \(x'\sim U[m-\alpha d,M+\alpha d]\). At \(\alpha=.5\), leaving the parental interval has probability \(1/2\).
+\end{frame}
+\begin{frame}{Clipping is local}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/offspring_04_blend.png}\end{center}
+{\small Blend computes new gene values and may cross bounds. Clipping only repairs gene-level bounds.}
+\end{frame}
+\begin{frame}{Invalid routes}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/offspring_06_the_divide.png}\end{center}
+{\small Cut and blend do not construct valid routes in this test. Uniform crossover only recovers a valid parent.}
+\end{frame}
+\begin{frame}{Two families}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/offspring_07_ordered.png}\end{center}
+{\small OX1 works for routes; arithmetic crossover works for real values. Choosing the family is part of the model.}
+\end{frame}
+\begin{frame}{Transfer to the challenge}
+\normalsize
+For the 48 proportions, a real-valued crossover proposes a child. The shared evaluator checks gene bounds, annual quota, potable minimum, and monthly variation. Gene clipping does not prove global feasibility.
+\end{frame}
+\end{document}

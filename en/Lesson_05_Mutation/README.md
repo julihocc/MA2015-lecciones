@@ -8,7 +8,7 @@ Lesson 02 left for dead — where it finds that mutation was never what was
 missing.
 
 - **Source in the book:** Gridin, *Learning Genetic Algorithms with Python*,
-  Chapter 5 (*Mutation*) — 7 sections, ~1,895 words, 7 figures, 113 lines across
+  Chapter 5 (*Mutation*) — 7 sections, `1,895 words, 7 figures, 113 lines across
   7 files (`bit_flip.py`, `exchange.py`, `inversion.py`, `shift.py`,
   `shuffle.py`, `random_deviation.py`, `fitness_driven.py`). One file per
   operator, and no measurement of any of them.
@@ -167,16 +167,12 @@ Lesson_05_Mutation/
 ├── figures/       one figure per script
 ```
 
-## Status
+## Active full package — W08, 25 September 2026
 
-| Piece | State |
-|---|---|
-| Code | Done. Six scripts, all run clean under `uv run`, all claims computed from their own output. |
-| Figures | Done — six, each named after its producing script. |
-| Slides | Not started, blocked on the course Beamer template. |
-| Spanish mirror | Not started. |
+Five components: 6 scripts in src/, extensive deck and notebook in student/, compact deck and notebook in instructor/. 6 figures in figures/. Both PDFs compiled twice; notebooks and scripts ran without errors. The compact deck has nine slides and comments in every code cell.
+
+Forty-minute route per lesson. In S04: 51 minutes for L04, 35 for L05, and 14 for transitions and closure. Synthetic examples remain distinct from the Planta Física model. External data and ZIP: not applicable. Hosted Colab, full accessibility, and student distribution were not checked.
 
 ## Guided notebooks
 
-Student entry point: [`notebooks/README.md`](notebooks/README.md). This lesson has 2 independently runnable sequences: [`lesson_05_mutation_reach.ipynb`](notebooks/lesson_05_mutation_reach.ipynb), [`lesson_05_permutation_mutation.ipynb`](notebooks/lesson_05_permutation_mutation.ipynb). The retained outputs were validated on date omitted against the frozen scripts in three fresh-kernel path modes; see the notebook README for environment details and the explicit hosted-Colab gap.
-
+The current complete student notebook is in [`student/`](student/). The earlier milestone notebooks remain in [`notebooks/`](notebooks/) as supplementary material.

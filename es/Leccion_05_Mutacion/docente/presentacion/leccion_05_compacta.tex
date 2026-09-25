@@ -1,0 +1,42 @@
+\input{../../../../templates/es/preambulo.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+\tituloleccion{05}{Mutación}
+\begin{frame}{Pregunta de diseño}
+\normalsize
+¿Qué tan lejos mueve un cromosoma una aplicación de mutación? Tasa y tamaño de paso son decisiones distintas.
+\end{frame}
+\begin{frame}{Modelo real}
+\normalsize
+Para cada gen, \(B_i\sim\mathrm{Bernoulli}(p)\), \(\Delta_i\sim\mathcal N(0,\sigma^2)\), \(x_i'=\Pi_{[l,u]}(x_i+B_i\Delta_i)\). El número esperado de genes activados es \(Lp\).
+\end{frame}
+\begin{frame}{Tasa y paso}
+\normalsize
+Con \(L=48\) y \(p=.10\), se activan 4.8 genes en promedio. Fijar \(p\sigma\) no fija el salto máximo ni la posibilidad de cruzar una región de baja aptitud.
+\end{frame}
+\begin{frame}{Tres regímenes}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/alcance_mutacion_02_tasa_y_paso.png}\end{center}
+{\small Comparar genes tocados, distancia total y salto máximo, no sólo una salida individual.}
+\end{frame}
+\begin{frame}{Cima de ancho cero}
+\normalsize
+Si la cima de una escalera existe sólo en \(x=4\), una cuadrícula puede verla; una propuesta continua ideal la acierta con probabilidad cero. Revisar la geometría antes de ajustar \(p\) o \(\sigma\).
+\end{frame}
+\begin{frame}{Reparar la meta}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/alcance_mutacion_04_la_escalera_muerta.png}\end{center}
+{\small Al ensanchar la banda superior a 0.5, la misma regla de búsqueda puede alcanzarla.}
+\end{frame}
+\begin{frame}{Comparar movimientos}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../../figures/mutacion_permutacion_02_reordenamientos.png}\end{center}
+{\small Posiciones modificadas y recorrido de índices ordenan los operadores de modo distinto.}
+\end{frame}
+\begin{frame}{Transferencia a Planta Física}
+\normalsize
+Para 48 proporciones, escoger \(p\) y \(\sigma\) en la escala de las decisiones. Acotar genes no prueba cuota anual, mínimo potable ni continuidad mensual; usar el evaluador compartido.
+\end{frame}
+\end{document}

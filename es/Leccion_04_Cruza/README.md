@@ -7,7 +7,7 @@ que no pueden intercambiarse. Una cruza elegida para la representación equivoca
 produce una solución peor: produce algo que no es una solución.
 
 - **Fuente en el libro:** Gridin, *Learning Genetic Algorithms with Python*,
-  Capítulo 4 (*Crossover*) — 7 secciones, ~2,748 palabras, 14 figuras, 157 líneas
+  Capítulo 4 (*Crossover*) — 7 secciones, `2,748 palabras, 14 figuras, 157 líneas
   en 7 archivos.
 - **Presupuesto:** 51 min (El Capítulo 4 es el 7.8% del libro).
 - **Prerrequisitos:** Lección 01 (BLX-alpha y `acotar()` se introdujeron allí,
@@ -153,16 +153,12 @@ Leccion_04_Cruza/
 ├── figures/       una figura por script
 ```
 
-## Estado
+## Paquete integral activo — W08, 25/09/2026
 
-| Pieza | Estado |
-|---|---|
-| Código | Hecho. Siete scripts, todos se ejecutan limpios, una figura cada uno. |
-| Figuras | Hecho — siete, cada una con el nombre de su script productor. |
-| Diapositivas | No iniciado, bloqueado en la plantilla de Beamer del curso. |
-| Espejo español | Hecho. |
+Cinco componentes: 7 scripts en src/, presentación y libreta extensas en estudiante/, presentación y libreta compactas en docente/. 8 figuras en figures/. Los dos PDF compilaron dos veces; ambas libretas y los scripts ejecutaron sin errores. El compacto tiene nueve láminas y comentarios en cada celda de código.
+
+Ruta de 40 minutos por lección. En S04: L04 recibe 51 minutos, L05 recibe 35 y las transiciones y cierre reciben 14. Ejemplos sintéticos separados del modelo de Planta Física. Datos externos y ZIP: no aplica. Colab alojado, accesibilidad integral y distribución estudiantil: no comprobados.
 
 ## Cuadernos guiados
 
-Entrada para estudiantes: [`notebooks/README.md`](notebooks/README.md). Esta lección tiene 1 secuencia ejecutable de forma independiente: [`leccion_04_cruza.ipynb`](notebooks/leccion_04_cruza.ipynb). Las salidas retenidas se validaron el date omitted contra los scripts congelados en tres modos de ruta con kernels nuevos; el README de cuadernos registra el entorno y la brecha explícita de Colab alojado.
-
+La libreta extensa activa está en [`estudiante/`](estudiante/). Los cuadernos previos por hitos permanecen en [`notebooks/`](notebooks/) como material complementario.

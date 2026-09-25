@@ -1,0 +1,76 @@
+\input{../../../templates/es/preambulo.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+\tituloleccion{04}{Cruza}
+\begin{frame}{Pregunta de diseño}
+\normalsize
+Dados dos padres fijos, ¿qué descendientes puede alcanzar un operador? El caso de Planta Física usa 48 decisiones reales, cuatro edificios por doce meses.
+\end{frame}
+\begin{frame}{Qué se mide}
+\normalsize
+El alcance es el soporte de la distribución de hijos. Mido hijos distintos, genes nuevos, clones y fracción legal. Una muestra ilustra; enumerar demuestra el tamaño del soporte.
+\end{frame}
+\begin{frame}{Línea base}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/descendencia_01_dos_padres.png}\end{center}
+{\small Los dos padres fijos dan una línea base comparable para cada operador.}
+\end{frame}
+\begin{frame}{Un punto}
+\normalsize
+Con seis genes distintos, cinco cortes interiores y dos orientaciones producen exactamente 10 hijos. Cada gen se copia de uno de los padres: no hay valores nuevos.
+\end{frame}
+\begin{frame}{Varios cortes y uniforme}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/descendencia_03_mas_cortes.png}\end{center}
+{\small En esta implementación: un corte 10 hijos, dos cortes 12, tres cortes 8, uniforme 64.}
+\end{frame}
+\begin{frame}{Un detalle del algoritmo}
+\normalsize
+Los tres cortes se toman de \texttt{range(1,L-1)}: se excluye la última frontera interior. El resultado 8 depende de esa implementación; no es una ley general sobre más cortes.
+\end{frame}
+\begin{frame}{BLX-\(\alpha\)}
+\normalsize
+Si \(m=\min(a,b)\), \(M=\max(a,b)\) y \(d=M-m\), entonces \(x'\sim U[m-\alpha d,M+\alpha d]\). Para \(\alpha=.5\), salir del intervalo parental tiene probabilidad \(1/2\).
+\end{frame}
+\begin{frame}{Acotar no basta}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/descendencia_04_mezcla.png}\end{center}
+{\small La mezcla calcula genes nuevos y puede salir del dominio. Acotar sólo repara límites por gen.}
+\end{frame}
+\begin{frame}{Guiada por aptitud}
+\normalsize
+Evaluar candidatos y conservar los que no empeoran reduce el deterioro observado. Cada intento interno consume una llamada al evaluador; devolver un padre sin cambio también es posible.
+\end{frame}
+\begin{frame}{Representación}
+\normalsize
+Un vector real admite mezcla aritmética. Una permutación debe visitar cada parada exactamente una vez. Un corte ordinario puede repetir paradas y omitir otras.
+\end{frame}
+\begin{frame}{Rutas ilegales}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/descendencia_06_la_division.png}\end{center}
+{\small Corte y mezcla no construyen rutas legales en esta prueba. La cruza uniforme sólo recupera un padre legal.}
+\end{frame}
+\begin{frame}{Cruza ordenada}
+\normalsize
+OX1 copia un segmento y llena los huecos en el orden relativo del otro padre. Conserva pertenencia y unicidad en permutaciones; sobre vectores reales puede resultar inerte.
+\end{frame}
+\begin{frame}{Dos familias}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/descendencia_07_ordenada.png}\end{center}
+{\small OX1 funciona para rutas; una cruza aritmética funciona para valores reales. Elegir la familia es parte del modelo.}
+\end{frame}
+\begin{frame}{Transferencia al reto}
+\normalsize
+Para las 48 proporciones del caso, una cruza real propone un hijo. El evaluador compartido comprueba límites por gen, cuota anual, mínimo potable y variación mensual. Acotar cada gen no demuestra factibilidad global.
+\end{frame}
+\begin{frame}{Ficha de diseño}
+\normalsize
+En equipos de tres: elegir familia, parámetro, reparación y medida de diversidad. El revisor explica el método; el verificador cuenta evaluaciones y comprueba factibilidad.
+\end{frame}
+\begin{frame}{Interpretación}
+\normalsize
+Fracción legal no equivale a aptitud. Comparar operadores con el mismo presupuesto, ocho semillas y una política de reparación común. Estos resultados son sintéticos, no parámetros confirmados por Planta Física.
+\end{frame}
+\end{document}

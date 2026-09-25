@@ -1,0 +1,76 @@
+\input{../../../templates/en/preamble.tex}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\date{}
+\begin{document}
+\lessontitle{04}{Crossover}
+\begin{frame}{Design question}
+\normalsize
+Given two fixed parents, which children can an operator reach? The Planta Física case has 48 real-valued decisions: four buildings by twelve months.
+\end{frame}
+\begin{frame}{What to measure}
+\normalsize
+Reach is the support of the child distribution. Measure distinct children, new gene values, clones, and validity. Sampling illustrates; enumeration establishes support size.
+\end{frame}
+\begin{frame}{Baseline}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/offspring_01_two_parents.png}\end{center}
+{\small The same fixed parents provide a comparable baseline for every operator.}
+\end{frame}
+\begin{frame}{One point}
+\normalsize
+With six distinct genes, five interior cuts and two orientations produce exactly 10 children. Each gene copies one parent: no new values appear.
+\end{frame}
+\begin{frame}{More cuts and uniform}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/offspring_03_more_cuts.png}\end{center}
+{\small In this implementation: one cut 10 children, two cuts 12, three cuts 8, uniform 64.}
+\end{frame}
+\begin{frame}{An implementation detail}
+\normalsize
+Three cuts are sampled from \texttt{range(1,L-1)}, excluding the last interior boundary. The count 8 depends on this implementation; it is not a general law about more cuts.
+\end{frame}
+\begin{frame}{BLX-\(\alpha\)}
+\normalsize
+If \(m=\min(a,b)\), \(M=\max(a,b)\), and \(d=M-m\), then \(x'\sim U[m-\alpha d,M+\alpha d]\). At \(\alpha=.5\), leaving the parental interval has probability \(1/2\).
+\end{frame}
+\begin{frame}{Clipping is local}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/offspring_04_blend.png}\end{center}
+{\small Blend computes new gene values and may cross bounds. Clipping only repairs gene-level bounds.}
+\end{frame}
+\begin{frame}{Fitness guided}
+\normalsize
+Evaluating proposals and keeping those that do not underperform reduces observed deterioration. Every internal trial consumes an evaluator call; an unchanged parent may be returned.
+\end{frame}
+\begin{frame}{Representation}
+\normalsize
+A real vector admits arithmetic blend. A permutation must visit each stop exactly once. Ordinary cuts can duplicate some stops and omit others.
+\end{frame}
+\begin{frame}{Invalid routes}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/offspring_06_the_divide.png}\end{center}
+{\small Cut and blend do not construct valid routes in this test. Uniform crossover only recovers a valid parent.}
+\end{frame}
+\begin{frame}{Ordered crossover}
+\normalsize
+OX1 copies a segment and fills gaps in the other parent's relative order. It preserves membership and uniqueness for permutations; it may be inert on real-valued vectors.
+\end{frame}
+\begin{frame}{Two families}
+\normalsize
+\begin{center}\includegraphics[width=.84\textwidth,height=.53\textheight,keepaspectratio]{../figures/offspring_07_ordered.png}\end{center}
+{\small OX1 works for routes; arithmetic crossover works for real values. Choosing the family is part of the model.}
+\end{frame}
+\begin{frame}{Transfer to the challenge}
+\normalsize
+For the 48 proportions, a real-valued crossover proposes a child. The shared evaluator checks gene bounds, annual quota, potable minimum, and monthly variation. Gene clipping does not prove global feasibility.
+\end{frame}
+\begin{frame}{Design record}
+\normalsize
+In teams of three: choose family, parameter, repair, and diversity measure. The reviewer explains the method; the verifier counts evaluations and checks feasibility.
+\end{frame}
+\begin{frame}{Interpretation}
+\normalsize
+Validity rate is not fitness. Compare operators under the same budget, eight seeds, and common repair policy. These results are synthetic, not Planta Física confirmed parameters.
+\end{frame}
+\end{document}

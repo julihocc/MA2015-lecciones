@@ -8,7 +8,7 @@ que la Lección 02 dio por muerta, donde descubre que la mutación nunca fue lo 
 faltaba.
 
 - **Fuente en el libro:** Gridin, *Learning Genetic Algorithms with Python*,
-  Capítulo 5 (*Mutation*) — 7 secciones, ~1,895 palabras, 7 figuras, 113 líneas en
+  Capítulo 5 (*Mutation*) — 7 secciones, `1,895 palabras, 7 figuras, 113 líneas en
   7 archivos (`bit_flip.py`, `exchange.py`, `inversion.py`, `shift.py`,
   `shuffle.py`, `random_deviation.py`, `fitness_driven.py`). Un archivo por
   operador y ninguna medición de ninguno de ellos.
@@ -163,16 +163,12 @@ Leccion_05_Mutacion/
 ├── figures/       una figura por script
 ```
 
-## Estado
+## Paquete integral activo — W08, 25/09/2026
 
-| Pieza | Estado |
-|---|---|
-| Código | Hecho. Seis scripts, todos se ejecutan limpios bajo `uv run`, todas las afirmaciones calculadas a partir de su propia salida. |
-| Figuras | Hecho — seis, cada una nombrada por su script productor. |
-| Diapositivas | No comenzado, bloqueado por la plantilla Beamer del curso. |
-| Espejo en español | Hecho (este directorio). |
+Cinco componentes: 6 scripts en src/, presentación y libreta extensas en estudiante/, presentación y libreta compactas en docente/. 6 figuras en figures/. Los dos PDF compilaron dos veces; ambas libretas y los scripts ejecutaron sin errores. El compacto tiene nueve láminas y comentarios en cada celda de código.
+
+Ruta de 40 minutos por lección. En S04: L04 recibe 51 minutos, L05 recibe 35 y las transiciones y cierre reciben 14. Ejemplos sintéticos separados del modelo de Planta Física. Datos externos y ZIP: no aplica. Colab alojado, accesibilidad integral y distribución estudiantil: no comprobados.
 
 ## Cuadernos guiados
 
-Entrada para estudiantes: [`notebooks/README.md`](notebooks/README.md). Esta lección tiene 2 secuencias ejecutables de forma independiente: [`leccion_05_alcance_mutacion.ipynb`](notebooks/leccion_05_alcance_mutacion.ipynb), [`leccion_05_mutacion_permutacion.ipynb`](notebooks/leccion_05_mutacion_permutacion.ipynb). Las salidas retenidas se validaron el date omitted contra los scripts congelados en tres modos de ruta con kernels nuevos; el README de cuadernos registra el entorno y la brecha explícita de Colab alojado.
-
+La libreta extensa activa está en [`estudiante/`](estudiante/). Los cuadernos previos por hitos permanecen en [`notebooks/`](notebooks/) como material complementario.
