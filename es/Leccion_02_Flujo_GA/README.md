@@ -26,7 +26,7 @@ establece convergencia ni optimalidad. La escalera es
 
 ## Los ejemplos en ejecución
 
-El prefijo es `ga_flow_`. Tres funciones de aptitud se entregan a un controlador sin cambios:
+El prefijo es `flujo_ag_`. Tres funciones de aptitud se entregan a un controlador sin cambios:
 
 - `sine_landscape` — El `sin(x) − 0.2·|x|` de la Lección 01, ahora solo un problema entre otros.
 - `closeness_to_target` — `−(x − 4.2)²`, una minimización escrita como una maximización.
@@ -36,10 +36,10 @@ El prefijo es `ga_flow_`. Tres funciones de aptitud se entregan a un controlador
 
 | # | Script | Qué agrega | Qué prueba su salida |
 |---|---|---|---|
-| 1 | `ga_flow_01_the_five_phases.py` | `evolve_one_generation()`, `run()`, un censo por fase | Misma semilla, misma respuesta que la Lección 01: `x=+1.372 f=+0.706`. La ejecución costó **107** evaluaciones de aptitud, no las 110 obvias — un individuo seleccionado pero no cruzado ni mutado es el mismo objeto y nunca se vuelve a evaluar |
-| 2 | `ga_flow_02_injected_fitness.py` | la función de aptitud se convierte en un argumento | Un controlador, dos problemas: la ejecución del seno reproduce exactamente el paso 1, la ejecución del objetivo aterriza a **0.0038** de +4.200. La única diferencia entre las ejecuciones es qué función se pasó |
-| 3 | `ga_flow_03_population_metrics.py` | `population_metrics()`, la tabla de historial, su figura | En el problema del seno, la aptitud promedio sube de −1.5588 a +0.6228 mientras que la dispersión genética cae de **6.665 a 0.064** para la generación 8. El campeón se queda quieto mientras la población colapsa debajo de él |
-| 4 | `ga_flow_04_stopping_condition.py` | `PATIENCE`, `MIN_IMPROVEMENT`, detenerse por estancamiento, ejecuciones de control | La regla ahorra de **49 a 51** de las 60 generaciones permitidas y cuesta menos que `MIN_IMPROVEMENT` en ambos problemas. También expone un defecto: en 1 de 2 problemas, la última generación ya no contiene al campeón — nada aquí lo protege |
+| 1 | `flujo_ag_01_las_cinco_fases.py` | `evolve_one_generation()`, `run()`, un censo por fase | Misma semilla, misma respuesta que la Lección 01: `x=+1.372 f=+0.706`. La ejecución costó **107** evaluaciones de aptitud, no las 110 obvias — un individuo seleccionado pero no cruzado ni mutado es el mismo objeto y nunca se vuelve a evaluar |
+| 2 | `flujo_ag_02_aptitud_inyectada.py` | la función de aptitud se convierte en un argumento | Un controlador, dos problemas: la ejecución del seno reproduce exactamente el paso 1, la ejecución del objetivo aterriza a **0.0038** de +4.200. La única diferencia entre las ejecuciones es qué función se pasó |
+| 3 | `flujo_ag_03_metricas_poblacion.py` | `population_metrics()`, la tabla de historial, su figura | En el problema del seno, la aptitud promedio sube de −1.5588 a +0.6228 mientras que la dispersión genética cae de **6.665 a 0.064** para la generación 8. El campeón se queda quieto mientras la población colapsa debajo de él |
+| 4 | `flujo_ag_04_condicion_parada.py` | `PATIENCE`, `MIN_IMPROVEMENT`, detenerse por estancamiento, ejecuciones de control | La regla ahorra de **49 a 51** de las 60 generaciones permitidas y cuesta menos que `MIN_IMPROVEMENT` en ambos problemas. También expone un defecto: en 1 de 2 problemas, la última generación ya no contiene al campeón — nada aquí lo protege |
 | 5 | `flujo_ag_05_paisajes_escalonados.py` | `escalera()`, el tercer problema, el veredicto frente a la referencia de cuadrícula densa | La escalera **no** rompe la regla: la ejecución llega a `+2.0000`, la referencia de cuadrícula densa del paisaje, y la regla la detiene sin haber perdido nada. Cada uno de los tres problemas coincide con su referencia de cuadrícula, déficit `+0.0000` |
 
 **Estos números se verifican contra la salida real.** Cualquier diapositiva, folleto o traducción que indique una cifra debe indicar una de estas. Vuelve a ejecutar el script en lugar de confiar en esta tabla si el código ha cambiado.
@@ -62,7 +62,7 @@ Dos dispositivos, obligatorios para todo el curso:
 ## Ejecutándolo
 
 ```bash
-uv run es/Leccion_02_Flujo_GA/src/ga_flow_01_the_five_phases.py
+uv run es/Leccion_02_Flujo_GA/src/flujo_ag_01_las_cinco_fases.py
 ```
 
 Autónomo, sin argumentos, figuras guardadas en `../figures/`. Toda la secuencia se ejecuta en aproximadamente **8 s**.
