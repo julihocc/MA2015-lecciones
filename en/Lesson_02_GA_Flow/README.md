@@ -126,16 +126,10 @@ Lesson_02_GA_Flow/
 ├── figures/       one figure per script (step 5 saves two)
 ```
 
-## Status
+## Paths and status, September 25, 2026
 
-| Piece | State |
-|---|---|
-| Code | Done. Five scripts, all run clean. |
-| Figures | Done. |
-| Slides | Not started, blocked on the course Beamer template. |
-| Spanish mirror | Not started. |
+- Shared scripts: [`src/`](src/), 5 steps; reproducible figures in [`figures/`](figures/).
+- Independent study: [`student/lesson_02.pdf`](student/lesson_02.pdf) and [`student/lesson_02_ga_flow.ipynb`](student/lesson_02_ga_flow.ipynb), with TeX source beside the PDF.
+- Instructor use: [`instructor/presentation/lesson_02_compact.pdf`](instructor/presentation/lesson_02_compact.pdf) and [`instructor/notebooks/lesson_02_compact.ipynb`](instructor/notebooks/lesson_02_compact.ipynb). The compact deck has 9 slides; the notebook has explanatory comments next to its code.
 
-## Guided notebooks
-
-Student entry point: [`notebooks/README.md`](notebooks/README.md). This lesson has 1 independently runnable sequence: [`lesson_02_ga_flow.ipynb`](notebooks/lesson_02_ga_flow.ipynb). The retained outputs were validated on date omitted against the frozen scripts in three fresh-kernel path modes; see the notebook README for environment details and the explicit hosted-Colab gap.
-
+The extensive route retains the complete progression; the compact pair is self-contained for roughly 40 minutes. Examples are synthetic. Transfer to the Planta Física challenge is a modeling choice, not a partner-validated outcome. Student distribution remains blocked until rights for Gridin-derived material are documented. Canvas and hosted Colab were not changed or tested.

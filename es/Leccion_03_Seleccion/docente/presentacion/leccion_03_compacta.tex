@@ -1,0 +1,61 @@
+\input{../../../../templates/es/preambulo.tex}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}[frame number]
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{03}{Selección}
+
+\begin{frame}{Población y pregunta}
+
+Diez candidatos tienen aptitudes ordenadas de $-5$ a $4$. La selección devuelve diez copias de estos mismos candidatos. ¿Quién se reproduce, quién desaparece y cuántas copias conserva el mejor?
+
+\end{frame}
+
+\begin{frame}{Probabilidad proporcional}
+
+Con pesos no negativos $w_i$, $p_i=w_i/\sum_j w_j$ y las copias esperadas son $Np_i$. Como las aptitudes incluyen valores negativos, se añade un piso. Ese piso cambia $p_i$ y por tanto la presión.
+
+\end{frame}
+
+\begin{frame}{Rango y escala}
+
+La selección por rango asigna pesos por posición, no por la distancia entre aptitudes. Una transformación creciente de aptitud conserva el orden y las probabilidades por rango. Aun así, una muestra puede perder al mejor.
+
+\end{frame}
+
+\begin{frame}{Elitismo y SUS}
+
+Elitismo copia intacto al campeón antes de llenar los demás lugares; con aptitud fija conserva al mejor. El muestreo universal estocástico (SUS) usa puntos equiespaciados: misma esperanza que ruleta y menor variación de copias.
+
+\end{frame}
+
+\begin{frame}{Torneo como perilla}
+
+En un torneo con reemplazo de tamaño $k$, elijo el mejor entre $k$ sorteos. Al crecer $k$, aumentan las copias esperadas del campeón y suele caer la diversidad. $k=3$ es una configuración inicial, no una respuesta universal.
+
+\end{frame}
+
+\begin{frame}{Medición antes de elegir}
+
+Registro copias del mejor, individuos extintos, aptitud media y dispersión de genes. En la secuencia extensa de 13 configuraciones, presión y aptitud media correlacionan $+0.95$; presión y dispersión, $-0.92$. Son observaciones del caso, no leyes.
+
+\end{frame}
+
+\begin{frame}{Aplicación a Planta Física}
+
+La selección no repara planes inviables: el evaluador o una reparación documentada deben hacerlo. Para comparar $k$, mantengo el mismo evaluador de 48 decisiones, las mismas semillas y el mismo presupuesto de evaluaciones.
+
+\end{frame}
+
+\begin{frame}{Salida de clase}
+
+Decido una selección inicial y justifico su presión. Registro un riesgo de pérdida de diversidad y la métrica con la que lo vigilaré. Conservo el mejor plan observado fuera de la población si no garantizo elitismo.
+
+\end{frame}
+
+\end{document}

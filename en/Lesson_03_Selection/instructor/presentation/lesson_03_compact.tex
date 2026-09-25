@@ -1,0 +1,61 @@
+\input{../../../../templates/en/preamble.tex}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}[frame number]
+
+\date{}
+
+\begin{document}
+
+\lessontitle{03}{Selection}
+
+\begin{frame}{Population and question}
+
+Ten candidates have fitness values ordered from $-5$ to $4$. Selection returns ten copies of these same candidates. Who reproduces, who disappears, and how many copies does the champion get?
+
+\end{frame}
+
+\begin{frame}{Proportional probability}
+
+For nonnegative weights $w_i$, $p_i=w_i/\sum_j w_j$ and expected copies are $Np_i$. Fitness includes negative values, so a floor is added. That floor changes $p_i$ and therefore selection pressure.
+
+\end{frame}
+
+\begin{frame}{Rank and scale}
+
+Rank selection assigns weights by position, not fitness distance. A monotone fitness transformation preserves order and rank probabilities. Even so, one sample can lose the champion.
+
+\end{frame}
+
+\begin{frame}{Elitism and SUS}
+
+Elitism copies the champion unchanged before filling other slots; with fixed fitness it preserves the best. Stochastic universal sampling (SUS) uses equally spaced pointers: the same expected counts as roulette with less sampling variation.
+
+\end{frame}
+
+\begin{frame}{Tournament as a control}
+
+A size-$k$ tournament with replacement chooses the best of $k$ draws. As $k$ grows, expected champion copies rise and diversity tends to fall. $k=3$ is a starting configuration, not a universal answer.
+
+\end{frame}
+
+\begin{frame}{Measure before choosing}
+
+Track champion copies, lost individuals, mean fitness, and gene spread. Across 13 configurations in the extensive sequence, pressure correlates $+0.95$ with mean fitness and $-0.92$ with spread. These are case observations, not laws.
+
+\end{frame}
+
+\begin{frame}{Apply to Planta Física}
+
+Selection cannot repair infeasible plans: the evaluator or documented repair must do so. To compare $k$, hold the 48-decision evaluator, seeds, and evaluation budget fixed.
+
+\end{frame}
+
+\begin{frame}{Exit ticket}
+
+Choose an initial selector and justify its pressure. State one diversity-loss risk and the metric to watch. Archive the best plan seen outside the population if elitism is not guaranteed.
+
+\end{frame}
+
+\end{document}

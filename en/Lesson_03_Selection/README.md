@@ -95,16 +95,10 @@ Lesson_03_Selection/
 ├── figures/       one figure per script
 ```
 
-## Status
+## Paths and status, September 25, 2026
 
-| Piece | State |
-|---|---|
-| Code | Done. Six scripts, all run clean, one figure each. |
-| Figures | Done — six, each named after its producing script. |
-| Slides | Not started, blocked on the course Beamer template. |
-| Spanish mirror | Not started. |
+- Shared scripts: [`src/`](src/), 6 steps; reproducible figures in [`figures/`](figures/).
+- Independent study: [`student/lesson_03.pdf`](student/lesson_03.pdf) and [`student/lesson_03_selection_pressure.ipynb`](student/lesson_03_selection_pressure.ipynb), with TeX source beside the PDF.
+- Instructor use: [`instructor/presentation/lesson_03_compact.pdf`](instructor/presentation/lesson_03_compact.pdf) and [`instructor/notebooks/lesson_03_compact.ipynb`](instructor/notebooks/lesson_03_compact.ipynb). The compact deck has 9 slides; the notebook has explanatory comments next to its code.
 
-## Guided notebooks
-
-Student entry point: [`notebooks/README.md`](notebooks/README.md). This lesson has 1 independently runnable sequence: [`lesson_03_selection_pressure.ipynb`](notebooks/lesson_03_selection_pressure.ipynb). The retained outputs were validated on date omitted against the frozen scripts in three fresh-kernel path modes; see the notebook README for environment details and the explicit hosted-Colab gap.
-
+The extensive route retains the complete progression; the compact pair is self-contained for roughly 40 minutes. Examples are synthetic. Transfer to the Planta Física challenge is a modeling choice, not a partner-validated outcome. Student distribution remains blocked until rights for Gridin-derived material are documented. Canvas and hosted Colab were not changed or tested.

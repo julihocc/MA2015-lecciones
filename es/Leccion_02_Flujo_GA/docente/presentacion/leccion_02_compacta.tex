@@ -1,0 +1,61 @@
+\input{../../../../templates/es/preambulo.tex}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}[frame number]
+
+\date{}
+
+\begin{document}
+
+\tituloleccion{02}{Flujo del algoritmo genético}
+
+\begin{frame}{Problema y meta}
+
+Maximizo $f(x)=-(x-2)^2$ en $[-4,4]$. El máximo conocido es $f(2)=0$. Una población contiene candidatos; cada evaluación cuesta una llamada a $f$. Este ejemplo es sintético.
+
+\end{frame}
+
+\begin{frame}{Una generación y la parada}
+
+$P_t\;\longrightarrow\;$ selección $\longrightarrow$ cruza $\longrightarrow$ mutación $\longrightarrow$ reemplazo $\longrightarrow P_{t+1}$. El controlador evalúa y decide cuándo parar. Una generación no equivale a una corrida completa.
+
+\end{frame}
+
+\begin{frame}{Selección y creación}
+
+Un torneo de dos copia al candidato más apto de una pareja aleatoria. Si los padres son $1$ y $3$, su promedio es $2$. La mutación suma un desplazamiento aleatorio; se acota el resultado a $[-4,4]$. Sólo cruza y mutación proponen genes nuevos.
+
+\end{frame}
+
+\begin{frame}{Problema como argumento}
+
+El controlador recibe una función $f$; no codifica el paisaje dentro del ciclo. Cambiar de $-(x-2)^2$ al evaluador de otro problema cambia la aptitud, no las cinco fases. Para minimizar $c(x)$ se puede maximizar $-c(x)$, preservando restricciones.
+
+\end{frame}
+
+\begin{frame}{Medir población y costo}
+
+En cada generación registro mejor actual $\max f(P_t)$, promedio $\overline f_t$ y dispersión $\sigma(P_t)$. Conservo aparte el mejor histórico. El presupuesto se mide en evaluaciones, no sólo en generaciones.
+
+\end{frame}
+
+\begin{frame}{Parada: evidencia limitada}
+
+Una regla de paciencia detiene tras varias generaciones sin mejora apreciable del mejor histórico. Detecta estancamiento observado, no convergencia ni óptimo global. Sin elitismo, la última población puede perder al campeón archivado.
+
+\end{frame}
+
+\begin{frame}{Caso de escalones}
+
+En el ejemplo extenso, la cima de la escalera tiene ancho $0.5$; la corrida alcanza la referencia de cuadrícula. Un escalón plano no prueba que la regla de parada falle. Comparar contra referencia y presupuesto evita conclusiones ficticias.
+
+\end{frame}
+
+\begin{frame}{Transferencia a Planta Física}
+
+Un plan se codifica con 48 decisiones; el evaluador devuelve una aptitud escalar y comprueba factibilidad. Comparo el AG con búsqueda aleatoria usando el mismo evaluador y presupuesto. Pregunta: ¿qué se archiva si reemplazo toda la población?
+
+\end{frame}
+
+\end{document}

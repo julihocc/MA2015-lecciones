@@ -1,0 +1,61 @@
+\input{../../../../templates/en/preamble.tex}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}[frame number]
+
+\date{}
+
+\begin{document}
+
+\lessontitle{02}{Genetic algorithm flow}
+
+\begin{frame}{Problem and target}
+
+Maximize $f(x)=-(x-2)^2$ on $[-4,4]$. The known maximum is $f(2)=0$. A population stores candidates; each evaluation costs one call to $f$. This example is synthetic.
+
+\end{frame}
+
+\begin{frame}{One generation and stopping}
+
+$P_t\;\longrightarrow\;$ selection $\longrightarrow$ crossover $\longrightarrow$ mutation $\longrightarrow$ replacement $\longrightarrow P_{t+1}$. The controller evaluates and decides when to stop. One generation is not an entire run.
+
+\end{frame}
+
+\begin{frame}{Selection and creation}
+
+A two-way tournament copies the fitter candidate from a random pair. Parents $1$ and $3$ average to $2$. Mutation adds a random displacement; clip the result to $[-4,4]$. Only crossover and mutation propose new genes.
+
+\end{frame}
+
+\begin{frame}{Problem as an argument}
+
+The controller accepts a function $f$; the landscape is not hard-coded in the loop. Switching from $-(x-2)^2$ to another evaluator changes fitness, not the five phases. Minimizing $c(x)$ can mean maximizing $-c(x)$ while preserving constraints.
+
+\end{frame}
+
+\begin{frame}{Measure population and cost}
+
+For each generation record current best $\max f(P_t)$, mean $\overline f_t$, and spread $\sigma(P_t)$. Keep the all-time best separately. Count evaluations, not only generations, as the budget.
+
+\end{frame}
+
+\begin{frame}{Stopping has limited meaning}
+
+A patience rule stops after several generations without meaningful improvement in the all-time best. It detects observed stagnation, not convergence or a global optimum. Without elitism, the last population may lose its archived champion.
+
+\end{frame}
+
+\begin{frame}{The stepped case}
+
+In the extensive example, the top step is $0.5$ wide and the run reaches the grid reference. A flat step alone does not prove that patience fails. Comparing against a reference and budget prevents a false conclusion.
+
+\end{frame}
+
+\begin{frame}{Transfer to Planta Física}
+
+A plan has 48 decisions; its evaluator returns scalar fitness and checks feasibility. Compare the GA with random search using the same evaluator and budget. Question: what do you archive when replacing the entire population?
+
+\end{frame}
+
+\end{document}

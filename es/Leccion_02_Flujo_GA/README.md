@@ -67,25 +67,10 @@ uv run es/Leccion_02_Flujo_GA/src/ga_flow_01_the_five_phases.py
 
 Autónomo, sin argumentos, figuras guardadas en `../figures/`. Toda la secuencia se ejecuta en aproximadamente **8 s**.
 
-## Contenido de la carpeta
+## Rutas y estado, 25 de septiembre de 2026
 
-```
-Leccion_02_Flujo_GA/
-├── README.md      este archivo — el contrato de la lección
-├── src/           los cinco scripts numerados
-├── figures/       una figura por script (el paso 5 guarda dos)
-```
+- Scripts compartidos: [`src/`](src/), 5 pasos; figuras reproducibles en [`figures/`](figures/).
+- Estudio autónomo: [`estudiante/leccion_02.pdf`](estudiante/leccion_02.pdf) y [`estudiante/leccion_02_flujo_ag.ipynb`](estudiante/leccion_02_flujo_ag.ipynb), con la fuente TeX junto al PDF.
+- Uso docente: [`docente/presentacion/leccion_02_compacta.pdf`](docente/presentacion/leccion_02_compacta.pdf) y [`docente/notebooks/leccion_02_compacta.ipynb`](docente/notebooks/leccion_02_compacta.ipynb). La presentación compacta tiene 9 láminas y la libreta contiene comentarios de guía junto al código.
 
-## Estado
-
-| Pieza | Estado |
-|---|---|
-| Código | Listo. Cinco scripts, todos se ejecutan limpios. |
-| Figuras | Listo. |
-| Diapositivas | No comenzado, bloqueado por la plantilla Beamer del curso. |
-| Espejo en español | Terminado. |
-
-## Cuadernos guiados
-
-Entrada para estudiantes: [`notebooks/README.md`](notebooks/README.md). Esta lección tiene 1 secuencia ejecutable de forma independiente: [`leccion_02_flujo_ag.ipynb`](notebooks/leccion_02_flujo_ag.ipynb). Las salidas retenidas se validaron el date omitted contra los scripts congelados en tres modos de ruta con kernels nuevos; el README de cuadernos registra el entorno y la brecha explícita de Colab alojado.
-
+Las piezas extensas conservan la progresión completa; las compactas son autónomas para una ruta de unos 40 minutos. Los ejemplos son sintéticos. La aplicación al reto de Planta Física es una decisión de modelación, no un resultado validado por el socio. La distribución estudiantil sigue bloqueada hasta acreditar derechos del material derivado de Gridin. No se modificó Canvas ni se probó Colab alojado.

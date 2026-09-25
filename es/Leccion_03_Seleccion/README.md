@@ -58,25 +58,10 @@ uv run es/Leccion_03_Seleccion/src/presion_seleccion_01_la_poblacion.py
 
 Cada script es independiente, no recibe argumentos, y guarda su figura en `../figures/` bajo su propio nombre. Toda la secuencia se ejecuta en aproximadamente **16 s** (2,000 muestras por medición es lo que compra los promedios estables).
 
-## Contenido de la carpeta
+## Rutas y estado, 25 de septiembre de 2026
 
-```
-Leccion_03_Seleccion/
-├── README.md      este archivo — el contrato de la lección
-├── src/           los seis scripts numerados
-├── figures/       una figura por script
-```
+- Scripts compartidos: [`src/`](src/), 6 pasos; figuras reproducibles en [`figures/`](figures/).
+- Estudio autónomo: [`estudiante/leccion_03.pdf`](estudiante/leccion_03.pdf) y [`estudiante/leccion_03_presion_seleccion.ipynb`](estudiante/leccion_03_presion_seleccion.ipynb), con la fuente TeX junto al PDF.
+- Uso docente: [`docente/presentacion/leccion_03_compacta.pdf`](docente/presentacion/leccion_03_compacta.pdf) y [`docente/notebooks/leccion_03_compacta.ipynb`](docente/notebooks/leccion_03_compacta.ipynb). La presentación compacta tiene 9 láminas y la libreta contiene comentarios de guía junto al código.
 
-## Estado
-
-| Pieza | Estado |
-|---|---|
-| Código | Terminado. Seis scripts, todos ejecutan limpiamente, una figura cada uno. |
-| Figuras | Terminado — seis, cada una nombrada según el script que la produce. |
-| Diapositivas | No iniciado, bloqueado por la plantilla Beamer del curso. |
-| Espejo español | Terminado. |
-
-## Cuadernos guiados
-
-Entrada para estudiantes: [`notebooks/README.md`](notebooks/README.md). Esta lección tiene 1 secuencia ejecutable de forma independiente: [`leccion_03_presion_seleccion.ipynb`](notebooks/leccion_03_presion_seleccion.ipynb). Las salidas retenidas se validaron el date omitted contra los scripts congelados en tres modos de ruta con kernels nuevos; el README de cuadernos registra el entorno y la brecha explícita de Colab alojado.
-
+Las piezas extensas conservan la progresión completa; las compactas son autónomas para una ruta de unos 40 minutos. Los ejemplos son sintéticos. La aplicación al reto de Planta Física es una decisión de modelación, no un resultado validado por el socio. La distribución estudiantil sigue bloqueada hasta acreditar derechos del material derivado de Gridin. No se modificó Canvas ni se probó Colab alojado.
