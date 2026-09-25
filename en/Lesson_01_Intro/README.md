@@ -63,3 +63,11 @@ uv run python 02-lecciones/en/Lesson_01_Intro/src/first_example_01_the_landscape
 Each script runs without arguments or imports from other steps, saves its PNG relative to its own location and closes figures. With a headless backend, use `MPLBACKEND=Agg`. The notebook saves figures relative to the kernel working directory and embeds them in its outputs.
 
 The academic source is Ivan Gridin, *Learning Genetic Algorithms with Python*, Chapter 1. The course preserves its algorithmic sequence while adding independent increments and explanatory material. See the extensive materials for derivations, syntax examples and the connection to engineering design decisions.
+
+## 2026-09-25 · compact code guidance
+
+Every code cell in the compact instructor notebook now carries explanatory comments beside the relevant operation. The executable Python and saved outputs were preserved; a fresh run reproduced the saved outputs. Student materials were not changed.
+
+| Notebook | Code cells | SHA-256 |
+|---|---:|---|
+| [lesson_01_intro_compact.ipynb](notebooks/lesson_01_intro_compact.ipynb) | 7 | 5543AEBB830CEDA86A3D5C63E9B78EEC2F8C6A69C5C9A6AFC8E57A0A7E93C89A |

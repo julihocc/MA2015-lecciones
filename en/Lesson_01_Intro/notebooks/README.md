@@ -21,3 +21,11 @@ Keep baseline parameters and seeds for the first run. The extensive notebook exp
 The script's mutation figure shows an unbounded proposal density; the notebook shows a histogram of sampled, clipped proposals. Both use the same samples and arrival criterion. Neither a density height nor a finite observed fraction is a guaranteed probability for another run.
 
 The current revision has passed two isolated local executions per notebook. Both notebooks also passed Run All on new hosted Google Colab CPU runtimes on 22 September 2026 (Python 3.13.15, NumPy 2.1.3, Matplotlib 3.10.0), including the final baseline and reproducibility assertions.
+
+## 2026-09-25 · compact code guidance
+
+Every code cell in the compact instructor notebook now carries explanatory comments beside the relevant operation. The executable Python and saved outputs were preserved; a fresh run reproduced the saved outputs. Student materials were not changed.
+
+| Notebook | Code cells | SHA-256 |
+|---|---:|---|
+| [lesson_01_intro_compact.ipynb](lesson_01_intro_compact.ipynb) | 7 | 5543AEBB830CEDA86A3D5C63E9B78EEC2F8C6A69C5C9A6AFC8E57A0A7E93C89A |

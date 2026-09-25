@@ -1,7 +1,4 @@
-# Lecciones en español
-
-Este directorio contiene la secuencia de lecciones en español con ejemplos
-ejecutables, figuras, cuadernos y diapositivas.
+# Materiales de lección · notebooks
 
 ## 25/09/2026 · comentarios guía en compactos
 
@@ -9,4 +6,4 @@ Cada celda de código de la libreta compacta docente contiene ahora comentarios 
 
 | Libreta | Celdas de código | SHA-256 |
 |---|---:|---|
-| [leccion_01_intro_compacta.ipynb](Leccion_01_Intro/docente/notebooks/leccion_01_intro_compacta.ipynb) | 7 | 0415662E2DC36935A27646EC3EA9AEA79E38E22386E47712667C4AAE8E70F577 |
+| [leccion_01_intro_compacta.ipynb](leccion_01_intro_compacta.ipynb) | 7 | 0415662E2DC36935A27646EC3EA9AEA79E38E22386E47712667C4AAE8E70F577 |
